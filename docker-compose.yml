@@ -1,0 +1,43 @@
+version: '3.9'
+
+services:
+  webserv:
+    container_name: webserv
+    build: frontend
+    restart: always
+    networks:
+      front:
+      back:
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+  db:
+    container_name: postgresql
+    restart: always
+    image: postgres:14.3-alpine
+    networks:
+      back:
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  nestjs:
+    depends_on:
+      - db
+    container_name: nestjs
+    restart: always
+    build: backend
+    networks:
+      back:
+
+volumes:
+  db: { }
+  caddy_data: {}
+  caddy_config: {}
+
+networks:
+  front:
+  back:
