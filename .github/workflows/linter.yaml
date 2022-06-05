@@ -43,4 +43,4 @@ jobs:
           cache: 'yarn'
           cache-dependency-path: 'frontend/yarn.lock'
       - run: yarn install --immutable
-      - run: yarn run lint
+      - run: yarn run lint && yarn run check

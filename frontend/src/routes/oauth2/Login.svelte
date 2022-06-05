@@ -1,12 +1,11 @@
-<script>
+<script lang="ts">
   import { nanoid } from "nanoid";
 
-  const client_id =
-    "ba3d391399909e1abe4166962a096cbc7c4f8bb9c55a66e764d63fac14521ffc";
-  const redirect_uri = "http://localhost:3000/";
-  const scope = "public";
+  const client_id = encodeURIComponent(import.meta.env.VITE_CLIENT_ID);
+  const redirect_uri = encodeURIComponent(import.meta.env.VITE_REDIRECT_URI);
   const state = nanoid();
   const response_type = "code";
+  const scope = "public";
 
   localStorage.setItem("state", state);
 
