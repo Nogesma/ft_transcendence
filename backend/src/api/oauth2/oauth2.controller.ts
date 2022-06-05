@@ -1,6 +1,6 @@
 import { Controller, HttpStatus, Param, Post, Res } from "@nestjs/common";
 import fetch, { FormData } from "node-fetch";
-import jwt from "jsonwebtoken";
+import { nanoid } from "nanoid";
 
 @Controller("api/oauth2")
 export class Oauth2Controller {
@@ -13,8 +13,6 @@ export class Oauth2Controller {
     data.set("grant_type", "authorization_code");
     data.set("code", params.code);
     data.set("state", params.state);
-
-    console.log(`Received request with code: ${params.code}`);
 
     const tokenResponse = await getOauthToken<{
       access_token: string;
@@ -34,19 +32,15 @@ export class Oauth2Controller {
 
     if (userData === null) response.end(HttpStatus.UNAUTHORIZED);
 
-    createAuthenticateUser(userData);
-    console.log(userData.id, userData.login);
+    const token = createAuthenticateUser(userData);
 
     response.end(
       JSON.stringify({
-        accessToken: jwt.sign({ token: access_token }, process.env.JWT_SECRET),
+        sessionToken: token,
       })
     );
   }
 }
-
-// const base64Encode = (s) => Buffer.from(s, "utf-8").toString("base64");
-// const base64Decode = (s) => Buffer.from(s, "base64").toString("utf-8");
 
 function getOauthToken<T>(body): Promise<T> | null {
   return fetch("https://api.intra.42.fr/oauth/token", {
@@ -74,5 +68,6 @@ const createAuthenticateUser = ({ id, login, displayname, image_url }) => {
   login;
   displayname;
   image_url;
-  return;
+  // todo create user if not exist, add nanoid to session token table
+  return nanoid();
 };
