@@ -1,6 +1,8 @@
 localhost {
-    precompressed br zstd gzip
-    encode br zstd gzip
-    file_server
-    reverse_proxy /api/* nestjs:3000
+    encode zstd gzip
+    root * dist
+    file_server {
+        precompressed br zstd gzip
+    }
+    reverse_proxy /api/* localhost:3000
 }

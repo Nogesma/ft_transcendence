@@ -1,12 +1,14 @@
+// todo: fix need to add .js extension to imports (we cannot use commonjs as node-fetch doesn't support it anymore)
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "es2020",
+    "moduleResolution": "nodenext",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2017",
+    "target": "es2020",
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
@@ -16,6 +18,7 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "strict": true
   }
 }
