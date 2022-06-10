@@ -16,6 +16,7 @@
     localStorage.removeItem("state");
   }
 
+  //todo: 2fa
   const postOauth = async (c: string, s: string) => {
     const res = await fetch(
       `${import.meta.env.VITE_BACKEND_URI}/api/oauth2/${c}/${s}`,
@@ -25,9 +26,6 @@
     );
 
     if (res.ok) {
-      const json = await res.json();
-      console.log("json:", json);
-      localStorage.setItem("token", json.sessionToken);
       window.history.replaceState({}, document.title, "/");
       replace("/");
     }
