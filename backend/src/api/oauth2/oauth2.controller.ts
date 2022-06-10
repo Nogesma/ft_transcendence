@@ -1,6 +1,7 @@
 import { Controller, HttpStatus, Param, Post, Res } from "@nestjs/common";
 import fetch, { FormData } from "node-fetch";
 import { nanoid } from "nanoid";
+import dayjs from "dayjs";
 
 @Controller("api/oauth2")
 export class Oauth2Controller {
@@ -14,16 +15,13 @@ export class Oauth2Controller {
     data.set("code", params.code);
     data.set("state", params.state);
 
-    const tokenResponse = await getOauthToken<{
-      access_token: string;
-      refresh_token: string;
-    }>(data);
+    const tokenResponse = await getOauthToken<{ access_token: string }>(data);
 
     if (tokenResponse === null) response.end(HttpStatus.UNAUTHORIZED);
 
     const { access_token } = tokenResponse;
 
-    const userData = await getUserData<{
+    const userData = await get42UserData<{
       id: number;
       login: string;
       displayname: string;
@@ -34,11 +32,12 @@ export class Oauth2Controller {
 
     const token = createAuthenticateUser(userData);
 
-    response.end(
-      JSON.stringify({
-        sessionToken: token,
-      })
-    );
+    response.cookie("token", token, {
+      expires: dayjs().add(1, "M").toDate(),
+      sameSite: "strict",
+    });
+
+    response.end();
   }
 }
 
@@ -52,7 +51,7 @@ function getOauthToken<T>(body): Promise<T> | null {
   });
 }
 
-function getUserData<T>(token): Promise<T> | null {
+function get42UserData<T>(token): Promise<T> | null {
   return fetch("https://api.intra.42.fr/v2/me", {
     headers: {
       authorization: `Bearer ${token}`,
@@ -63,6 +62,7 @@ function getUserData<T>(token): Promise<T> | null {
   });
 }
 
+/** We should only use id/login to authenticate user, as all other fields can be modified */
 const createAuthenticateUser = ({ id, login, displayname, image_url }) => {
   id;
   login;

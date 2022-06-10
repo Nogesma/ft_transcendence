@@ -1,6 +1,8 @@
 <script lang="ts">
   import logo from "../assets/svelte.png";
   import Counter from "../lib/Counter.svelte";
+
+  // todo: fetch /api/me to get user data, if 401, redirect to login page
 </script>
 
 <main>
