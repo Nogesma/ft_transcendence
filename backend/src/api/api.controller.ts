@@ -16,6 +16,7 @@ export class ApiController {
 
 // todo: actually fetch db to get username, displayname
 const getUser = (id) => {
+  id;
   return {
     username: "msegrans",
     displayname: "Mano Ségransan",
