@@ -48,7 +48,7 @@ export class Oauth2Controller {
     const uid = getUserBy2FAToken(token);
     if (!uid) return res.status(HttpStatus.UNAUTHORIZED).end();
 
-    const { secret, retries } = getUser2FASecret(uid);
+    const { secret } = getUser2FASecret(uid);
 
     const hasValidCode = speakeasy.totp.verify({
       secret: secret,
@@ -58,14 +58,7 @@ export class Oauth2Controller {
       algorithm: "sha256",
     });
 
-    // We return 401 if code is not valid, but keep the 2fa temporary token
-    // in the database to allow for more tries.
-    // One the number of retries reach 0, we send a 403.
-    if (!hasValidCode) {
-      if (retries == 0) return res.status(HttpStatus.FORBIDDEN).end();
-
-      return res.status(HttpStatus.UNAUTHORIZED).end();
-    }
+    if (!hasValidCode) return res.status(HttpStatus.UNAUTHORIZED).end();
 
     removeTemporary2FAToken(uid);
 
@@ -74,19 +67,12 @@ export class Oauth2Controller {
 }
 
 const getUser2FASecret = (id) => {
-  const [secret, retries] = ["abc", 1];
+  const [secret] = ["abc"];
 
-  if (retries == 1) removeTemporary2FAToken(id);
-  updateTemporary2FAToken(id);
-
-  return { secret, retries: retries - 1 };
+  return { secret };
 };
 
 const removeTemporary2FAToken = (id) => {
-  id;
-};
-
-const updateTemporary2FAToken = (id) => {
   id;
 };
 
@@ -97,10 +83,10 @@ const getUserBy2FAToken = (token) => {
 };
 
 const createUserSession = (response, uid) => {
-  const token = createSessionToken(uid);
+  const { token, expires } = createSessionToken(uid);
 
   response.cookie("token", token, {
-    expires: dayjs().add(1, "M").toDate(),
+    expires,
     sameSite: "strict",
     signed: true,
     httpOnly: true,
@@ -113,17 +99,19 @@ const createUserSession = (response, uid) => {
 const create2FAToken = (id) => {
   id;
 
-  return nanoid();
+  return { token: nanoid(), expires: dayjs().add(10, "minutes").toDate() };
 };
 
 const create2FATemporaryToken = (response, uid) => {
-  const token = create2FAToken(uid);
+  const { token, expires } = create2FAToken(uid);
 
   response.cookie("2fa", token, {
+    expires,
     sameSite: "strict",
     signed: true,
     httpOnly: true,
   });
+
   response.status(HttpStatus.I_AM_A_TEAPOT).end();
 };
 
@@ -160,7 +148,8 @@ const createUser = ({ id, login, displayname, image_url }) => {
 const createSessionToken = (id) => {
   id;
   // todo create user if not exist, add nanoid to session token table
-  return nanoid();
+
+  return { token: nanoid(), expires: dayjs().add(1, "M").toDate() };
 };
 
 const has2FAEnabled = (id) => {
