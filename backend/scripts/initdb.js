@@ -2,6 +2,28 @@ import pkg from "pg";
 
 const { Client } = pkg;
 
+const createdb = async () => {
+  const client = new Client({
+    user: process.env.USER,
+    host: "localhost",
+    password: "",
+    port: 5432,
+    database: "template1",
+  });
+  client.connect();
+  await client.query(`CREATE DATABASE ${process.env.DB_NAME}`).catch(() => {
+    console.error("DB already exist");
+  });
+  await client
+    .query(
+      `CREATE USER ${process.env.DB_USER} with password '${process.env.DB_PASSWORD}'`
+    )
+    .catch(() => {
+      console.error("User already exist");
+    });
+  await client.end();
+};
+
 const initdb = async () => {
   const client = new Client({
     user: process.env.DB_USER,
@@ -12,17 +34,6 @@ const initdb = async () => {
   });
 
   client.connect();
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  await client.query(`CREATE DATABASE ${process.env.DB_NAME}`).catch(() => {
-    console.log("DB already exist");
-  });
-  await client
-    .query(
-      `CREATE USER ${process.env.DB_USER} with password '${process.env.DB_PASSWORD}'`
-    )
-    .catch(() => {
-      console.log("User already exist");
-    });
   await client
     .query(
       `
@@ -34,8 +45,19 @@ const initdb = async () => {
     );`
     )
     .catch(() => {
-      console.log("Table already exist");
+      console.error("Table already exist");
+    });
+  await client
+    .query(
+      `CREATE TABLE "Session" (
+          "id" int PRIMARY KEY,
+          "token" varchar UNIQUE
+    );`
+    )
+    .catch(() => {
+      console.error("Second table already exist");
     });
   await client.end();
 };
+await createdb();
 await initdb();
