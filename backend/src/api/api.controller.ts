@@ -8,9 +8,9 @@ export class ApiController {
 
     if (uid === null) response.status(HttpStatus.UNAUTHORIZED).end();
 
-    const { username, displayname } = getUser(uid);
+    const { username, displayname, image_url } = getUser(uid);
 
-    response.end(JSON.stringify({ username, displayname }));
+    response.end(JSON.stringify({ username, displayname, image_url }));
   }
 }
 
@@ -20,5 +20,6 @@ const getUser = (id) => {
   return {
     username: "msegrans",
     displayname: "Mano Ségransan",
+    image_url: "https://cdn.intra.42.fr/users/msegrans.jpg",
   };
 };

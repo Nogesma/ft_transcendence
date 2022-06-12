@@ -1,4 +1,3 @@
-// todo: fix need to add .js extension to imports (we cannot use commonjs as node-fetch doesn't support it anymore)
 {
   "compilerOptions": {
     "module": "es2020",

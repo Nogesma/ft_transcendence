@@ -3,7 +3,6 @@ import fetch, { FormData } from "node-fetch";
 import { nanoid } from "nanoid";
 import dayjs from "dayjs";
 import speakeasy from "speakeasy";
-import { response } from "express";
 
 @Controller("api/auth")
 export class Oauth2Controller {
@@ -35,14 +34,14 @@ export class Oauth2Controller {
 
     const uid = createUser(userData);
 
-    if (has2FAEnabled(uid)) return create2FATemporaryToken(response, uid);
+    if (has2FAEnabled(uid)) return create2FATemporaryToken(res, uid);
 
     return createUserSession(res, uid);
   }
 
   @Post("2fa/:code")
   async authenticate2FA(@Req() req, @Res() res, @Param() params) {
-    const token = req?.cookies["2fa"];
+    const token = req.signedCookies ? req.signedCookies["2fa"] : null;
 
     if (!token) return res.status(HttpStatus.UNAUTHORIZED).end();
 
@@ -78,9 +77,17 @@ const getUser2FASecret = (id) => {
   const [secret, retries] = ["abc", 1];
 
   if (retries == 1) removeTemporary2FAToken(id);
-  updateTemporary2FAToken();
+  updateTemporary2FAToken(id);
 
   return { secret, retries: retries - 1 };
+};
+
+const removeTemporary2FAToken = (id) => {
+  id;
+};
+
+const updateTemporary2FAToken = (id) => {
+  id;
 };
 
 const getUserBy2FAToken = (token) => {
@@ -95,16 +102,28 @@ const createUserSession = (response, uid) => {
   response.cookie("token", token, {
     expires: dayjs().add(1, "M").toDate(),
     sameSite: "strict",
+    signed: true,
+    httpOnly: true,
   });
 
   response.end();
   response.status(HttpStatus.I_AM_A_TEAPOT).end();
 };
 
+const create2FAToken = (id) => {
+  id;
+
+  return nanoid();
+};
+
 const create2FATemporaryToken = (response, uid) => {
   const token = create2FAToken(uid);
 
-  response.cookie("2fa", token, { sameSite: "strict" });
+  response.cookie("2fa", token, {
+    sameSite: "strict",
+    signed: true,
+    httpOnly: true,
+  });
   response.status(HttpStatus.I_AM_A_TEAPOT).end();
 };
 

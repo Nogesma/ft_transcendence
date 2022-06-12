@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { querystring, replace } from "svelte-spa-router";
+  import { push, querystring, replace } from "svelte-spa-router";
 
   const urlParams = new URLSearchParams($querystring);
   const code = urlParams.get("code");
@@ -16,16 +16,18 @@
     localStorage.removeItem("state");
   }
 
-  //todo: 2fa
   const postOauth = async (c: string, s: string) => {
     const res = await fetch(
-      `${import.meta.env.VITE_BACKEND_URI}/api/oauth2/${c}/${s}`,
+      `${import.meta.env.VITE_BACKEND_URI}/api/auth/oauth2/${c}/${s}`,
       {
         method: "POST",
+        credentials: "include",
       }
     );
 
-    if (res.ok) {
+    if (res.status == 418) {
+      push("#/auth/2fa");
+    } else {
       window.history.replaceState({}, document.title, "/");
       replace("/");
     }
