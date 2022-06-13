@@ -54,8 +54,8 @@ export class Oauth2Controller {
       secret: secret,
       encoding: "base32",
       token: params.code,
-      window: 2,
-      algorithm: "sha256",
+      window: 1,
+      algorithm: "sha512",
     });
 
     if (!hasValidCode) return res.status(HttpStatus.UNAUTHORIZED).end();
@@ -93,7 +93,6 @@ const createUserSession = (response, uid) => {
   });
 
   response.end();
-  response.status(HttpStatus.I_AM_A_TEAPOT).end();
 };
 
 const create2FAToken = (id) => {
