@@ -22,9 +22,10 @@ export class ApiController {
   async getUserData(@Req() req, @Res() res) {
     const uid = req?.uid;
 
-    if (uid === null) return res.status(HttpStatus.UNAUTHORIZED).end();
+    if (!uid) return res.status(HttpStatus.UNAUTHORIZED).end();
 
-    const { username, displayname, image_url } = await getUser(uid);
+    console.log({ uid });
+    const { username, displayname, image_url } = (await getUser(uid)).toJSON();
 
     res.json({ username, displayname, image_url }).end();
   }
@@ -33,7 +34,7 @@ export class ApiController {
   async generateNew2FA(@Req() req, @Res() res) {
     const uid = req?.uid;
 
-    if (uid === null) return res.status(HttpStatus.UNAUTHORIZED).end();
+    if (!uid) return res.status(HttpStatus.UNAUTHORIZED).end();
 
     const secret = speakeasy.generateSecret().base32;
 
@@ -43,7 +44,7 @@ export class ApiController {
       secret: secret,
       encoding: "base32",
       algorithm: "sha512",
-      label: await getUser(uid).login,
+      label: await (await getUser(uid)).toJSON().login,
       issuer: "ft_transcendence",
     });
 
@@ -54,9 +55,9 @@ export class ApiController {
   async validate2FA(@Req() req, @Res() res, @Param() params) {
     const uid = req?.uid;
 
-    if (uid === null) return res.status(HttpStatus.UNAUTHORIZED).end();
+    if (!uid) return res.status(HttpStatus.UNAUTHORIZED).end();
 
-    const { secret } = get2FASecret(uid);
+    const { secret } = (await get2FASecret(uid)).toJSON();
 
     const hasValidCode = speakeasy.totp.verify({
       secret: secret,

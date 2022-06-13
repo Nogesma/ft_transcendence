@@ -6,15 +6,18 @@ import TwoFactorSecrets from "../models/TwoFactorSecrets.js";
 const newUser = (id, login, displayname, image_url, tfa = false) =>
   Users.create({ id, login, displayname, image_url, tfa });
 
-const getUser = (id) => Users.findOne({ id });
+const getUser = (id) => Users.findByPk(id);
 
 const newSession = (id, token, expires) =>
   Sessions.create({ id, token, expires });
 
+const getSession = (token) => Sessions.findOne({ where: { token } });
+
 const new2FAToken = (id, token, expires) =>
   Temporary2FATokens.create({ id, token, expires });
 
-const getTemporary2FAToken = (token) => Temporary2FATokens.findOne({ token });
+const getTemporary2FAToken = (token) =>
+  Temporary2FATokens.findOne({ where: { token } });
 
 const set2FASecret = (id, secret, temp = true) =>
   TwoFactorSecrets.create({ id, secret, temp });
@@ -24,7 +27,7 @@ const setPermanent2FASecret = (id) =>
 
 const enableUser2FA = (id) => Users.update({ id }, { tfa: true });
 
-const get2FASecret = (id) => TwoFactorSecrets.findOne({ id });
+const get2FASecret = (id) => TwoFactorSecrets.findByPk(id);
 
 const destroyTemporary2FAToken = (opt) => Temporary2FATokens.destroy(opt);
 
@@ -39,4 +42,5 @@ export {
   newSession,
   new2FAToken,
   destroyTemporary2FAToken,
+  getSession,
 };

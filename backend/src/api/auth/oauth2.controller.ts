@@ -27,8 +27,7 @@ export class Oauth2Controller {
 
     const tokenResponse = await getOauthToken<{ access_token: string }>(data);
 
-    if (tokenResponse === null)
-      return res.status(HttpStatus.UNAUTHORIZED).end();
+    if (!tokenResponse) return res.status(HttpStatus.UNAUTHORIZED).end();
 
     const { access_token } = tokenResponse;
 
@@ -39,7 +38,7 @@ export class Oauth2Controller {
       image_url: string;
     }>(access_token);
 
-    if (userData === null) return res.status(HttpStatus.UNAUTHORIZED).end();
+    if (!userData) return res.status(HttpStatus.UNAUTHORIZED).end();
 
     const user = await createUser(userData);
 
@@ -54,12 +53,12 @@ export class Oauth2Controller {
 
     if (!token) return res.status(HttpStatus.UNAUTHORIZED).end();
 
-    const tempToken = await getTemporary2FAToken(token);
+    const tempToken = (await getTemporary2FAToken(token)).toJSON();
 
     if (!tempToken || isExpired(tempToken.expires))
       return res.status(HttpStatus.UNAUTHORIZED).end();
 
-    const { secret, temp } = get2FASecret(tempToken.id);
+    const { secret, temp } = (await get2FASecret(tempToken.id)).toJSON();
 
     if (temp) return res.status(HttpStatus.UNAUTHORIZED).end();
 
@@ -135,7 +134,7 @@ function get42UserData<T>(token): Promise<T> | null {
 }
 
 const createUser = async ({ id, login, displayname, image_url }) => {
-  const user = await getUser(id);
+  const user = (await getUser(id)).toJSON();
 
   if (!user) return newUser(id, login, displayname, image_url, false);
 

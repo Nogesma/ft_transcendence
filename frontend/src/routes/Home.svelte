@@ -5,7 +5,9 @@
   let displayName: string, profilePicture: string;
 
   const getUserData = async () => {
-    const res = await fetch(`${import.meta.env.VITE_BACKEND_URI}/api/me`);
+    const res = await fetch(`${import.meta.env.VITE_BACKEND_URI}/api/me`, {
+      credentials: "include",
+    });
 
     if (res.ok) {
       const json = await res.json();
