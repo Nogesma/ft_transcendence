@@ -1,5 +1,4 @@
 import pkg from "pg";
-
 const { Client } = pkg;
 
 const createdb = async () => {
@@ -37,26 +36,51 @@ const initdb = async () => {
   await client
     .query(
       `
-    CREATE TABLE "users" (
+    CREATE TABLE "Users" (
 	    "id" int PRIMARY KEY,
 	    "login" VARCHAR unique,
 	    "displayname" VARCHAR unique,
-	    "image_url" varchar
+	    "image_url" varchar,
+	    "tfa" boolean
     );`
     )
     .catch(() => {
       console.error("Table already exist");
     });
+
   await client
     .query(
-      `CREATE TABLE "Session" (
-          "id" int PRIMARY KEY,
-          "token" varchar UNIQUE
+      `CREATE TABLE "Sessions" (
+          "id" int,
+          FOREIGN KEY (id) REFERENCES "Users" (id),
+          "token" varchar UNIQUE,
+          "expire" timestamp
     );`
     )
-    .catch(() => {
-      console.error("Second table already exist");
-    });
+    .catch(console.error);
+
+  await client
+    .query(
+      `CREATE TABLE "TwoFactorSecrets" (
+          "id" int,
+          FOREIGN KEY (id) REFERENCES "Users" (id),
+          "secret" varchar UNIQUE,
+          "temp" boolean
+    );`
+    )
+    .catch(console.error);
+
+  await client
+    .query(
+      `CREATE TABLE "Temporary2FATokens" (
+          "id" int,
+          FOREIGN KEY (id) REFERENCES "Users" (id),
+          "token" varchar UNIQUE,
+          "expire" timestamp
+    );`
+    )
+    .catch(console.error);
+
   await client.end();
 };
 await createdb();
