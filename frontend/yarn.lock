@@ -202,15 +202,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/speakeasy@npm:^2.0.7":
-  version: 2.0.7
-  resolution: "@types/speakeasy@npm:2.0.7"
-  dependencies:
-    "@types/node": "*"
-  checksum: 30152d950ea23654060ef596ea459935a9ea80ba4d9803b13fc9b02c7a27a7b5c96742f2cb00db51b19ba0e13ef9a16c1fd977042f61c9019b10c4191e2f1b97
-  languageName: node
-  linkType: hard
-
 "@typescript-eslint/eslint-plugin@npm:^5.27.1":
   version: 5.27.1
   resolution: "@typescript-eslint/eslint-plugin@npm:5.27.1"
@@ -456,13 +447,6 @@ __metadata:
   version: 1.0.2
   resolution: "balanced-match@npm:1.0.2"
   checksum: 9706c088a283058a8a99e0bf91b0a2f75497f185980d9ffa8b304de1d9e58ebda7c72c07ebf01dadedaac5b2907b2c6f566f660d62bd336c3468e960403b9d65
-  languageName: node
-  linkType: hard
-
-"base32.js@npm:0.0.1":
-  version: 0.0.1
-  resolution: "base32.js@npm:0.0.1"
-  checksum: 74e520ca832b034c43c0996f52ffa29792fa2f2bb2b75fc8415fb6cd42194a486cac8a68531d73e401ae836194093e2746f7c4325e860ff0a6de8d05a54af132
   languageName: node
   linkType: hard
 
@@ -1256,7 +1240,6 @@ __metadata:
     "@sveltejs/vite-plugin-svelte": ^1.0.0-next.49
     "@tsconfig/svelte": ^3.0.0
     "@types/qrcode": ^1.4.2
-    "@types/speakeasy": ^2.0.7
     "@typescript-eslint/eslint-plugin": ^5.27.1
     "@typescript-eslint/parser": ^5.27.1
     eslint: ^8.17.0
@@ -1267,7 +1250,6 @@ __metadata:
     prettier-plugin-svelte: ^2.7.0
     qrcode: ^1.5.0
     ramda: ^0.28.0
-    speakeasy: ^2.0.0
     svelte: ^3.48.0
     svelte-check: ^2.7.2
     svelte-preprocess: ^4.10.7
@@ -2463,15 +2445,6 @@ __metadata:
   version: 1.4.8
   resolution: "sourcemap-codec@npm:1.4.8"
   checksum: b57981c05611afef31605732b598ccf65124a9fcb03b833532659ac4d29ac0f7bfacbc0d6c5a28a03e84c7510e7e556d758d0bb57786e214660016fb94279316
-  languageName: node
-  linkType: hard
-
-"speakeasy@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "speakeasy@npm:2.0.0"
-  dependencies:
-    base32.js: 0.0.1
-  checksum: 2a44aa4336cd39a0dcdc051c7adcd3fc76fdba239dc1ded50052164c9d80d773183827934a62850a5fb7a7a19f13bf5561ec88bd23777c6d228c4aaa175bea1a
   languageName: node
   linkType: hard
 

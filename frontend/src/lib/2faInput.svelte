@@ -1,7 +1,7 @@
 <script lang="ts">
   import { replace } from "svelte-spa-router";
 
-  export let url;
+  export let url: string;
 
   let s: string;
   let error: string = "";

@@ -67,6 +67,7 @@ export class Oauth2Controller {
 }
 
 const getUser2FASecret = (id) => {
+  id;
   const [secret] = ["abc"];
 
   return { secret };
