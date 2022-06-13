@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import sequelize from "../database/startDB.js";
+import sequelize from "../database/db.js";
 
 const Temporary2FATokens = sequelize.define("Sessions", {
   id: {
@@ -16,8 +16,7 @@ const Temporary2FATokens = sequelize.define("Sessions", {
     unique: true,
     allowNull: false,
   },
-
-  expire: {
+  expires: {
     type: "TIMESTAMP",
     allowNull: false,
   },

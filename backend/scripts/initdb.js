@@ -54,7 +54,7 @@ const initdb = async () => {
           "id" int,
           FOREIGN KEY (id) REFERENCES "Users" (id),
           "token" varchar UNIQUE,
-          "expire" timestamp
+          "expires" timestamp
     );`
     )
     .catch(console.error);
@@ -76,7 +76,7 @@ const initdb = async () => {
           "id" int,
           FOREIGN KEY (id) REFERENCES "Users" (id),
           "token" varchar UNIQUE,
-          "expire" timestamp
+          "expires" timestamp
     );`
     )
     .catch(console.error);

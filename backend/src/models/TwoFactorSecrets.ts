@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import sequelize from "../database/startDB.js";
+import sequelize from "../database/db.js";
 
 const TwoFactorSecrets = sequelize.define("Sessions", {
   id: {
@@ -16,7 +16,6 @@ const TwoFactorSecrets = sequelize.define("Sessions", {
     unique: true,
     allowNull: false,
   },
-
   temp: {
     type: DataTypes.BOOLEAN,
     allowNull: false,

@@ -8,6 +8,13 @@ import {
   Param,
 } from "@nestjs/common";
 import speakeasy from "speakeasy";
+import {
+  enableUser2FA,
+  get2FASecret,
+  getUser,
+  set2FASecret,
+  setPermanent2FASecret,
+} from "../database/controller.js";
 
 @Controller("api")
 export class ApiController {
@@ -17,7 +24,7 @@ export class ApiController {
 
     if (uid === null) return res.status(HttpStatus.UNAUTHORIZED).end();
 
-    const { username, displayname, image_url } = getUser(uid);
+    const { username, displayname, image_url } = await getUser(uid);
 
     res.json({ username, displayname, image_url }).end();
   }
@@ -30,13 +37,13 @@ export class ApiController {
 
     const secret = speakeasy.generateSecret().base32;
 
-    setTemporary2FASecret(uid, secret);
+    await set2FASecret(uid, secret);
 
     const otpauthURL = speakeasy.otpauthURL({
       secret: secret,
       encoding: "base32",
       algorithm: "sha512",
-      label: getUser(1).username,
+      label: await getUser(uid).login,
       issuer: "ft_transcendence",
     });
 
@@ -49,7 +56,7 @@ export class ApiController {
 
     if (uid === null) return res.status(HttpStatus.UNAUTHORIZED).end();
 
-    const { secret } = getTemporary2FASecret(uid);
+    const { secret } = get2FASecret(uid);
 
     const hasValidCode = speakeasy.totp.verify({
       secret: secret,
@@ -67,32 +74,3 @@ export class ApiController {
     res.end();
   }
 }
-
-// todo: actually fetch db to get username, displayname
-const getUser = (id) => {
-  id;
-  return {
-    username: "msegrans",
-    displayname: "Mano Ségransan",
-    image_url: "https://cdn.intra.42.fr/users/msegrans.jpg",
-  };
-};
-
-const setTemporary2FASecret = (id, secret) => {
-  id;
-  secret;
-};
-
-const getTemporary2FASecret = (id) => {
-  id;
-
-  return { secret: "abc" };
-};
-
-const setPermanent2FASecret = (id) => {
-  id;
-};
-
-const enableUser2FA = (id) => {
-  id;
-};
