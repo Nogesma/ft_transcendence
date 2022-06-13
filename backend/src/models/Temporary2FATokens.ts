@@ -1,4 +1,4 @@
-import { Sequelize, DataTypes } from "sequelize";
+import { DataTypes } from "sequelize";
 import sequelize from "../database/startDB.js";
 
 const Temporary2FATokens = sequelize.define("Sessions", {
