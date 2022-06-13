@@ -35,8 +35,8 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.5.5",
+    "sequelize": "^6.20.1",
     "speakeasy": "^2.0.0"
-    "sequelize": "^6.20.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.2.6",
