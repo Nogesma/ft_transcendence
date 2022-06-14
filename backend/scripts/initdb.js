@@ -3,16 +3,16 @@ const { Client } = pkg;
 
 const createdb = async () => {
   const client = new Client({
-    user: "postgres",
+    user: "lgyger",
     host: "localhost",
     password: "",
     port: 5432,
     database: "template1",
   });
   client.connect();
-  await client.query(`CREATE DATABASE ${process.env.DB_NAME}`).catch(() => {
-    console.error("DB already exist");
-  });
+  await client
+    .query(`CREATE DATABASE ${process.env.DB_NAME}`)
+    .catch(console.error);
   await client
     .query(
       `CREATE USER ${process.env.DB_USER} with password '${process.env.DB_PASSWORD}'`
