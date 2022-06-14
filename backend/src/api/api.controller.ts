@@ -24,7 +24,6 @@ export class ApiController {
 
     if (!uid) return res.status(HttpStatus.UNAUTHORIZED).end();
 
-    console.log({ uid });
     const { username, displayname, image_url } = (await getUser(uid)).toJSON();
 
     res.json({ username, displayname, image_url }).end();

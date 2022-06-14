@@ -1,5 +1,4 @@
 import { Controller, HttpStatus, Param, Post, Req, Res } from "@nestjs/common";
-import fetch, { FormData } from "node-fetch";
 import { nanoid } from "nanoid";
 import dayjs from "dayjs";
 import speakeasy from "speakeasy";
@@ -12,31 +11,28 @@ import {
   newSession,
   newUser,
 } from "../../database/controller.js";
+import { default as axios } from "axios";
 
 @Controller("api/auth")
 export class Oauth2Controller {
   @Post("oauth2/:code/:state")
   async addUser(@Res() res, @Param() params) {
-    const data = new FormData();
-    data.set("redirect_uri", process.env.REDIRECT_URI);
-    data.set("client_id", process.env.CLIENT_ID);
-    data.set("client_secret", process.env.CLIENT_SECRET);
-    data.set("grant_type", "authorization_code");
-    data.set("code", params.code);
-    data.set("state", params.state);
+    const data = {
+      redirect_uri: process.env.REDIRECT_URI,
+      client_id: process.env.CLIENT_ID,
+      client_secret: process.env.CLIENT_SECRET,
+      grant_type: "authorization_code",
+      code: params.code,
+      state: params.state,
+    };
 
-    const tokenResponse = await getOauthToken<{ access_token: string }>(data);
+    const tokenResponse = await getOauthToken(data);
 
     if (!tokenResponse) return res.status(HttpStatus.UNAUTHORIZED).end();
 
     const { access_token } = tokenResponse;
 
-    const userData = await get42UserData<{
-      id: number;
-      login: string;
-      displayname: string;
-      image_url: string;
-    }>(access_token);
+    const userData = await get42UserData(access_token);
 
     if (!userData) return res.status(HttpStatus.UNAUTHORIZED).end();
 
@@ -112,26 +108,25 @@ const create2FATemporaryToken = async (response, id) => {
   response.status(HttpStatus.I_AM_A_TEAPOT).end();
 };
 
-function getOauthToken<T>(body): Promise<T> | null {
-  return fetch("https://api.intra.42.fr/oauth/token", {
-    method: "POST",
-    body,
-  }).then((res) => {
-    if (res.ok) return res.json() as Promise<T>;
-    return null;
-  });
-}
+const getOauthToken = (data) =>
+  axios
+    .post("https://api.intra.42.fr/oauth/token", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .then(({ data }) => data)
+    .catch(() => null);
 
-function get42UserData<T>(token): Promise<T> | null {
-  return fetch("https://api.intra.42.fr/v2/me", {
-    headers: {
-      authorization: `Bearer ${token}`,
-    },
-  }).then((res) => {
-    if (res.ok) return res.json() as Promise<T>;
-    return null;
-  });
-}
+const get42UserData = (token) =>
+  axios
+    .get("https://api.intra.42.fr/v2/me", {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    })
+    .then(({ data }) => data)
+    .catch(() => null);
 
 const createUser = async ({ id, login, displayname, image_url }) => {
   const user = (await getUser(id)).toJSON();
