@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/db.js";
-import { timestamp } from "rxjs";
 
 const Sessions = sequelize.define(
   "Sessions",

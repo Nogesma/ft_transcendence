@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import sequelize from "../database/db.js";
 
 const Temporary2FATokens = sequelize.define(
-  "Sessions",
+  "Temporary2FAToken",
   {
     id: {
       type: DataTypes.INTEGER,

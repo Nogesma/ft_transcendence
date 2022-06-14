@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import sequelize from "../database/db.js";
 
 const TwoFactorSecrets = sequelize.define(
-  "Sessions",
+  "TwoFactorSecret",
   {
     id: {
       type: DataTypes.INTEGER,

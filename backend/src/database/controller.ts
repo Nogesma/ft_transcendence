@@ -23,13 +23,14 @@ const set2FASecret = (id, secret, temp = true) =>
   TwoFactorSecrets.create({ id, secret, temp });
 
 const setPermanent2FASecret = (id) =>
-  TwoFactorSecrets.update({ id }, { temp: false });
+  TwoFactorSecrets.update({ temp: false }, { where: { id } });
 
-const enableUser2FA = (id) => Users.update({ id }, { tfa: true });
+const enableUser2FA = (id) => Users.update({ tfa: true }, { where: { id } });
 
 const get2FASecret = (id) => TwoFactorSecrets.findByPk(id);
 
-const destroyTemporary2FAToken = (opt) => Temporary2FATokens.destroy(opt);
+const destroyTemporary2FAToken = (id) =>
+  Temporary2FATokens.destroy({ where: { id } });
 
 export {
   enableUser2FA,

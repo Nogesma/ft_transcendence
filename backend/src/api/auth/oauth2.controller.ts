@@ -72,7 +72,7 @@ export class Oauth2Controller {
 
     if (!hasValidCode) return res.status(HttpStatus.UNAUTHORIZED).end();
 
-    await destroyTemporary2FAToken(tempToken);
+    await destroyTemporary2FAToken(tempToken.id);
 
     return createUserSession(res, tempToken.id);
   }
