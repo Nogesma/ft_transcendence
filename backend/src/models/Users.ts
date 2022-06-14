@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import sequelize from "../database/startDB.js";
+import sequelize from "../database/db.js";
 
 const Users = sequelize.define(
   "User",
@@ -26,9 +26,7 @@ const Users = sequelize.define(
       allowNull: false,
     },
   },
-  {
-    timestamps: false,
-  }
+  { timestamps: false }
 );
 
 export default Users;

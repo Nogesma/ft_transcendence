@@ -1,42 +1,46 @@
 import { Controller, HttpStatus, Param, Post, Req, Res } from "@nestjs/common";
-import fetch, { FormData } from "node-fetch";
 import { nanoid } from "nanoid";
 import dayjs from "dayjs";
 import speakeasy from "speakeasy";
+import {
+  destroyTemporary2FAToken,
+  get2FASecret,
+  getTemporary2FAToken,
+  getUser,
+  new2FAToken,
+  newSession,
+  newUser,
+} from "../../database/controller.js";
+import { default as axios } from "axios";
 
 @Controller("api/auth")
 export class Oauth2Controller {
   @Post("oauth2/:code/:state")
   async addUser(@Res() res, @Param() params) {
-    const data = new FormData();
-    data.set("redirect_uri", process.env.REDIRECT_URI);
-    data.set("client_id", process.env.CLIENT_ID);
-    data.set("client_secret", process.env.CLIENT_SECRET);
-    data.set("grant_type", "authorization_code");
-    data.set("code", params.code);
-    data.set("state", params.state);
+    const data = {
+      redirect_uri: process.env.REDIRECT_URI,
+      client_id: process.env.CLIENT_ID,
+      client_secret: process.env.CLIENT_SECRET,
+      grant_type: "authorization_code",
+      code: params.code,
+      state: params.state,
+    };
 
-    const tokenResponse = await getOauthToken<{ access_token: string }>(data);
+    const tokenResponse = await getOauthToken(data);
 
-    if (tokenResponse === null)
-      return res.status(HttpStatus.UNAUTHORIZED).end();
+    if (!tokenResponse) return res.status(HttpStatus.UNAUTHORIZED).end();
 
     const { access_token } = tokenResponse;
 
-    const userData = await get42UserData<{
-      id: number;
-      login: string;
-      displayname: string;
-      image_url: string;
-    }>(access_token);
+    const userData = await get42UserData(access_token);
 
-    if (userData === null) return res.status(HttpStatus.UNAUTHORIZED).end();
+    if (!userData) return res.status(HttpStatus.UNAUTHORIZED).end();
 
-    const uid = createUser(userData);
+    const user = await createUser(userData);
 
-    if (has2FAEnabled(uid)) return create2FATemporaryToken(res, uid);
+    if (user.tfa) return create2FATemporaryToken(res, user.id);
 
-    return createUserSession(res, uid);
+    return createUserSession(res, user.id);
   }
 
   @Post("2fa/:code")
@@ -45,10 +49,14 @@ export class Oauth2Controller {
 
     if (!token) return res.status(HttpStatus.UNAUTHORIZED).end();
 
-    const uid = getUserBy2FAToken(token);
-    if (!uid) return res.status(HttpStatus.UNAUTHORIZED).end();
+    const tempToken = (await getTemporary2FAToken(token)).toJSON();
 
-    const { secret } = getUser2FASecret(uid);
+    if (!tempToken || isExpired(tempToken.expires))
+      return res.status(HttpStatus.UNAUTHORIZED).end();
+
+    const { secret, temp } = (await get2FASecret(tempToken.id)).toJSON();
+
+    if (temp) return res.status(HttpStatus.UNAUTHORIZED).end();
 
     const hasValidCode = speakeasy.totp.verify({
       secret: secret,
@@ -60,31 +68,19 @@ export class Oauth2Controller {
 
     if (!hasValidCode) return res.status(HttpStatus.UNAUTHORIZED).end();
 
-    removeTemporary2FAToken(uid);
+    await destroyTemporary2FAToken(tempToken.id);
 
-    return createUserSession(res, uid);
+    return createUserSession(res, tempToken.id);
   }
 }
 
-const getUser2FASecret = (id) => {
-  id;
-  const [secret] = ["abc"];
+const isExpired = (date) => dayjs(date).isBefore(dayjs());
 
-  return { secret };
-};
+const createUserSession = async (response, id) => {
+  const token = nanoid();
+  const expires = dayjs().add(1, "M").toDate();
 
-const removeTemporary2FAToken = (id) => {
-  id;
-};
-
-const getUserBy2FAToken = (token) => {
-  if (token === "abc") return 123;
-
-  return null;
-};
-
-const createUserSession = (response, uid) => {
-  const { token, expires } = createSessionToken(uid);
+  await newSession(id, token, expires);
 
   response.cookie("token", token, {
     expires,
@@ -96,14 +92,11 @@ const createUserSession = (response, uid) => {
   response.end();
 };
 
-const create2FAToken = (id) => {
-  id;
+const create2FATemporaryToken = async (response, id) => {
+  const token = nanoid();
+  const expires = dayjs().add(10, "minutes").toDate();
 
-  return { token: nanoid(), expires: dayjs().add(10, "minutes").toDate() };
-};
-
-const create2FATemporaryToken = (response, uid) => {
-  const { token, expires } = create2FAToken(uid);
+  await new2FAToken(id, token, expires);
 
   response.cookie("2fa", token, {
     expires,
@@ -115,45 +108,30 @@ const create2FATemporaryToken = (response, uid) => {
   response.status(HttpStatus.I_AM_A_TEAPOT).end();
 };
 
-function getOauthToken<T>(body): Promise<T> | null {
-  return fetch("https://api.intra.42.fr/oauth/token", {
-    method: "POST",
-    body,
-  }).then((res) => {
-    if (res.ok) return res.json() as Promise<T>;
-    return null;
-  });
-}
+const getOauthToken = (data) =>
+  axios
+    .post("https://api.intra.42.fr/oauth/token", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .then(({ data }) => data)
+    .catch(() => null);
 
-function get42UserData<T>(token): Promise<T> | null {
-  return fetch("https://api.intra.42.fr/v2/me", {
-    headers: {
-      authorization: `Bearer ${token}`,
-    },
-  }).then((res) => {
-    if (res.ok) return res.json() as Promise<T>;
-    return null;
-  });
-}
+const get42UserData = (token) =>
+  axios
+    .get("https://api.intra.42.fr/v2/me", {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    })
+    .then(({ data }) => data)
+    .catch(() => null);
 
-/** We should only use id/login to authenticate user, as all other fields can be modified */
-const createUser = ({ id, login, displayname, image_url }) => {
-  id;
-  login;
-  displayname;
-  image_url;
-  return id;
-};
+const createUser = async ({ id, login, displayname, image_url }) => {
+  const user = (await getUser(id))?.toJSON();
 
-const createSessionToken = (id) => {
-  id;
-  // todo create user if not exist, add nanoid to session token table
+  if (!user) return newUser(id, login, displayname, image_url, false);
 
-  return { token: nanoid(), expires: dayjs().add(1, "M").toDate() };
-};
-
-const has2FAEnabled = (id) => {
-  id;
-  // todo create user if not exist, add nanoid to session token table
-  return true;
+  return user;
 };
