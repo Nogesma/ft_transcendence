@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { equals } from "ramda";
   import { push, querystring, replace } from "svelte-spa-router";
+  import axios from "axios";
 
   const urlParams = new URLSearchParams($querystring);
   const code = urlParams.get("code");
@@ -16,22 +18,22 @@
     localStorage.removeItem("state");
   }
 
-  const postOauth = async (c: string, s: string) => {
-    const res = await fetch(
-      `${import.meta.env.VITE_BACKEND_URI}/api/auth/oauth2/${c}/${s}`,
-      {
-        method: "POST",
-        credentials: "include",
-      }
-    );
+  const teapot = axios.create({
+    validateStatus: equals(418),
+  });
 
-    if (res.status == 418) {
-      push("#/auth/2fa");
-    } else {
-      window.history.replaceState({}, document.title, "/");
-      replace("/");
-    }
-  };
+  const postOauth = async (c: string, s: string) =>
+    teapot
+      .post(
+        `${import.meta.env.VITE_BACKEND_URI}/api/auth/oauth2/${c}/${s}`,
+        {},
+        { withCredentials: true }
+      )
+      .then(() => push("#/auth/2fa"))
+      .catch(() => {
+        window.history.replaceState({}, document.title, "/");
+        replace("/");
+      });
 </script>
 
 <h1>Callback</h1>

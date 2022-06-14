@@ -1,20 +1,20 @@
 <script lang="ts">
   import { push } from "svelte-spa-router";
   import { onMount } from "svelte";
+  import axios from "axios";
 
   let displayName: string, profilePicture: string;
 
-  const getUserData = async () => {
-    const res = await fetch(`${import.meta.env.VITE_BACKEND_URI}/api/me`, {
-      credentials: "include",
-    });
-
-    if (res.ok) {
-      const json = await res.json();
-      displayName = json.displayname;
-      profilePicture = json.image_url;
-    } else await push("#/auth/login");
-  };
+  const getUserData = async () =>
+    axios
+      .get(`${import.meta.env.VITE_BACKEND_URI}/api/me`, {
+        withCredentials: true,
+      })
+      .then(({ data }) => {
+        displayName = data.displayname;
+        profilePicture = data.image_url;
+      })
+      .catch(() => push("#/auth/login"));
 
   onMount(getUserData);
 </script>

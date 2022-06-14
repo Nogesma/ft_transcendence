@@ -6,6 +6,7 @@ import {
   Res,
   Post,
   Param,
+  Body,
 } from "@nestjs/common";
 import speakeasy from "speakeasy";
 import {
@@ -14,6 +15,7 @@ import {
   getUser,
   set2FASecret,
   setPermanent2FASecret,
+  updateUserName,
 } from "../database/controller.js";
 
 @Controller("api")
@@ -70,6 +72,19 @@ export class ApiController {
 
     setPermanent2FASecret(uid);
     enableUser2FA(uid);
+
+    res.end();
+  }
+
+  @Post("me/name")
+  async updateName(@Req() req, @Res() res, @Body() body) {
+    const uid = req?.uid;
+
+    if (!uid) return res.status(HttpStatus.UNAUTHORIZED).end();
+
+    const { name } = body;
+
+    await updateUserName(uid, name);
 
     res.end();
   }

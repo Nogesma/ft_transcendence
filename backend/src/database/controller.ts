@@ -8,6 +8,11 @@ const newUser = (id, login, displayname, image_url, tfa = false) =>
 
 const getUser = (id) => Users.findByPk(id);
 
+const enableUser2FA = (id) => Users.update({ tfa: true }, { where: { id } });
+
+const updateUserName = (id, displayname) =>
+  Users.update({ displayname }, { where: { id } });
+
 const newSession = (id, token, expires) =>
   Sessions.create({ id, token, expires });
 
@@ -19,18 +24,16 @@ const new2FAToken = (id, token, expires) =>
 const getTemporary2FAToken = (token) =>
   Temporary2FATokens.findOne({ where: { token } });
 
+const destroyTemporary2FAToken = (id) =>
+  Temporary2FATokens.destroy({ where: { id } });
+
 const set2FASecret = (id, secret, temp = true) =>
   TwoFactorSecrets.create({ id, secret, temp });
 
 const setPermanent2FASecret = (id) =>
   TwoFactorSecrets.update({ temp: false }, { where: { id } });
 
-const enableUser2FA = (id) => Users.update({ tfa: true }, { where: { id } });
-
 const get2FASecret = (id) => TwoFactorSecrets.findByPk(id);
-
-const destroyTemporary2FAToken = (id) =>
-  Temporary2FATokens.destroy({ where: { id } });
 
 export {
   enableUser2FA,
@@ -44,4 +47,5 @@ export {
   new2FAToken,
   destroyTemporary2FAToken,
   getSession,
+  updateUserName,
 };
