@@ -1,4 +1,5 @@
 import Home from "./routes/Home.svelte";
+import Chat from "./routes/chat/Chat.svelte";
 import NotFound from "./routes/404.svelte";
 import Login from "./routes/auth/Login.svelte";
 import Callback from "./routes/auth/Callback.svelte";
@@ -12,6 +13,7 @@ export default {
   "/": Home,
   "/chat/join": JoinChannel,
   "/settings": Settings,
+  "/chat": Chat,
   "/settings/2fa": Manage2FA,
   "/settings/username": ManageUserName,
   "/auth/login": Login,

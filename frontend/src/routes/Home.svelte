@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { push } from "svelte-spa-router";
+import { push } from "svelte-spa-router";
   import { onMount } from "svelte";
   import axios from "axios";
   import ChannelManager from "../lib/ChannelManager.svelte";
@@ -22,5 +22,6 @@
   <h1 class="m-auto text-5xl font-bold">
     {localStorage.getItem("displayname")}
   </h1>
+  <button on:click={() => push("/chat")}>Chat</button>
   <ChannelManager />
 </main>
