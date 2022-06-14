@@ -129,7 +129,7 @@ const get42UserData = (token) =>
     .catch(() => null);
 
 const createUser = async ({ id, login, displayname, image_url }) => {
-  const user = (await getUser(id)).toJSON();
+  const user = (await getUser(id))?.toJSON();
 
   if (!user) return newUser(id, login, displayname, image_url, false);
 
