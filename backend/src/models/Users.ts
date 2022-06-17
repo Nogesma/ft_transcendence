@@ -17,10 +17,6 @@ const Users = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    image_url: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     tfa: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
