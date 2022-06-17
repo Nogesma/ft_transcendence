@@ -2247,6 +2247,7 @@ __metadata:
     jest: 28.1.1
     joi: ^17.6.0
     nanoid: ^4.0.0
+    nestjs: ^0.0.1
     pg: ^8.7.3
     prettier: ^2.7.1
     ramda: ^0.28.0
@@ -5570,6 +5571,13 @@ __metadata:
   version: 2.6.2
   resolution: "neo-async@npm:2.6.2"
   checksum: deac9f8d00eda7b2e5cd1b2549e26e10a0faa70adaa6fdadca701cc55f49ee9018e427f424bac0c790b7c7e2d3068db97f3093f1093975f2acb8f8818b936ed9
+  languageName: node
+  linkType: hard
+
+"nestjs@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "nestjs@npm:0.0.1"
+  checksum: d59ca09648d12303b1772e2ed4f5384717a678a6caaf76fae32a96d25d351eeec9e243411a09a9b92d084f19f4aa1b52164abaf97f13fcb98cfd3c5498686d28
   languageName: node
   linkType: hard
 
