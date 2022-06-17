@@ -23,7 +23,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-svelte3": "^4.0.0",
     "nanoid": "^4.0.0",
-    "prettier": "^2.7.0",
+    "prettier": "^2.7.1",
     "prettier-plugin-svelte": "^2.7.0",
     "qrcode": "^1.5.0",
     "ramda": "^0.28.0",

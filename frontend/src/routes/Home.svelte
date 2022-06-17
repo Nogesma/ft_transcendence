@@ -3,11 +3,9 @@
   import { onMount } from "svelte";
   import axios from "axios";
 
-  let login: string, displayname: string;
+  let login: string, displayname: string, error: string, file: FileList;
 
-  let file,
-    error,
-    t = 0;
+  let t = 0;
 
   const getUserData = async () =>
     axios
@@ -24,13 +22,8 @@
 
   const uploadAvatar = async () => {
     const form = new FormData();
-    form.append("size", file[0].size);
-    /* Other parts */
     form.append("file", file[0]);
-    form.append("mimeType", file[0].mimeType);
 
-    console.log(file);
-    console.log(file.size);
     await axios
       .post(`${import.meta.env.VITE_BACKEND_URI}/api/me/avatar`, form, {
         withCredentials: true,
@@ -50,7 +43,7 @@
   {#if login}
     <img
       src={`${import.meta.env.VITE_WEBSERV_URI}/users/${login}.jpg?t=${t}`}
-      alt="Profile picture"
+      alt="Profile"
     />
     <h1>{displayname}</h1>
   {/if}

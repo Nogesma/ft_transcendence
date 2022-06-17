@@ -7,55 +7,53 @@ import {
   Post,
   Param,
   Body,
-  UseInterceptors,
-  BadRequestException,
 } from "@nestjs/common";
 import speakeasy from "speakeasy";
 import {
   enableUser2FA,
   get2FASecret,
   getUser,
+  getUserName,
   set2FASecret,
   setPermanent2FASecret,
   updateUserName,
 } from "../database/controller.js";
-import { FileInterceptor } from "@nestjs/platform-express";
-import {
-  fileTypeFromBuffer,
-  fileTypeFromStream,
-  fileTypeStream,
-} from "file-type";
+import { fileTypeFromBuffer } from "file-type";
 import busboy from "busboy";
 import fs from "fs";
+import path from "path";
+import { Request, Response } from "express";
 
 @Controller("api")
 export class ApiController {
   @Get("me")
-  async getUserData(@Req() req, @Res() res) {
+  async getUserData(@Req() req: Request, @Res() res: Response) {
     const uid = req?.uid;
-
     if (!uid) return res.status(HttpStatus.UNAUTHORIZED).end();
 
-    const { login, displayname } = (await getUser(uid)).toJSON();
+    const user = await getUser(uid);
+    if (!user) return res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
+    const { login, displayname } = user.toJSON();
 
     res.json({ login, displayname }).end();
   }
 
   @Get("2fa")
-  async generateNew2FA(@Req() req, @Res() res) {
+  async generateNew2FA(@Req() req: Request, @Res() res: Response) {
     const uid = req?.uid;
-
     if (!uid) return res.status(HttpStatus.UNAUTHORIZED).end();
 
     const secret = speakeasy.generateSecret().base32;
-
     await set2FASecret(uid, secret);
+
+    const login = await getUserName(uid);
+    if (!login) return res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
 
     const otpauthURL = speakeasy.otpauthURL({
       secret: secret,
       encoding: "base32",
       algorithm: "sha512",
-      label: await (await getUser(uid)).toJSON().login,
+      label: login,
       issuer: "ft_transcendence",
     });
 
@@ -63,15 +61,21 @@ export class ApiController {
   }
 
   @Post("2fa/:code")
-  async validate2FA(@Req() req, @Res() res, @Param() params) {
+  async validate2FA(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param() params: { code: string | undefined }
+  ) {
     const uid = req?.uid;
-
     if (!uid) return res.status(HttpStatus.UNAUTHORIZED).end();
+    if (!params.code) return res.status(HttpStatus.BAD_REQUEST).end();
 
-    const { secret } = (await get2FASecret(uid)).toJSON();
+    const TFA = await get2FASecret(uid);
+    if (!TFA) return res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
+    const { secret } = TFA.toJSON();
 
     const hasValidCode = speakeasy.totp.verify({
-      secret: secret,
+      secret,
       encoding: "base32",
       token: params.code,
       window: 1,
@@ -87,22 +91,22 @@ export class ApiController {
   }
 
   @Post("me/name")
-  async updateName(@Req() req, @Res() res, @Body() body) {
+  async updateName(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() body: { name: string | undefined }
+  ) {
     const uid = req?.uid;
-
     if (!uid) return res.status(HttpStatus.UNAUTHORIZED).end();
+    if (!body.name) return res.status(HttpStatus.BAD_REQUEST).end();
 
-    const { name } = body;
-
-    await updateUserName(uid, name);
-
+    await updateUserName(uid, body.name);
     res.end();
   }
 
   @Post("me/avatar")
-  async updateAvatar(@Req() req, @Res() res) {
+  async updateAvatar(@Req() req: Request, @Res() res: Response) {
     const uid = req?.uid;
-
     if (!uid) return res.status(HttpStatus.UNAUTHORIZED).end();
 
     const bb = busboy({
@@ -110,44 +114,46 @@ export class ApiController {
       limits: { files: 1, fileSize: 1024 ** 2 }, // 1MB Max Size
     });
 
-    bb.on("file", async (name, file, info) => {
-      if ("image/jpeg" !== info.mimeType) {
-        console.log("BAD MIME", info);
+    bb.on("file", async (_, file, info) => {
+      if ("image/jpeg" !== info.mimeType)
         return res.status(HttpStatus.BAD_REQUEST).end();
-      }
 
       file.once("readable", async () => {
+        // Checks that magicNumber of file matches jpeg
         const magicNumber = file.read(3);
-
         const fileTypeResult = await fileTypeFromBuffer(magicNumber);
-
         if (!fileTypeResult || fileTypeResult.ext !== "jpg")
           return res.status(HttpStatus.BAD_REQUEST).end();
 
-        const { login } = (await getUser(uid)).toJSON();
-        // todo: maybe validate username to avoid path escape?
+        const login = await getUserName(uid);
+        if (!login) return res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
 
-        const path = `${process.env.AVATAR_UPLOAD_PATH}/${login}`;
+        const imagePath = path.join(process.env.AVATAR_UPLOAD_PATH, login);
+
+        // Checks for directory traversal
+        if (imagePath.indexOf(process.env.AVATAR_UPLOAD_PATH) !== 0)
+          return res.status(HttpStatus.FORBIDDEN).end();
 
         file.on("limit", () => {
           res.writeHead(HttpStatus.PAYLOAD_TOO_LARGE, { Connection: "close" });
           req.unpipe(bb);
-          fs.unlinkSync(path);
+          fs.unlinkSync(imagePath);
           return res.end();
         });
 
         bb.on("close", async () => {
+          // This event fires when file is not valid or when we hit file size limit
           if (res.writableFinished) return;
 
+          await fs.renameSync(imagePath, `${imagePath}.jpg`);
           res.writeHead(HttpStatus.CREATED, { Connection: "close" });
-
-          await fs.renameSync(path, `${path}.jpg`);
-
           return res.end();
         });
 
+        // Rollback the number of bytes we read when checking the magic number
         await file.unshift(magicNumber);
-        file.pipe(fs.createWriteStream(path));
+
+        file.pipe(fs.createWriteStream(imagePath));
       });
     });
 
