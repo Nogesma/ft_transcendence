@@ -8,6 +8,7 @@
   "type": "module",
   "scripts": {
     "init": "node --require dotenv/config scripts/initdb.js",
+    "init:docker": "node --require dotenv/config scripts/initdb_docker.js",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "start": "nest start",
