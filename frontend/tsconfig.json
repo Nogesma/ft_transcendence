@@ -15,7 +15,11 @@
     "allowJs": true,
     "checkJs": true,
     "isolatedModules": true,
-    "strict": true
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
     "src/**/*.d.ts",

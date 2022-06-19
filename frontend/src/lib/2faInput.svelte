@@ -1,25 +1,27 @@
 <script lang="ts">
   import { replace } from "svelte-spa-router";
+  import axios from "axios";
 
   export let url: string;
 
   let s: string;
   let error: string = "";
 
-  const post2FA = async () => {
-    const res = await fetch(`${import.meta.env.VITE_BACKEND_URI}/${url}/${s}`, {
-      method: "POST",
-      credentials: "include",
-    });
-
-    if (res.ok) {
-      window.history.replaceState({}, document.title, "/");
-      await replace("/");
-    } else {
-      error = "Wrong 2FA Code";
-      s = "";
-    }
-  };
+  const post2FA = async () =>
+    axios
+      .post(
+        `${import.meta.env.VITE_BACKEND_URI}/${url}/${s}`,
+        {},
+        { withCredentials: true }
+      )
+      .then(() => {
+        window.history.replaceState({}, document.title, "/");
+        replace("/");
+      })
+      .catch(() => {
+        error = "Wrong 2FA Code";
+        s = "";
+      });
 </script>
 
 <h1>2FA</h1>

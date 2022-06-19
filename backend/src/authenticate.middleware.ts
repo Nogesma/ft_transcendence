@@ -2,6 +2,12 @@ import { HttpStatus, Injectable, NestMiddleware } from "@nestjs/common";
 import { getSession } from "./database/controller.js";
 import dayjs from "dayjs";
 
+declare module "express" {
+  export interface Request {
+    uid: number;
+  }
+}
+
 @Injectable()
 export class AuthenticateMiddleware implements NestMiddleware {
   async use(req: any, res: any, next: () => void) {
@@ -9,7 +15,7 @@ export class AuthenticateMiddleware implements NestMiddleware {
 
     if (!token) return res.status(HttpStatus.UNAUTHORIZED).end();
 
-    const session = (await getSession(token)).toJSON();
+    const session = (await getSession(token))?.toJSON();
 
     if (!session || !session.id || isExpired(session.expires))
       return res.status(HttpStatus.UNAUTHORIZED).end();
@@ -19,4 +25,4 @@ export class AuthenticateMiddleware implements NestMiddleware {
   }
 }
 
-const isExpired = (date) => dayjs(date).isBefore(dayjs());
+const isExpired = (date: Date) => dayjs(date).isBefore(dayjs());

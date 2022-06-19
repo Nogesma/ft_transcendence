@@ -1,27 +1,56 @@
 <script lang="ts">
   import { push } from "svelte-spa-router";
   import { onMount } from "svelte";
+  import axios from "axios";
 
-  let displayName: string, profilePicture: string;
+  let login: string, displayname: string, error: string, file: FileList;
 
-  const getUserData = async () => {
-    const res = await fetch(`${import.meta.env.VITE_BACKEND_URI}/api/me`, {
-      credentials: "include",
-    });
+  let t = 0;
 
-    if (res.ok) {
-      const json = await res.json();
-      displayName = json.displayname;
-      profilePicture = json.image_url;
-    } else await push("#/auth/login");
-  };
+  const getUserData = async () =>
+    axios
+      .get(`${import.meta.env.VITE_BACKEND_URI}/api/me`, {
+        withCredentials: true,
+      })
+      .then(({ data }) => {
+        displayname = data.displayname;
+        login = data.login;
+      })
+      .catch(() => push("/auth/login"));
 
   onMount(getUserData);
+
+  const uploadAvatar = async () => {
+    const form = new FormData();
+    form.append("file", file[0]);
+
+    await axios
+      .post(`${import.meta.env.VITE_BACKEND_URI}/api/me/avatar`, form, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then(() => t++)
+      .catch((e) => {
+        if (e.status != 401) error = "Invalid file";
+        else push("/");
+      });
+  };
 </script>
 
 <main>
-  <img src={profilePicture} alt="Svelte Logo" />
-  <h1>{displayName}</h1>
+  {#if login}
+    <img
+      src={`${import.meta.env.VITE_WEBSERV_URI}/users/${login}.jpg?t=${t}`}
+      alt="Profile"
+    />
+    <h1>{displayname}</h1>
+  {/if}
+
+  <h3>{error ?? ""}</h3>
+  <input type="file" accept="image/jpeg" bind:files={file} />
+  <button on:click={uploadAvatar}>Submit</button>
 </main>
 
 <style>

@@ -12,11 +12,18 @@ import {
   newUser,
 } from "../../database/controller.js";
 import { default as axios } from "axios";
+import { Request, Response } from "express";
 
 @Controller("api/auth")
 export class Oauth2Controller {
   @Post("oauth2/:code/:state")
-  async addUser(@Res() res, @Param() params) {
+  async addUser(
+    @Res() res: Response,
+    @Param() params: { code: string | undefined; state: string | undefined }
+  ) {
+    if (!params.code || !params.state)
+      return res.status(HttpStatus.BAD_REQUEST).end();
+
     const data = {
       redirect_uri: process.env.REDIRECT_URI,
       client_id: process.env.CLIENT_ID,
@@ -44,19 +51,24 @@ export class Oauth2Controller {
   }
 
   @Post("2fa/:code")
-  async authenticate2FA(@Req() req, @Res() res, @Param() params) {
+  async authenticate2FA(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param() params: { code: string | undefined }
+  ) {
     const token = req.signedCookies ? req.signedCookies["2fa"] : null;
-
     if (!token) return res.status(HttpStatus.UNAUTHORIZED).end();
+    if (!params.code) return res.status(HttpStatus.BAD_REQUEST).end();
 
-    const tempToken = (await getTemporary2FAToken(token)).toJSON();
-
+    const tempToken = (await getTemporary2FAToken(token))?.toJSON();
     if (!tempToken || isExpired(tempToken.expires))
       return res.status(HttpStatus.UNAUTHORIZED).end();
 
-    const { secret, temp } = (await get2FASecret(tempToken.id)).toJSON();
-
-    if (temp) return res.status(HttpStatus.UNAUTHORIZED).end();
+    const TFA = await get2FASecret(tempToken.id);
+    if (!TFA) return res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
+    const { secret, temp } = TFA.toJSON();
+    if (temp === undefined || temp === null || temp || !secret)
+      return res.status(HttpStatus.UNAUTHORIZED).end();
 
     const hasValidCode = speakeasy.totp.verify({
       secret: secret,
@@ -74,9 +86,9 @@ export class Oauth2Controller {
   }
 }
 
-const isExpired = (date) => dayjs(date).isBefore(dayjs());
+const isExpired = (date: Date) => dayjs(date).isBefore(dayjs());
 
-const createUserSession = async (response, id) => {
+const createUserSession = async (response: Response, id: number) => {
   const token = nanoid();
   const expires = dayjs().add(1, "M").toDate();
 
@@ -92,7 +104,7 @@ const createUserSession = async (response, id) => {
   response.end();
 };
 
-const create2FATemporaryToken = async (response, id) => {
+const create2FATemporaryToken = async (response: Response, id: number) => {
   const token = nanoid();
   const expires = dayjs().add(10, "minutes").toDate();
 
@@ -108,7 +120,14 @@ const create2FATemporaryToken = async (response, id) => {
   response.status(HttpStatus.I_AM_A_TEAPOT).end();
 };
 
-const getOauthToken = (data) =>
+const getOauthToken = (data: {
+  redirect_uri: string;
+  client_id: string;
+  client_secret: string;
+  grant_type: string;
+  code: string;
+  state: string;
+}) =>
   axios
     .post("https://api.intra.42.fr/oauth/token", data, {
       headers: {
@@ -118,7 +137,7 @@ const getOauthToken = (data) =>
     .then(({ data }) => data)
     .catch(() => null);
 
-const get42UserData = (token) =>
+const get42UserData = (token: string) =>
   axios
     .get("https://api.intra.42.fr/v2/me", {
       headers: {
@@ -128,10 +147,18 @@ const get42UserData = (token) =>
     .then(({ data }) => data)
     .catch(() => null);
 
-const createUser = async ({ id, login, displayname, image_url }) => {
+const createUser = async ({
+  id,
+  login,
+  displayname,
+}: {
+  id: number;
+  login: string;
+  displayname: string;
+}) => {
   const user = (await getUser(id))?.toJSON();
 
-  if (!user) return newUser(id, login, displayname, image_url, false);
+  if (!user) return newUser(id, login, displayname, false);
 
   return user;
 };

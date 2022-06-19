@@ -1,36 +1,43 @@
-import Users from "../models/Users.js";
-import Sessions from "../models/Sessions.js";
-import Temporary2FATokens from "../models/Temporary2FATokens.js";
-import TwoFactorSecrets from "../models/TwoFactorSecrets.js";
+import User from "../models/User.js";
+import Session from "../models/Session.js";
+import Temporary2FAToken from "../models/Temporary2FAToken.js";
+import TwoFactorSecret from "../models/TwoFactorSecret.js";
 
-const newUser = (id, login, displayname, image_url, tfa = false) =>
-  Users.create({ id, login, displayname, image_url, tfa });
+const newUser = (id: number, login: string, displayname: string, tfa = false) =>
+  User.create({ id, login, displayname, tfa });
 
-const getUser = (id) => Users.findByPk(id);
+const getUser = (id: number) => User.findByPk(id);
 
-const newSession = (id, token, expires) =>
-  Sessions.create({ id, token, expires });
+const getUserName = async (id: number) =>
+  (await User.findByPk(id, { attributes: ["login"] }))?.toJSON()?.login;
 
-const getSession = (token) => Sessions.findOne({ where: { token } });
+const enableUser2FA = (id: number) =>
+  User.update({ tfa: true }, { where: { id } });
 
-const new2FAToken = (id, token, expires) =>
-  Temporary2FATokens.create({ id, token, expires });
+const updateUserName = (id: number, displayname: string) =>
+  User.update({ displayname }, { where: { id } });
 
-const getTemporary2FAToken = (token) =>
-  Temporary2FATokens.findOne({ where: { token } });
+const newSession = (id: number, token: string, expires: Date) =>
+  Session.create({ id, token, expires });
 
-const set2FASecret = (id, secret, temp = true) =>
-  TwoFactorSecrets.create({ id, secret, temp });
+const getSession = (token: string) => Session.findOne({ where: { token } });
 
-const setPermanent2FASecret = (id) =>
-  TwoFactorSecrets.update({ temp: false }, { where: { id } });
+const new2FAToken = (id: number, token: string, expires: Date) =>
+  Temporary2FAToken.create({ id, token, expires });
 
-const enableUser2FA = (id) => Users.update({ tfa: true }, { where: { id } });
+const getTemporary2FAToken = (token: string) =>
+  Temporary2FAToken.findOne({ where: { token } });
 
-const get2FASecret = (id) => TwoFactorSecrets.findByPk(id);
+const destroyTemporary2FAToken = (id: number) =>
+  Temporary2FAToken.destroy({ where: { id } });
 
-const destroyTemporary2FAToken = (id) =>
-  Temporary2FATokens.destroy({ where: { id } });
+const set2FASecret = (id: number, secret: string, temp = true) =>
+  TwoFactorSecret.create({ id, secret, temp });
+
+const setPermanent2FASecret = (id: number) =>
+  TwoFactorSecret.update({ temp: false }, { where: { id } });
+
+const get2FASecret = (id: number) => TwoFactorSecret.findByPk(id);
 
 export {
   enableUser2FA,
@@ -44,4 +51,6 @@ export {
   new2FAToken,
   destroyTemporary2FAToken,
   getSession,
+  updateUserName,
+  getUserName,
 };
