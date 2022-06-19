@@ -1,4 +1,12 @@
-import { Controller, HttpStatus, Param, Post, Req, Res } from "@nestjs/common";
+import {
+  Controller,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+  Req,
+  Res,
+} from "@nestjs/common";
 import { nanoid } from "nanoid";
 import dayjs from "dayjs";
 import speakeasy from "speakeasy";
@@ -19,29 +27,32 @@ export class Oauth2Controller {
   @Post("oauth2/:code/:state")
   async addUser(
     @Res() res: Response,
-    @Param() params: { code: string | undefined; state: string | undefined }
+    @Param("code") code: string,
+    @Param("state") state: string
   ) {
-    if (!params.code || !params.state)
-      return res.status(HttpStatus.BAD_REQUEST).end();
-
     const data = {
       redirect_uri: process.env.REDIRECT_URI,
       client_id: process.env.CLIENT_ID,
       client_secret: process.env.CLIENT_SECRET,
       grant_type: "authorization_code",
-      code: params.code,
-      state: params.state,
+      code: code,
+      state: state,
     };
 
     const tokenResponse = await getOauthToken(data);
 
-    if (!tokenResponse) return res.status(HttpStatus.UNAUTHORIZED).end();
+    if (!tokenResponse)
+      throw new HttpException("42 Not Authorized", HttpStatus.UNAUTHORIZED);
 
     const { access_token } = tokenResponse;
 
     const userData = await get42UserData(access_token);
 
-    if (!userData) return res.status(HttpStatus.UNAUTHORIZED).end();
+    if (!userData)
+      throw new HttpException(
+        "Unable to fetch user data from 42",
+        HttpStatus.UNAUTHORIZED
+      );
 
     const user = await createUser(userData);
 
@@ -54,31 +65,40 @@ export class Oauth2Controller {
   async authenticate2FA(
     @Req() req: Request,
     @Res() res: Response,
-    @Param() params: { code: string | undefined }
+    @Param("code") code: string
   ) {
     const token = req.signedCookies ? req.signedCookies["2fa"] : null;
-    if (!token) return res.status(HttpStatus.UNAUTHORIZED).end();
-    if (!params.code) return res.status(HttpStatus.BAD_REQUEST).end();
+    if (!token)
+      throw new HttpException("2FA Token not found", HttpStatus.UNAUTHORIZED);
 
     const tempToken = (await getTemporary2FAToken(token))?.toJSON();
     if (!tempToken || isExpired(tempToken.expires))
-      return res.status(HttpStatus.UNAUTHORIZED).end();
+      throw new HttpException(
+        "2FA Token invalid or expired",
+        HttpStatus.UNAUTHORIZED
+      );
 
     const TFA = await get2FASecret(tempToken.id);
-    if (!TFA) return res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
+    if (!TFA)
+      throw new HttpException(
+        "Could not find 2FA Secret",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+
     const { secret, temp } = TFA.toJSON();
     if (temp === undefined || temp === null || temp || !secret)
-      return res.status(HttpStatus.UNAUTHORIZED).end();
+      throw new HttpException("Invalid 2FA Secret", HttpStatus.UNAUTHORIZED);
 
     const hasValidCode = speakeasy.totp.verify({
       secret: secret,
       encoding: "base32",
-      token: params.code,
+      token: code,
       window: 1,
       algorithm: "sha512",
     });
 
-    if (!hasValidCode) return res.status(HttpStatus.UNAUTHORIZED).end();
+    if (!hasValidCode)
+      throw new HttpException("Invalid 2FA Code", HttpStatus.UNAUTHORIZED);
 
     await destroyTemporary2FAToken(tempToken.id);
 

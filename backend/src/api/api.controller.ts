@@ -7,6 +7,7 @@ import {
   Post,
   Param,
   Body,
+  HttpException,
 } from "@nestjs/common";
 import speakeasy from "speakeasy";
 import {
@@ -28,11 +29,13 @@ import { Request, Response } from "express";
 export class ApiController {
   @Get("me")
   async getUserData(@Req() req: Request, @Res() res: Response) {
-    const uid = req?.uid;
-    if (!uid) return res.status(HttpStatus.UNAUTHORIZED).end();
+    const user = await getUser(req.uid);
+    if (!user)
+      throw new HttpException(
+        "Could not find user",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
 
-    const user = await getUser(uid);
-    if (!user) return res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
     const { login, displayname } = user.toJSON();
 
     res.json({ login, displayname }).end();
@@ -40,8 +43,7 @@ export class ApiController {
 
   @Get("2fa")
   async generateNew2FA(@Req() req: Request, @Res() res: Response) {
-    const uid = req?.uid;
-    if (!uid) return res.status(HttpStatus.UNAUTHORIZED).end();
+    const uid = req.uid;
 
     const secret = speakeasy.generateSecret().base32;
     await set2FASecret(uid, secret);
@@ -64,11 +66,9 @@ export class ApiController {
   async validate2FA(
     @Req() req: Request,
     @Res() res: Response,
-    @Param() params: { code: string | undefined }
+    @Param("code") code: string
   ) {
-    const uid = req?.uid;
-    if (!uid) return res.status(HttpStatus.UNAUTHORIZED).end();
-    if (!params.code) return res.status(HttpStatus.BAD_REQUEST).end();
+    const uid = req.uid;
 
     const TFA = await get2FASecret(uid);
     if (!TFA) return res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
@@ -77,7 +77,7 @@ export class ApiController {
     const hasValidCode = speakeasy.totp.verify({
       secret,
       encoding: "base32",
-      token: params.code,
+      token: code,
       window: 1,
       algorithm: "sha512",
     });
@@ -96,19 +96,15 @@ export class ApiController {
     @Res() res: Response,
     @Body() body: { name: string | undefined }
   ) {
-    const uid = req?.uid;
-    if (!uid) return res.status(HttpStatus.UNAUTHORIZED).end();
-    if (!body.name) return res.status(HttpStatus.BAD_REQUEST).end();
+    if (!body.name)
+      throw new HttpException("Missing name in body", HttpStatus.BAD_REQUEST);
 
-    await updateUserName(uid, body.name);
+    await updateUserName(req.uid, body.name);
     res.end();
   }
 
   @Post("me/avatar")
   async updateAvatar(@Req() req: Request, @Res() res: Response) {
-    const uid = req?.uid;
-    if (!uid) return res.status(HttpStatus.UNAUTHORIZED).end();
-
     const bb = busboy({
       headers: req.headers,
       limits: { files: 1, fileSize: 1024 ** 2 }, // 1MB Max Size
@@ -116,23 +112,30 @@ export class ApiController {
 
     bb.on("file", async (_, file, info) => {
       if ("image/jpeg" !== info.mimeType)
-        return res.status(HttpStatus.BAD_REQUEST).end();
+        throw new HttpException(
+          "Image mime type is not jpeg",
+          HttpStatus.BAD_REQUEST
+        );
 
       file.once("readable", async () => {
         // Checks that magicNumber of file matches jpeg
         const magicNumber = file.read(3);
         const fileTypeResult = await fileTypeFromBuffer(magicNumber);
         if (!fileTypeResult || fileTypeResult.ext !== "jpg")
-          return res.status(HttpStatus.BAD_REQUEST).end();
+          throw new HttpException("Image is not jpeg", HttpStatus.BAD_REQUEST);
 
-        const login = await getUserName(uid);
-        if (!login) return res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
+        const login = await getUserName(req.uid);
+        if (!login)
+          throw new HttpException(
+            "Could not find user",
+            HttpStatus.INTERNAL_SERVER_ERROR
+          );
 
         const imagePath = path.join(process.env.AVATAR_UPLOAD_PATH, login);
 
         // Checks for directory traversal
         if (imagePath.indexOf(process.env.AVATAR_UPLOAD_PATH) !== 0)
-          return res.status(HttpStatus.FORBIDDEN).end();
+          throw new HttpException("Login is invalid", HttpStatus.FORBIDDEN);
 
         file.on("limit", () => {
           res.writeHead(HttpStatus.PAYLOAD_TOO_LARGE, { Connection: "close" });
