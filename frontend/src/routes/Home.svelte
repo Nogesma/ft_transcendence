@@ -22,6 +22,7 @@
 <main>
   <img src={profilePicture} alt="Svelte Logo" />
   <h1>{displayName}</h1>
+  <div>The pathway to <a href="./#/pong">Pong</a></div> <!--todo clean url?-->
 </main>
 
 <style>
