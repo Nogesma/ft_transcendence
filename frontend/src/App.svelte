@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "./app.css";
   import Router, { push } from "svelte-spa-router";
   import routes from "./routes";
 

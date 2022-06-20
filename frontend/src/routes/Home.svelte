@@ -39,33 +39,34 @@
   };
 </script>
 
-<main>
+<main class="flex flex-col">
   {#if login}
     <img
+      class="w-80 m-auto"
       src={`${import.meta.env.VITE_WEBSERV_URI}/users/${login}.jpg?t=${t}`}
       alt="Profile"
     />
-    <h1>{displayname}</h1>
+    <h1 class="m-auto text-3xl font-bold">{displayname}</h1>
   {/if}
 
-  <h3>{error ?? ""}</h3>
-  <input type="file" accept="image/jpeg" bind:files={file} />
-  <button on:click={uploadAvatar}>Submit</button>
+  <h3 class="m-auto">{error ?? ""}</h3>
+
+  <div class="m-auto mt-10">
+    <label
+      for="avatar_upload"
+      class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
+      >Choose avatar...</label
+    >
+    <input
+      class="opacity-0"
+      type="file"
+      accept="image/jpeg"
+      id="avatar_upload"
+      bind:files={file}
+    />
+    <button
+      class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
+      on:click={uploadAvatar}>Submit</button
+    >
+  </div>
 </main>
-
-<style>
-  :root {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  }
-
-  main {
-    text-align: center;
-    padding: 1em;
-    margin: 0 auto;
-  }
-
-  img {
-    height: 16rem;
-  }
-</style>
