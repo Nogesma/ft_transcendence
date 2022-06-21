@@ -1,7 +1,7 @@
 <script lang="ts">
   import { push } from "svelte-spa-router";
   import { onMount } from "svelte";
-
+  import Pong from "../lib/Pong/Pong.svelte";
   let displayName: string, profilePicture: string;
 
   const getUserData = async () => {
@@ -22,7 +22,7 @@
 <main>
   <img src={profilePicture} alt="Svelte Logo" />
   <h1>{displayName}</h1>
-  <div>The pathway to <a href="./#/pong">Pong</a></div> <!--todo clean url?-->
+  <Pong height="500" width="1000" />
 </main>
 
 <style>
