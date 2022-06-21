@@ -1,15 +1,9 @@
-import { MiddlewareConsumer, Module } from "@nestjs/common";
-import { ApiController } from "./api/api.controller.js";
-import { Oauth2Controller } from "./api/auth/oauth2.controller.js";
-import { AuthenticateMiddleware } from "./authenticate.middleware.js";
+import { Module } from "@nestjs/common";
+import { ApiModule } from "./api/api.module.js";
 
 @Module({
-  imports: [],
-  controllers: [ApiController, Oauth2Controller],
+  imports: [ApiModule],
+  controllers: [],
   providers: [],
 })
-export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthenticateMiddleware).forRoutes(ApiController);
-  }
-}
+export class AppModule {}

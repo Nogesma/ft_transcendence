@@ -1,15 +1,5 @@
-import {
-  Controller,
-  HttpException,
-  HttpStatus,
-  Param,
-  Post,
-  Req,
-  Res,
-} from "@nestjs/common";
-import { nanoid } from "nanoid";
-import dayjs from "dayjs";
-import speakeasy from "speakeasy";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { default as axios } from "axios";
 import {
   destroyTemporary2FAToken,
   get2FASecret,
@@ -19,17 +9,14 @@ import {
   newSession,
   newUser,
 } from "../../database/controller.js";
-import { default as axios } from "axios";
-import { Request, Response } from "express";
+import { Response } from "express";
+import { nanoid } from "nanoid";
+import dayjs from "dayjs";
+import speakeasy from "speakeasy";
 
-@Controller("api/auth")
-export class Oauth2Controller {
-  @Post("oauth2/:code/:state")
-  async addUser(
-    @Res() res: Response,
-    @Param("code") code: string,
-    @Param("state") state: string
-  ) {
+@Injectable()
+export class AuthService {
+  async oauth2Handshake(res: Response, code: string, state: string) {
     const data = {
       redirect_uri: process.env.REDIRECT_URI,
       client_id: process.env.CLIENT_ID,
@@ -61,16 +48,7 @@ export class Oauth2Controller {
     return createUserSession(res, user.id);
   }
 
-  @Post("2fa/:code")
-  async authenticate2FA(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Param("code") code: string
-  ) {
-    const token = req.signedCookies ? req.signedCookies["2fa"] : null;
-    if (!token)
-      throw new HttpException("2FA Token not found", HttpStatus.UNAUTHORIZED);
-
+  async authenticate2FA(res: Response, token: string, code: string) {
     const tempToken = (await getTemporary2FAToken(token))?.toJSON();
     if (!tempToken || isExpired(tempToken.expires))
       throw new HttpException(
@@ -105,40 +83,6 @@ export class Oauth2Controller {
     return createUserSession(res, tempToken.id);
   }
 }
-
-const isExpired = (date: Date) => dayjs(date).isBefore(dayjs());
-
-const createUserSession = async (response: Response, id: number) => {
-  const token = nanoid();
-  const expires = dayjs().add(1, "M").toDate();
-
-  await newSession(id, token, expires);
-
-  response.cookie("token", token, {
-    expires,
-    sameSite: "strict",
-    signed: true,
-    httpOnly: true,
-  });
-
-  response.end();
-};
-
-const create2FATemporaryToken = async (response: Response, id: number) => {
-  const token = nanoid();
-  const expires = dayjs().add(10, "minutes").toDate();
-
-  await new2FAToken(id, token, expires);
-
-  response.cookie("2fa", token, {
-    expires,
-    sameSite: "strict",
-    signed: true,
-    httpOnly: true,
-  });
-
-  response.status(HttpStatus.I_AM_A_TEAPOT).end();
-};
 
 const getOauthToken = (data: {
   redirect_uri: string;
@@ -181,4 +125,38 @@ const createUser = async ({
   if (!user) return newUser(id, login, displayname, false);
 
   return user;
+};
+
+const create2FATemporaryToken = async (response: Response, id: number) => {
+  const token = nanoid();
+  const expires = dayjs().add(10, "minutes").toDate();
+
+  await new2FAToken(id, token, expires);
+
+  response.cookie("2fa", token, {
+    expires,
+    sameSite: "strict",
+    signed: true,
+    httpOnly: true,
+  });
+
+  response.status(HttpStatus.I_AM_A_TEAPOT).end();
+};
+
+const isExpired = (date: Date) => dayjs(date).isBefore(dayjs());
+
+const createUserSession = async (response: Response, id: number) => {
+  const token = nanoid();
+  const expires = dayjs().add(1, "M").toDate();
+
+  await newSession(id, token, expires);
+
+  response.cookie("token", token, {
+    expires,
+    sameSite: "strict",
+    signed: true,
+    httpOnly: true,
+  });
+
+  response.end();
 };
