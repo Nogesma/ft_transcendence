@@ -2,6 +2,7 @@
   import { push } from "svelte-spa-router";
   import { onMount } from "svelte";
   import axios from "axios";
+  import Navbar from "../lib/Navbar.svelte";
 
   let login: string, displayname: string, error: string, file: FileList;
 
@@ -13,8 +14,8 @@
         withCredentials: true,
       })
       .then(({ data }) => {
-        displayname = data.displayname;
-        login = data.login;
+        localStorage.displayname = data.displayname;
+        localStorage.login = data.login;
       })
       .catch(() => push("/auth/login"));
 
@@ -37,16 +38,14 @@
         else push("/");
       });
   };
+
 </script>
+
+<Navbar />
 
 <main class="flex flex-col">
   {#if login}
-    <img
-      class="w-80 m-auto"
-      src={`${import.meta.env.VITE_WEBSERV_URI}/users/${login}.jpg?t=${t}`}
-      alt="Profile"
-    />
-    <h1 class="m-auto text-3xl font-bold">{displayname}</h1>
+    <h1 class="m-auto text-5xl font-bold">{displayname}</h1>
   {/if}
 
   <h3 class="m-auto">{error ?? ""}</h3>
@@ -65,7 +64,7 @@
       bind:files={file}
     />
     <button
-      class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
+      class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-centers"
       on:click={uploadAvatar}>Submit</button
     >
   </div>
