@@ -7,7 +7,7 @@
   const updateUserName = async () =>
     axios
       .post(
-        `${import.meta.env.VITE_BACKEND_URI}/api/me/name`,
+        `${import.meta.env.VITE_BACKEND_URI}/api/user/name`,
         { name: s },
         {
           withCredentials: true,

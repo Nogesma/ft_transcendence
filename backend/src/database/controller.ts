@@ -1,7 +1,7 @@
-import User from "../models/User.js";
-import Session from "../models/Session.js";
-import Temporary2FAToken from "../models/Temporary2FAToken.js";
-import TwoFactorSecret from "../models/TwoFactorSecret.js";
+import { User } from "../models/user.model.js";
+import { Session } from "../models/session.model.js";
+import { Temporary2FAToken } from "../models/temporary2FAToken.model.js";
+import { TwoFactorSecret } from "../models/twoFactorSecrets.model.js";
 
 const newUser = (id: number, login: string, displayname: string, tfa = false) =>
   User.create({ id, login, displayname, tfa });

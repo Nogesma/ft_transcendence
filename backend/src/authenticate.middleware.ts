@@ -6,16 +6,17 @@ import {
 } from "@nestjs/common";
 import { getSession } from "./database/controller.js";
 import dayjs from "dayjs";
+import { NextFunction, Request, Response } from "express";
 
 declare module "express" {
   export interface Request {
-    uid: number;
+    id: number;
   }
 }
 
 @Injectable()
 export class AuthenticateMiddleware implements NestMiddleware {
-  async use(req: any, res: any, next: () => void) {
+  async use(req: Request, res: Response, next: NextFunction) {
     const token = req?.signedCookies?.token;
 
     if (!token)
@@ -26,7 +27,7 @@ export class AuthenticateMiddleware implements NestMiddleware {
     if (!session || !session.id || isExpired(session.expires))
       throw new HttpException("Invalid token", HttpStatus.UNAUTHORIZED);
 
-    req.uid = session.id;
+    req.id = session.id;
     next();
   }
 }

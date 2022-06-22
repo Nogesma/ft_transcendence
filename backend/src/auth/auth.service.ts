@@ -8,19 +8,24 @@ import {
   new2FAToken,
   newSession,
   newUser,
-} from "../../database/controller.js";
+} from "../database/controller.js";
 import { Response } from "express";
 import { nanoid } from "nanoid";
 import dayjs from "dayjs";
 import speakeasy from "speakeasy";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class AuthService {
+  constructor(
+    private readonly configService: ConfigService<EnvironmentVariables, true>
+  ) {}
+
   async oauth2Handshake(res: Response, code: string, state: string) {
     const data = {
-      redirect_uri: process.env.REDIRECT_URI,
-      client_id: process.env.CLIENT_ID,
-      client_secret: process.env.CLIENT_SECRET,
+      redirect_uri: this.configService.get("REDIRECT_URI"),
+      client_id: this.configService.get("CLIENT_ID"),
+      client_secret: this.configService.get("CLIENT_SECRET"),
       grant_type: "authorization_code",
       code: code,
       state: state,
