@@ -10,11 +10,11 @@ import {
   HttpException,
 } from "@nestjs/common";
 import { Request, Response } from "express";
-import { UserService } from "./user.service.js";
+import { SettingsService } from "./settings.service.js";
 
 @Controller("user")
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+export class SettingsController {
+  constructor(private readonly userService: SettingsService) {}
 
   @Get("me")
   async getUserData(@Req() req: Request) {

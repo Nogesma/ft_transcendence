@@ -1,10 +1,12 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { AuthModule } from "./auth/auth.module.js";
-import { UserModule } from "./user/user.module.js";
+import { SettingsModule } from "./settings/settings.module.js";
 import { AuthenticateMiddleware } from "./authenticate.middleware.js";
 import { DatabaseModule } from "./database.module.js";
 import { ConfigModule } from "@nestjs/config";
 import Joi from "joi";
+import { SessionModule } from "./session/session.module.js";
+import { SettingsController } from "./settings/settings.controller.js";
 
 @Module({
   imports: [
@@ -23,11 +25,12 @@ import Joi from "joi";
     }),
     DatabaseModule,
     AuthModule,
-    UserModule,
+    SettingsModule,
+    SessionModule,
   ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthenticateMiddleware).exclude("/auth").forRoutes("*");
+    consumer.apply(AuthenticateMiddleware).forRoutes(SettingsController);
   }
 }

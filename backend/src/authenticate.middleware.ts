@@ -4,9 +4,9 @@ import {
   Injectable,
   NestMiddleware,
 } from "@nestjs/common";
-import { getSession } from "./database/controller.js";
 import dayjs from "dayjs";
 import { NextFunction, Request, Response } from "express";
+import { SessionService } from "./session/session.service.js";
 
 declare module "express" {
   export interface Request {
@@ -16,13 +16,15 @@ declare module "express" {
 
 @Injectable()
 export class AuthenticateMiddleware implements NestMiddleware {
+  constructor(private readonly sessionService: SessionService) {}
+
   async use(req: Request, res: Response, next: NextFunction) {
     const token = req?.signedCookies?.token;
 
     if (!token)
       throw new HttpException("Token not found", HttpStatus.UNAUTHORIZED);
 
-    const session = (await getSession(token))?.toJSON();
+    const session = await this.sessionService.getSession(token);
 
     if (!session || !session.id || isExpired(session.expires))
       throw new HttpException("Invalid token", HttpStatus.UNAUTHORIZED);

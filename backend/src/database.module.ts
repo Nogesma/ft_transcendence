@@ -1,10 +1,10 @@
 import { SequelizeModule } from "@nestjs/sequelize";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { User } from "./models/user.model.js";
-import { Session } from "./models/session.model.js";
-import { Temporary2FAToken } from "./models/temporary2FAToken.model.js";
-import { TwoFactorSecret } from "./models/twoFactorSecrets.model.js";
+import { User } from "./user/user.model.js";
+import { Session } from "./session/session.model.js";
+import { TFASession } from "./TFASession/TFASession.model.js";
+import { TFASecret } from "./TFASecret/TFASecret.model.js";
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { TwoFactorSecret } from "./models/twoFactorSecrets.model.js";
         password: configService.get("DB_PASSWORD"),
         database: configService.get("DB_NAME"),
         logging: false,
-        models: [User, Session, Temporary2FAToken, TwoFactorSecret],
+        models: [User, Session, TFASession, TFASecret],
       }),
     }),
   ],

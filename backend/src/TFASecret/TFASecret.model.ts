@@ -8,10 +8,10 @@ import {
   Table,
   Unique,
 } from "sequelize-typescript";
-import { User } from "./user.model.js";
+import { User } from "../user/user.model.js";
 
 @Table({ timestamps: false, tableName: "TwoFactorSecrets" })
-export class TwoFactorSecret extends Model {
+export class TFASecret extends Model {
   @ForeignKey(() => User)
   @PrimaryKey
   @Column
