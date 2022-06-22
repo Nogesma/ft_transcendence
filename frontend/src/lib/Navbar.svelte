@@ -30,15 +30,36 @@
             document.removeEventListener('keyup', handleEscape, false);
         };
     });
+
+    // Dark mode toggle
+    let modeName;
+    let modeC;
+    let mode = false;
+    // let modeName = "light";
+    function toggle() {
+        window.document.body.classList.toggle('light-mode')
+        mode = !mode;
+        if (!mode) {
+            modeName = "light";
+            modeC = "gray";
+        } else {
+            modeName = "dark";
+            modeC = "green";
+        }
+    }
+    !mode ? modeName = "light": modeName = "dark";
+    !mode ? modeC = "green": modeC = "gray";
 </script>
 
 <nav class="bg-white border-gray-300 px-10 sm:px-10 py-2.5 dark:bg-gray-900">
     <div class="container flex flex-wrap justify-between items-center mx-auto">
-        <a href="#/" class="flex items-center">
+        <a href="/" class="flex items-center">
             <img src="{penguin}" class="mr-3 h-6 sm:h-9" alt="Logo"/>
             <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">penguins</span>
         </a>
         <div class="flex items-center md:order-2">
+            <button class="darkmodeButton bg-white bg-clip-border text-{modeC}-900
+                                      p-1 flex items-center m-2" on:click={toggle}>{modeName} mode</button>
             <div class="relative" bind:this={menu}>
                 <div>
                     <button
@@ -48,7 +69,6 @@
                             id="user-menu-button" aria-expanded="false"
                             type="button"
                     >
-
                         <img class="w-10 h-10 rounded-full object-cover
                                         border border-b-gray-100 shadow-sm"
                              src={`${import.meta.env.VITE_WEBSERV_URI}/users/${localStorage.getItem("login")}.jpg`}
@@ -64,11 +84,11 @@
                         >
                             <div class="z-50 my-4 text-base list-none bg-white rounded divide-y divide-gray-100
                                         shadow dark:bg-gray-700 dark:divide-gray-600">
-                                <button href="/profile"  class="block text-sm text-gray-900 dark:text-white">
+                                <a href="/settings/"  class="block text-sm text-gray-900 dark:text-white">
                                     {localStorage.getItem("displayname")}
-                                </button>
-                                <span class="block text-sm font-medium text-gray-500
-                                        truncate dark:text-gray-400">{localStorage.getItem("login")}@student.42lausanne.ch</span>
+                                </a>
+                                <span class="block text-sm font-medium text-{modeC}-500
+                                truncate dark:text-gray-400">{localStorage.getItem("login")}@student.42lausanne.ch</span>
                             </div>
                             <button href="#/logout" class="block text-sm text-gray-900 dark:text-white" type="button">
                                 Logout
