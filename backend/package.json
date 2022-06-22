@@ -16,6 +16,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "yarn run init && node dist/main",
     "lint": "prettier --check --plugin-search-dir=. . && eslint --max-warnings 0 .",
+    "check": "tsc --noEmit",
     "format": "prettier --write --plugin-search-dir=. .",
     "test": "jest",
     "test:watch": "jest --watch",
