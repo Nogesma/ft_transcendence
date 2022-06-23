@@ -8,6 +8,7 @@ import {
   Table,
   Unique,
 } from "sequelize-typescript";
+
 import { User } from "../user/user.model.js";
 
 @Table({ timestamps: false })

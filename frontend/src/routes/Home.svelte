@@ -1,7 +1,5 @@
 <script lang="ts">
-
-
-import { push } from "svelte-spa-router";
+  import { push } from "svelte-spa-router";
   import { onMount } from "svelte";
   import axios from "axios";
   import ChannelManager from "../lib/ChannelManager.svelte";
