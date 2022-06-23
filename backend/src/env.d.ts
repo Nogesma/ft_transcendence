@@ -1,15 +1,13 @@
 declare global {
-  namespace NodeJS {
-    interface ProcessEnv {
-      readonly CLIENT_ID: string;
-      readonly CLIENT_SECRET: string;
-      readonly REDIRECT_URI: string;
-      readonly COOKIE_SECRET: string;
-      readonly DB_USER: string;
-      readonly DB_NAME: string;
-      readonly DB_PASSWORD: string;
-      readonly AVATAR_UPLOAD_PATH: string;
-    }
+  interface EnvironmentVariables {
+    CLIENT_ID: string;
+    CLIENT_SECRET: string;
+    REDIRECT_URI: string;
+    COOKIE_SECRET: string;
+    DB_USER: string;
+    DB_NAME: string;
+    DB_PASSWORD: string;
+    AVATAR_UPLOAD_PATH: string;
   }
 }
 

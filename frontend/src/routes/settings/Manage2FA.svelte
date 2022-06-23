@@ -7,7 +7,7 @@
 
   const request2FA = async () =>
     axios
-      .get(`${import.meta.env.VITE_BACKEND_URI}/api/2fa`, {
+      .get(`${import.meta.env.VITE_BACKEND_URI}/api/user/2fa`, {
         withCredentials: true,
       })
       .then(({ data }) => {
