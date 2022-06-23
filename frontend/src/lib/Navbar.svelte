@@ -2,7 +2,7 @@
   import penguin from "../assets/Penguins.png";
   import { scale } from "svelte/transition";
   import { push } from "svelte-spa-router";
-  import { getIntraPicUrl } from "./utils.ts";
+  import ProfilePic from "./ProfilePic.svelte";
 
   let show = false; // menu state
   let menu: HTMLElement; // menu wrapper DOM reference
@@ -63,13 +63,7 @@
             aria-expanded="false"
             type="button"
           >
-            <img
-              class="w-10 h-10 rounded-full object-cover
-                                        border border-b-gray-100 shadow-sm"
-              src="/imgs/{localStorage.getItem('login')}.jpg"
-              alt="userPFP"
-              on:error={getIntraPicUrl}
-            />
+            <ProfilePic height="10" width="10" />
           </button>
           {#if show}
             <div
