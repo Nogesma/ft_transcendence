@@ -12,7 +12,7 @@
 
   const getUserData = async () =>
     axios
-      .get(`${import.meta.env.VITE_BACKEND_URI}/api/me`, {
+      .get(`${import.meta.env.VITE_BACKEND_URI}/api/user/me`, {
         withCredentials: true,
       })
       .then(({ data }) => {
@@ -28,7 +28,7 @@
     form.append("file", file[0]);
 
     await axios
-      .post(`${import.meta.env.VITE_BACKEND_URI}/api/me/avatar`, form, {
+      .post(`${import.meta.env.VITE_BACKEND_URI}/api/user/avatar`, form, {
         withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",
