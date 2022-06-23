@@ -12,6 +12,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
+      - avatars:/files
       - caddy_data:/data
       - caddy_config:/config
 
@@ -32,9 +33,12 @@ services:
     build: backend
     networks:
       back:
+    volumes:
+      - avatars:/files
 
 volumes:
   db: { }
+  avatars: { }
   caddy_data: {}
   caddy_config: {}
 

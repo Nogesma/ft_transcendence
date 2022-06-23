@@ -40,7 +40,6 @@ const initdb = async () => {
 	    "id" int PRIMARY KEY,
 	    "login" VARCHAR unique,
 	    "displayname" VARCHAR unique,
-	    "image_url" varchar,
 	    "tfa" boolean
     );`
     )

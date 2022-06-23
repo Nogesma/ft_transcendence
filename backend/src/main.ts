@@ -1,6 +1,5 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module.js";
-import "dotenv/config";
 import cookieParser from "cookie-parser";
 
 async function bootstrap() {
@@ -9,6 +8,7 @@ async function bootstrap() {
     origin: process.env.REDIRECT_URI,
     credentials: true,
   });
+  app.setGlobalPrefix("/api");
   app.use(cookieParser(process.env.COOKIE_SECRET));
   await app.listen(3000);
 }

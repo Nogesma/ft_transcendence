@@ -1,22 +1,37 @@
-import { HttpStatus, Injectable, NestMiddleware } from "@nestjs/common";
-import { getSession } from "./database/controller.js";
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NestMiddleware,
+} from "@nestjs/common";
 import dayjs from "dayjs";
+import { NextFunction, Request, Response } from "express";
+import { SessionService } from "./session/session.service.js";
+
+declare module "express" {
+  export interface Request {
+    id: number;
+  }
+}
 
 @Injectable()
 export class AuthenticateMiddleware implements NestMiddleware {
-  async use(req: any, res: any, next: () => void) {
+  constructor(private readonly sessionService: SessionService) {}
+
+  async use(req: Request, res: Response, next: NextFunction) {
     const token = req?.signedCookies?.token;
 
-    if (!token) return res.status(HttpStatus.UNAUTHORIZED).end();
+    if (!token)
+      throw new HttpException("Token not found", HttpStatus.UNAUTHORIZED);
 
-    const session = (await getSession(token)).toJSON();
+    const session = await this.sessionService.getSession(token);
 
     if (!session || !session.id || isExpired(session.expires))
-      return res.status(HttpStatus.UNAUTHORIZED).end();
+      throw new HttpException("Invalid token", HttpStatus.UNAUTHORIZED);
 
-    req.uid = session.id;
+    req.id = session.id;
     next();
   }
 }
 
-const isExpired = (date) => dayjs(date).isBefore(dayjs());
+const isExpired = (date: Date) => dayjs(date).isBefore(dayjs());
