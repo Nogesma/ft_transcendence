@@ -9,19 +9,18 @@
 		const socket = io("http://localhost:3000");
 		socket.on('connect',function() {
 			console.log("connected");
-
-			socket.emit("events", msg);
-		});
-		socket.on('events', function (event) {
-			console.log('received events', event);
-			str = event;
 		});
 		function sendmsg()
 		{
 			socket.emit("events", msg)
+			socket.on('events', function (event) {
+				str = event;
+			});
         }
 </script>
+{#if str}
 <h1>{str}</h1>
+{/if}
 <h1>Hello world</h1>
 <input bind:value={msg}>
 <button on:click="{sendmsg}">
