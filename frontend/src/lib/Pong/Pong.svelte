@@ -35,9 +35,7 @@
 
   //todo Extremement moche a refactor!
   let sphereGeometry = new SphereBufferGeometry(ball_rad, 25, 25);
-  let cubeGeometry = new BoxBufferGeometry(1, 1, 1);
   let sphereMaterial = new MeshStandardMaterial();
-  let wallMaterial = new MeshStandardMaterial();
   let floorGeometry = new PlaneBufferGeometry(
     box_len + 0.1,
     box_width + 0.1,

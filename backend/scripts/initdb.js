@@ -23,7 +23,7 @@ const createdb = async () => {
   await client.end();
 };
 
-const initdb = async () => {
+export const initdb = async () => {
   const client = new Client({
     user: process.env.DB_USER,
     host: "localhost",

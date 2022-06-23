@@ -70,5 +70,7 @@
       on:click={uploadAvatar}>Submit</button
     >
   </div>
-  <Pong height="500" width="1000" />
+  <div class="m-auto mt-10">
+    <Pong height="500" width="1000" />
+  </div>
 </main>
