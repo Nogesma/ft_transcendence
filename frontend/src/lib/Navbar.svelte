@@ -2,6 +2,7 @@
   import penguin from "../assets/Penguins.png";
   import { scale } from "svelte/transition";
   import { push } from "svelte-spa-router";
+  import { getIntraPicUrl } from "./utils.ts";
 
   let show = false; // menu state
   let menu: HTMLElement; // menu wrapper DOM reference
@@ -67,6 +68,7 @@
                                         border border-b-gray-100 shadow-sm"
               src="/imgs/{localStorage.getItem('login')}.jpg"
               alt="userPFP"
+              on:error={getIntraPicUrl}
             />
           </button>
           {#if show}
