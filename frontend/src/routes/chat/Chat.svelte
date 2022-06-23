@@ -10,12 +10,12 @@
 		socket.on('connect',function() {
 			console.log("connected");
 		});
+    socket.on('events', function (event) {
+	    str = event;
+    });
 		function sendmsg()
 		{
 			socket.emit("events", msg)
-			socket.on('events', function (event) {
-				str = event;
-			});
         }
 </script>
 {#if str}
