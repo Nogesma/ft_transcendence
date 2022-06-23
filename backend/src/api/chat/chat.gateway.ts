@@ -9,6 +9,8 @@ import { Logger } from "@nestjs/common";
 import { Server } from "socket.io";
 import { Socket } from "net";
 
+let array: Array<string>;
+array = new Array<string>();
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
 })
@@ -17,7 +19,8 @@ export class ChatGateway {
   server: Server;
   @SubscribeMessage("events")
   handleEvent(@MessageBody() data: string) {
-    this.server.sockets.emit("events", data);
+    array.push(data);
+    this.server.sockets.emit("events", array);
   }
 }
 const reta = "testa";
