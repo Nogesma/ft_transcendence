@@ -65,9 +65,7 @@
             <img
               class="w-10 h-10 rounded-full object-cover
                                         border border-b-gray-100 shadow-sm"
-              src={`${
-                import.meta.env.VITE_WEBSERV_URI
-              }/users/${localStorage.getItem("login")}.jpg`}
+              src="/imgs/{localStorage.getItem('login')}.jpg"
               alt="userPFP"
             />
           </button>

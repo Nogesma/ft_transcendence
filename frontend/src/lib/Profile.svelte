@@ -2,9 +2,7 @@
   <img
     class="w-40 h-40 rounded-full object-cover
             border border-b-gray-100 shadow-sm"
-    src={`${import.meta.env.VITE_WEBSERV_URI}/users/${localStorage.getItem(
-      "login"
-    )}.jpg`}
+    src="/imgs/{localStorage.getItem('login')}.jpg"
     alt="userPFP"
   />
   <div class="font-serif grid place-items-center">
