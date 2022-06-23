@@ -17,7 +17,6 @@ export class ChatGateway {
   server: Server;
   @SubscribeMessage("events")
   handleEvent(@MessageBody() data: string) {
-    console.log("test");
     this.server.sockets.emit("events", data);
   }
 }
