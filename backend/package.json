@@ -29,7 +29,7 @@
     "@nestjs/config": "^2.1.0",
     "@nestjs/core": "^8.4.7",
     "@nestjs/platform-express": "^8.4.7",
-    "@nestjs/sequelize": "^8.0.0",
+    "@nestjs/sequelize": "^8.0.1",
     "axios": "^0.27.2",
     "busboy": "^1.6.0",
     "cookie-parser": "^1.4.6",
@@ -46,7 +46,7 @@
     "speakeasy": "^2.0.0"
   },
   "devDependencies": {
-    "@nestjs/cli": "^8.2.7",
+    "@nestjs/cli": "^8.2.8",
     "@nestjs/schematics": "^8.0.11",
     "@nestjs/testing": "^8.4.7",
     "@tsconfig/node16": "^1.0.3",

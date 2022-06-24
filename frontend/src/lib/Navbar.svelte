@@ -2,6 +2,7 @@
   import penguin from "../assets/Penguins.png";
   import { scale } from "svelte/transition";
   import { push } from "svelte-spa-router";
+  import ProfilePic from "./ProfilePic.svelte";
 
   let show = false; // menu state
   let menu: HTMLElement; // menu wrapper DOM reference
@@ -62,14 +63,7 @@
             aria-expanded="false"
             type="button"
           >
-            <img
-              class="w-10 h-10 rounded-full object-cover
-                                        border border-b-gray-100 shadow-sm"
-              src={`${
-                import.meta.env.VITE_WEBSERV_URI
-              }/users/${localStorage.getItem("login")}.jpg`}
-              alt="userPFP"
-            />
+            <ProfilePic height="h-10" width="w-10" />
           </button>
           {#if show}
             <div
