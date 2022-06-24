@@ -63,7 +63,7 @@
             aria-expanded="false"
             type="button"
           >
-            <ProfilePic height="10" width="10" />
+            <ProfilePic height="h-10" width="w-10" />
           </button>
           {#if show}
             <div

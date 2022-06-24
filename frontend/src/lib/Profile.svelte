@@ -3,7 +3,7 @@
 </script>
 
 <div class="grid place-items-center py-3">
-  <ProfilePic height="40" width="40" />
+  <ProfilePic height="h-40" width="w-40" />
   <div class="font-serif grid place-items-center">
     <p class="font-bold hover:font-mono text-xl subpixel-antialiased">
       {localStorage.getItem("displayname")}

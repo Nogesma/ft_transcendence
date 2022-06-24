@@ -1,11 +1,11 @@
-<script>
-  export let width = "10";
-  export let height = "10";
+<script lang="ts">
+  export let width: string;
+  export let height: string;
   let imgURL = `/imgs/${localStorage.getItem("login")}.jpg`;
 </script>
 
 <img
-  class="w-{width} h-{height} rounded-full object-cover border border-b-gray-100 shadow-sm"
+  class="{width} {height} rounded-full object-cover border border-b-gray-100 shadow-sm"
   src={imgURL}
   alt="userPFP"
   on:error={() =>
