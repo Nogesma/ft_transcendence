@@ -1,6 +1,6 @@
 <script>
-  export let width = 10;
-  export let height = 10;
+  export let width = "10";
+  export let height = "10";
   let imgURL = `/imgs/${localStorage.getItem("login")}.jpg`;
 </script>
 
