@@ -1,12 +1,12 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
-import { AuthModule } from "./auth/auth.module.js";
-import { SettingsModule } from "./settings/settings.module.js";
+import { AuthModule } from "./routes/auth/auth.module.js";
+import { SettingsModule } from "./routes/settings/settings.module.js";
 import { AuthenticateMiddleware } from "./authenticate.middleware.js";
-import { DatabaseModule } from "./database.module.js";
+import { DatabaseModule } from "./database/database.module.js";
 import { ConfigModule } from "@nestjs/config";
 import Joi from "joi";
-import { SessionModule } from "./session/session.module.js";
-import { SettingsController } from "./settings/settings.controller.js";
+import { SessionModule } from "./models/session/session.module.js";
+import { SettingsController } from "./routes/settings/settings.controller.js";
 
 @Module({
   imports: [

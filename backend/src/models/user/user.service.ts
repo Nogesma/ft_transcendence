@@ -30,7 +30,9 @@ export class UserService {
 
   getUser = (id: number) => this.userModel.findByPk(id);
 
-  getUserLogin = async (id: number) => (await this.getUser(id))?.login;
+  getUserLogin = async (id: number) =>
+    (await this.userModel.findByPk(id, { attributes: { include: ["login"] } }))
+      ?.login;
 
   setUser2FA = (id: number, tfa: boolean) =>
     this.userModel.update({ tfa }, { where: { id } });

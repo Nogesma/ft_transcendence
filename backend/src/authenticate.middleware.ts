@@ -6,7 +6,7 @@ import {
 } from "@nestjs/common";
 import dayjs from "dayjs";
 import { NextFunction, Request, Response } from "express";
-import { SessionService } from "./session/session.service.js";
+import { SessionService } from "./models/session/session.service.js";
 
 declare module "express" {
   export interface Request {

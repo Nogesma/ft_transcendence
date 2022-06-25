@@ -7,8 +7,8 @@ import path from "path";
 import fs from "fs";
 import speakeasy from "speakeasy";
 import { ConfigService } from "@nestjs/config";
-import { UserService } from "../user/user.service.js";
-import { TFASecretService } from "../TFASecret/TFASecret.service.js";
+import { UserService } from "../../models/user/user.service.js";
+import { TFASecretService } from "../../models/TFASecret/TFASecret.service.js";
 
 @Injectable()
 export class SettingsService {

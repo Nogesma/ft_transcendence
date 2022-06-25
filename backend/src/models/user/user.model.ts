@@ -5,11 +5,13 @@ import {
   Model,
   PrimaryKey,
   Table,
+  Unique,
 } from "sequelize-typescript";
 
-@Table({ timestamps: false, tableName: "Users" })
+@Table({ timestamps: false })
 export class User extends Model {
   @PrimaryKey
+  @Unique
   @AllowNull(false)
   @Column
   id: number;

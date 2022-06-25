@@ -5,10 +5,10 @@ import { nanoid } from "nanoid";
 import dayjs from "dayjs";
 import speakeasy from "speakeasy";
 import { ConfigService } from "@nestjs/config";
-import { UserService } from "../user/user.service.js";
-import { SessionService } from "../session/session.service.js";
-import { TFASessionService } from "../TFASession/TFASession.service.js";
-import { TFASecretService } from "../TFASecret/TFASecret.service.js";
+import { UserService } from "../../models/user/user.service.js";
+import { SessionService } from "../../models/session/session.service.js";
+import { TFASessionService } from "../../models/TFASession/TFASession.service.js";
+import { TFASecretService } from "../../models/TFASecret/TFASecret.service.js";
 
 @Injectable()
 export class AuthService {

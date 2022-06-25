@@ -1,6 +1,7 @@
 import {
   AllowNull,
   Column,
+  Default,
   ForeignKey,
   Model,
   PrimaryKey,
@@ -9,19 +10,21 @@ import {
 } from "sequelize-typescript";
 import { User } from "../user/user.model.js";
 
-@Table({ timestamps: false, tableName: "Temporary2FATokens" })
-export class TFASession extends Model {
+@Table({ timestamps: false })
+export class TFASecret extends Model {
   @ForeignKey(() => User)
   @PrimaryKey
+  @Unique
   @Column
-  id: number;
+  user: number;
 
   @AllowNull(false)
   @Unique
   @Column
-  token: string;
+  secret: string;
 
   @AllowNull(false)
+  @Default(true)
   @Column
-  expires: Date;
+  temp: boolean;
 }

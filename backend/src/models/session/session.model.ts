@@ -3,18 +3,16 @@ import {
   Column,
   ForeignKey,
   Model,
-  PrimaryKey,
   Table,
   Unique,
 } from "sequelize-typescript";
 import { User } from "../user/user.model.js";
 
-@Table({ timestamps: false, tableName: "Sessions" })
+@Table({ timestamps: false })
 export class Session extends Model {
   @ForeignKey(() => User)
-  @PrimaryKey
   @Column
-  id: number;
+  user: number;
 
   @AllowNull(false)
   @Unique
