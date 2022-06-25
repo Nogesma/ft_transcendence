@@ -29,7 +29,7 @@ export class AuthenticateMiddleware implements NestMiddleware {
     if (!session || !session.id || isExpired(session.expires))
       throw new HttpException("Invalid token", HttpStatus.UNAUTHORIZED);
 
-    req.id = session.id;
+    req.id = session.user;
     next();
   }
 }

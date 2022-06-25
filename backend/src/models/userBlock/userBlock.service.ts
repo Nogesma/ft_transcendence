@@ -9,14 +9,15 @@ export class UserBlockService {
     private userBlockModel: typeof UserBlock
   ) {}
 
-  blockUser = (id: number, blocked: number) =>
-    this.userBlockModel.create({ id, blocked });
+  blockUser = (user: number, blocked: number) =>
+    this.userBlockModel.create({ user, blocked });
 
-  unBlockUser = (id: number, blocked: number) =>
-    this.userBlockModel.destroy({ where: { id, blocked } });
+  unBlockUser = (user: number, blocked: number) =>
+    this.userBlockModel.destroy({ where: { user, blocked } });
 
-  isBlocked = (id: number, blocked: number) =>
-    this.userBlockModel.findOne({ where: { id, blocked } });
+  isBlocked = (user: number, blocked: number) =>
+    this.userBlockModel.findOne({ where: { user, blocked } });
 
-  getBlocked = (id: number) => this.userBlockModel.findAll({ where: { id } });
+  getBlocked = (user: number) =>
+    this.userBlockModel.findAll({ where: { user } });
 }

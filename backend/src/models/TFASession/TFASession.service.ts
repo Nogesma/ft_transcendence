@@ -9,12 +9,12 @@ export class TFASessionService {
     private tfaSessionModel: typeof TFASession
   ) {}
 
-  createTFASession = (id: number, token: string, expires: Date) =>
-    this.tfaSessionModel.create({ id, token, expires });
+  createTFASession = (user: number, token: string, expires: Date) =>
+    this.tfaSessionModel.create({ user, token, expires });
 
   getTFASession = (token: string) =>
     this.tfaSessionModel.findOne({ where: { token } });
 
-  destroyTFASession = (id: number, token: string) =>
-    this.tfaSessionModel.destroy({ where: { id, token } });
+  destroyTFASession = (user: number, token: string) =>
+    this.tfaSessionModel.destroy({ where: { user, token } });
 }
