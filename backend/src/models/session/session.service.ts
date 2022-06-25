@@ -9,8 +9,8 @@ export class SessionService {
     private sessionModel: typeof Session
   ) {}
 
-  createSession = (id: number, token: string, expires: Date) =>
-    this.sessionModel.create({ id, token, expires });
+  createSession = (user: number, token: string, expires: Date) =>
+    this.sessionModel.create({ user, token, expires });
 
   getSession = (token: string) =>
     this.sessionModel.findOne({ where: { token } });

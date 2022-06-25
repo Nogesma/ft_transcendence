@@ -9,11 +9,11 @@ export class TFASecretService {
     private tfaSecretModel: typeof TFASecret
   ) {}
 
-  createTFASecret = (id: number, secret: string, temp: boolean) =>
-    this.tfaSecretModel.create({ id, secret, temp });
+  createTFASecret = (user: number, secret: string, temp: boolean) =>
+    this.tfaSecretModel.create({ user, secret, temp });
 
-  setTFASecretTemp = (id: number, temp: boolean) =>
-    this.tfaSecretModel.update({ temp }, { where: { id } });
+  setTFASecretTemp = (user: number, temp: boolean) =>
+    this.tfaSecretModel.update({ temp }, { where: { user } });
 
-  getTFASecret = (id: number) => this.tfaSecretModel.findByPk(id);
+  getTFASecret = (user: number) => this.tfaSecretModel.findByPk(user);
 }
