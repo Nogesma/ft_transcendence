@@ -8,4 +8,35 @@ export class ChannelService {
     @InjectModel(Channel)
     private channelModel: typeof Channel
   ) {}
+
+  createChannel = (
+    id: number,
+    name: string,
+    publicChannel: boolean,
+    password: boolean,
+    owner: number
+  ) => this.channelModel.create({ id, name, publicChannel, password, owner });
+
+  createChannelIfNotExist = async ({
+    id,
+    name,
+    publicChannel,
+    password,
+    owner,
+  }: {
+    id: number;
+    name: string;
+    publicChannel: boolean;
+    password: boolean;
+    owner: number;
+  }) => {
+    const channel = await this.getChannel(id);
+
+    if (!channel)
+      return this.createChannel(id, name, publicChannel, password, owner);
+
+    return channel;
+  };
+
+  getChannel = (id: number) => this.channelModel.findByPk(id);
 }

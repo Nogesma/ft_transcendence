@@ -23,7 +23,7 @@ export class Channel extends Model {
   @AllowNull(false)
   @Default(false)
   @Column
-  public: boolean;
+  publicChannel: boolean;
 
   @Default(false)
   @Column
