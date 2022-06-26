@@ -4,7 +4,7 @@
   let msg: string;
   let messagesList: Array<string> = [];
 
-  const socket = io("http://localhost:3000");
+  const socket = io("http://localhost:3000", { withCredentials: true });
 
   socket.on("connect", () => {
     console.log("connected");
