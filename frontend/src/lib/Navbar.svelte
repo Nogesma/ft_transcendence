@@ -48,11 +48,7 @@
       >
     </a>
     <div class="flex items-center md:order-2">
-      <button
-        class="darkmodeButton bg-white bg-clip-border text-{modeC}-900
-                                      p-1 flex items-center m-2"
-        on:click={toggle}>{modeName} mode</button
-      >
+      <button on:click={toggle}>{modeName} mode</button>
       <div class="relative" bind:this={menu}>
         <div>
           <button

@@ -6,9 +6,11 @@ import Authenticate2FA from "./routes/auth/TwoFactorAuth.svelte";
 import Manage2FA from "./routes/settings/Manage2FA.svelte";
 import ManageUserName from "./routes/settings/ManageUserName.svelte";
 import Settings from "./routes/settings/Settings.svelte";
+import JoinChannel from "./routes/chat/JoinChannel.svelte";
 
 export default {
   "/": Home,
+  "/chat/join": JoinChannel,
   "/settings": Settings,
   "/settings/2fa": Manage2FA,
   "/settings/username": ManageUserName,

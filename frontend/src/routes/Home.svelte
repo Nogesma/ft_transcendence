@@ -3,6 +3,7 @@
   import { onMount } from "svelte";
   import axios from "axios";
   import Navbar from "../lib/Navbar.svelte";
+  import ChannelManager from "../lib/ChannelManager.svelte";
 
   const getUserData = async () =>
     axios
@@ -22,4 +23,5 @@
   <h1 class="m-auto text-5xl font-bold">
     {localStorage.getItem("displayname")}
   </h1>
+  <ChannelManager />
 </main>

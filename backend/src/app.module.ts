@@ -7,6 +7,7 @@ import { ConfigModule } from "@nestjs/config";
 import Joi from "joi";
 import { SessionModule } from "./models/session/session.module.js";
 import { SettingsController } from "./routes/settings/settings.controller.js";
+import { ChatModule } from "./routes/chat/chat.module.js";
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { SettingsController } from "./routes/settings/settings.controller.js";
     AuthModule,
     SettingsModule,
     SessionModule,
+    ChatModule,
   ],
 })
 export class AppModule implements NestModule {
