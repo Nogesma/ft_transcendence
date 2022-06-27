@@ -40,7 +40,7 @@
 
 <nav class="bg-white border-gray-300 px-10 sm:px-10 py-2.5 dark:bg-gray-900">
   <div class="container flex flex-wrap justify-between items-center mx-auto">
-    <a href="/" class="flex items-center">
+    <a href="#/" class="flex items-center">
       <img src={penguin} class="mr-3 h-6 sm:h-9" alt="Logo" />
       <span
         class="self-center text-xl font-semibold whitespace-nowrap dark:text-white"
@@ -48,11 +48,7 @@
       >
     </a>
     <div class="flex items-center md:order-2">
-      <button
-        class="darkmodeButton bg-white bg-clip-border text-{modeC}-900
-                                      p-1 flex items-center m-2"
-        on:click={toggle}>{modeName} mode</button
-      >
+      <button on:click={toggle}>{modeName} mode</button>
       <div class="relative" bind:this={menu}>
         <div>
           <button
