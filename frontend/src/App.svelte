@@ -12,7 +12,6 @@
 
 <Router {routes} />
 
-
 <!--Dark mode style-->
 <style>
   :global(body.light-mode) {
@@ -24,5 +23,4 @@
     background-color: #1d3040;
     color: #bfc2c7;
   }
-
 </style>

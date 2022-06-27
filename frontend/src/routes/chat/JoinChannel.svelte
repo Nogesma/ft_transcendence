@@ -1,11 +1,8 @@
 <script lang="ts">
   // todo: this module should probably just be a popup within channelmanager
 
-  import { onMount } from "svelte";
   import axios from "axios";
   import { push } from "svelte-spa-router";
-
-  let publicChannels: Array<string>;
 
   const getPublicChannels = () =>
     axios.get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/public`, {

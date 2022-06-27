@@ -2,7 +2,6 @@
   import { push } from "svelte-spa-router";
   import { onMount } from "svelte";
   import axios from "axios";
-  import Navbar from "../lib/Navbar.svelte";
   import ChannelManager from "../lib/ChannelManager.svelte";
 
   const getUserData = async () =>
