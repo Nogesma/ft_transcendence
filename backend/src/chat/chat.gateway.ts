@@ -38,7 +38,6 @@ export class ChatGateway {
     (sessionService: SessionService) =>
     async (socket: Socket, next: (err?: ExtendedError) => void) => {
       const token = socket.request.signedCookies?.token;
-      console.log(socket.request.signedCookies);
       if (!token) return next(new Error("Token not found"));
 
       const session = await sessionService.getSession(token);
@@ -61,6 +60,8 @@ export class ChatGateway {
       .emit("newMessage", `User: ${socket.request.id} joined the room`);
     console.log(socket.request.id);
   }
+
+  handleConnection(socket: Socket) {}
 
   @SubscribeMessage("sendMessage")
   handleEvent(@MessageBody() data: string) {

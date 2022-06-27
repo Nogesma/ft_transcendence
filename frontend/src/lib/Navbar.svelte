@@ -1,8 +1,8 @@
 <script lang="ts">
   import penguin from "../assets/Penguins.png";
-  import { scale } from "svelte/transition";
-  import { push } from "svelte-spa-router";
   import ProfilePic from "./ProfilePic.svelte";
+  import { push } from "svelte-spa-router";
+  import { scale } from "svelte/transition";
 
   let show = false; // menu state
   let menu: HTMLElement; // menu wrapper DOM reference

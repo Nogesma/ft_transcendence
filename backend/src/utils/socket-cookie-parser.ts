@@ -1,4 +1,5 @@
 import cookieParser from "cookie-parser";
+import { NextFunction } from "express";
 import { Socket } from "socket.io";
 
 export interface ExtendedError extends Error {
@@ -7,6 +8,9 @@ export interface ExtendedError extends Error {
 
 export default (cookieSecret: string) =>
   (socket: Socket, next: (err?: ExtendedError) => void) => {
-    // @ts-ignore
-    cookieParser(cookieSecret)(socket.request, null, next);
+    cookieParser(cookieSecret)(
+      socket.request as never,
+      null as never,
+      next as NextFunction
+    );
   };

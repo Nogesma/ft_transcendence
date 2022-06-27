@@ -1,7 +1,7 @@
 <script lang="ts">
+  import axios from "axios";
   import QRCode from "qrcode";
   import TFAInput from "../../lib/2faInput.svelte";
-  import axios from "axios";
 
   let img: string;
 

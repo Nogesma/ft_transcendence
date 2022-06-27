@@ -3,7 +3,7 @@ const { Client } = pkg;
 
 const createdb = async () => {
   const client = new Client({
-    user: "lgyger",
+    user: "postgres",
     host: "localhost",
     password: "",
     port: 5432,

@@ -24,7 +24,7 @@ module.exports = {
     es2022: true,
   },
   rules: {
-    "sort-imports": 2,
+    "sort-imports": ["error", { ignoreCase: true }],
     "prefer-arrow-callback": 2,
   },
 };
