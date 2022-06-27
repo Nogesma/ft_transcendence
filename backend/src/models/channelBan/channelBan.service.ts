@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { ChannelBan } from "./channelBan.model.js";
-import { AllowNull, Column } from "sequelize-typescript";
 
 @Injectable()
 export class ChannelBanService {
@@ -18,6 +17,8 @@ export class ChannelBanService {
   getMuted = (user: number) =>
     this.channelBanModel.findOne({ where: { id: user, type: false } });
 
-  getAllBanned = () => this.channelBanModel.findAll({ where: { type: true } });
-  getAllMuted = () => this.channelBanModel.findAll({ where: { type: false } });
+  getAllBanned = (chan: number) =>
+    this.channelBanModel.findAll({ where: { type: true, channel: chan } });
+  getAllMuted = (chan: number) =>
+    this.channelBanModel.findAll({ where: { type: false, channel: chan } });
 }

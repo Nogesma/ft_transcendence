@@ -13,4 +13,7 @@ export class ChannelAdminService {
     this.channelAdminModel.create({ chan, user });
 
   getAdmin = (user: number) => this.channelAdminModel.findByPk(user);
+
+  removeAdmin = (user: number, chan: number) =>
+    this.channelAdminModel.destroy({ where: { id: user, channel: chan } });
 }

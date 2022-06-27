@@ -39,4 +39,5 @@ export class ChannelService {
 
   getPubChannel = () => this.channelModel.findAll({ where: { public: true } });
   getChannel = (id: number) => this.channelModel.findByPk(id);
+  findChannelByName = (name: string) => this.channelModel.findByPk(name);
 }
