@@ -8,4 +8,9 @@ export class ChannelAdminService {
     @InjectModel(ChannelAdmin)
     private channelAdminModel: typeof ChannelAdmin
   ) {}
+
+  addAdmin = (chan: number, user: number) =>
+    this.channelAdminModel.create({ chan, user });
+
+  getAdmin = (user: number) => this.channelAdminModel.findByPk(user);
 }

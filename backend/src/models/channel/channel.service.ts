@@ -31,12 +31,12 @@ export class ChannelService {
     owner: number;
   }) => {
     const channel = await this.getChannel(id);
-
     if (!channel)
       return this.createChannel(id, name, publicChannel, password, owner);
 
     return channel;
   };
 
+  getPubChannel = () => this.channelModel.findAll({ where: { public: true } });
   getChannel = (id: number) => this.channelModel.findByPk(id);
 }
