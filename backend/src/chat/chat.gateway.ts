@@ -54,13 +54,16 @@ export class ChatGateway {
     this.server.use(cookieParser(this.configService.get("COOKIE_SECRET")));
     this.server.use(this.socketUse(this.sessionService));
   }
-
   handleConnection(socket: Socket) {
+    socket.join("room1");
+    this.server.sockets
+      .to("room1")
+      .emit("newMessage", `User: ${socket.request.id} joined the room`);
     console.log(socket.request.id);
   }
 
   @SubscribeMessage("sendMessage")
   handleEvent(@MessageBody() data: string) {
-    this.server.sockets.emit("newMessage", data);
+    this.server.sockets.to("room1").emit("newMessage", data);
   }
 }
