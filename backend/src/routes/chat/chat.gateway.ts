@@ -56,14 +56,6 @@ export class ChatGateway {
     this.server.use(this.socketUse(this.sessionService));
   }
 
-  handleConnection(socket: Socket) {
-    socket.join(String(socket.request.userId));
-    this.server.sockets
-      .to("room1")
-      .emit("newMessage", `User: ${socket.request.userId} joined the room`);
-    console.log(socket.request.userId);
-  }
-
   @SubscribeMessage("joinRoom")
   handleRoomJoin(
     @ConnectedSocket() client: Socket,
@@ -72,15 +64,23 @@ export class ChatGateway {
     console.log({ id });
     console.log(client.request.signedCookies.token);
     console.log(client.request.userId);
+    client.join(String(client.request.userId));
+    this.server.sockets
+      .to(String(client.request.userId))
+      .emit("newMessage", `User: ${client.request.userId} joined the room`);
   }
 
   @SubscribeMessage("leaveRoom")
-  handleRoomLeave(@MessageBody() data: string) {
-    this.server.sockets.to("room1").emit("newMessage", data);
+  handleRoomLeave(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: string
+  ) {
+    this.server.sockets.to(String(client.request.userId)).emit("newMessage", data);
   }
 
   @SubscribeMessage("sendMessage")
-  handleEvent(@MessageBody() data: string) {
-    this.server.sockets.to("room1").emit("newMessage", data);
+  handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data: string) {
+    console.log("test");
+    this.server.sockets.to(String(client.request.userId)).emit("newMessage", data);
   }
 }

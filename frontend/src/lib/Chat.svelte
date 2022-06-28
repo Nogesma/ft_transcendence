@@ -37,4 +37,4 @@
 <h1>Hello world</h1>
 <br /><br />
 <input bind:value={msg} />
-<button on:click={sendmsg}> send message </button>
+<button class="btn" on:click={sendmsg}> send message </button>
