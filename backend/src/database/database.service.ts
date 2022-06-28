@@ -8,6 +8,7 @@ import { ChannelBan } from "../models/channelBan/channelBan.model.js";
 import { ChannelMember } from "../models/channelMember/channelMember.model.js";
 import { ChannelAdmin } from "../models/channelAdmin/channelAdmin.model.js";
 
+// todo: disable alter for prod
 @Injectable()
 export class DatabaseService {
   sync = () =>

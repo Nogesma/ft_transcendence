@@ -24,6 +24,5 @@
   <h1 class="m-auto text-5xl font-bold">
     {localStorage.displayname}
   </h1>
-  <button on:click={() => push("/chat")}>Chat</button>
   <ChannelManager />
 </main>

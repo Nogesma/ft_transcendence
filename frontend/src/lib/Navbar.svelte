@@ -8,7 +8,6 @@
   let menu: HTMLElement; // menu wrapper DOM reference
 
   const handleOutsideClick = (event: MouseEvent) => {
-    console.log(typeof Event);
     if (!menu.contains(event.target as Node)) show = false;
   };
 

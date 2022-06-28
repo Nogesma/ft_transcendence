@@ -27,10 +27,10 @@ export class ChannelService {
     const channel = await this.findChannelByName(name);
     if (!channel) return this.createChannel(name, pub, ownerId, password, salt);
 
-    return channel;
-  };
+  getChannelById = (id: number) => this.channelModel.findByPk(id);
 
-  getPubChannel = () => this.channelModel.findAll({ where: { public: true } });
-  getChannel = (id: number) => this.channelModel.findByPk(id);
+  getChannelByName = (name: string) =>
+    this.channelModel.findOne({ where: { name } });
+
   findChannelByName = (name: string) => this.channelModel.findByPk(name);
 }

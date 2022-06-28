@@ -11,7 +11,7 @@ export default {
   "/settings": wrap({
     asyncComponent: () => import("./routes/settings/Settings.svelte"),
   }),
-  "/settings/2fa": Manage2FA,
+ "/settings/2fa": Manage2FA,
   "/settings/username": ManageUserName,
   "/auth/login": wrap({
     asyncComponent: () => import("./routes/auth/Login.svelte"),
