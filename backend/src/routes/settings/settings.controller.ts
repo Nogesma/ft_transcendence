@@ -1,15 +1,16 @@
 import {
+  Body,
   Controller,
   Get,
+  HttpException,
   HttpStatus,
+  Param,
+  Post,
   Req,
   Res,
-  Post,
-  Param,
-  Body,
-  HttpException,
 } from "@nestjs/common";
 import { Request, Response } from "express";
+
 import { SettingsService } from "./settings.service.js";
 
 @Controller("user")

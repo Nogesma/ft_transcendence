@@ -10,9 +10,9 @@ const createdb = async () => {
     database: "template1",
   });
   client.connect();
-  await client.query(`CREATE DATABASE ${process.env.DB_NAME}`).catch(() => {
-    console.error("DB already exist");
-  });
+  await client
+    .query(`CREATE DATABASE ${process.env.DB_NAME}`)
+    .catch(console.error);
   await client
     .query(
       `CREATE USER ${process.env.DB_USER} with password '${process.env.DB_PASSWORD}'`

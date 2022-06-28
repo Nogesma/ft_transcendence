@@ -15,11 +15,15 @@ module.exports = {
   parserOptions: {
     project: "tsconfig.json",
     sourceType: "module",
-    ecmaVersion: 2020,
+    ecmaVersion: 2022,
+    extraFileExtensions: [".svelte"],
+    allowImportExportEverywhere: false,
   },
   env: {
     browser: true,
-    es2017: true,
-    node: true,
+    es2022: true,
+  },
+  rules: {
+    "prefer-arrow-callback": 2,
   },
 };
