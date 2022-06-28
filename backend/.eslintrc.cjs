@@ -17,7 +17,6 @@ module.exports = {
   },
   ignorePatterns: [".eslintrc.js"],
   rules: {
-    "sort-imports": ["error", { ignoreCase: true }],
     "prefer-arrow-callback": 2,
   },
 };

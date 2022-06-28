@@ -7,9 +7,9 @@ import {
 import { Server, Socket } from "socket.io";
 
 import { ConfigService } from "@nestjs/config";
-import cookieParser from "../utils/socket-cookie-parser.js";
-import { isExpired } from "../utils/date.js";
-import { SessionService } from "../session/session.service.js";
+import cookieParser from "../../utils/socket-cookie-parser.js";
+import { isExpired } from "../../utils/date.js";
+import { SessionService } from "../../models/session/session.service.js";
 
 export interface ExtendedError extends Error {
   data?: never;
@@ -53,6 +53,7 @@ export class ChatGateway {
     this.server.use(cookieParser(this.configService.get("COOKIE_SECRET")));
     this.server.use(this.socketUse(this.sessionService));
   }
+
   handleConnection(socket: Socket) {
     socket.join("room1");
     this.server.sockets
@@ -60,8 +61,6 @@ export class ChatGateway {
       .emit("newMessage", `User: ${socket.request.id} joined the room`);
     console.log(socket.request.id);
   }
-
-  handleConnection(socket: Socket) {}
 
   @SubscribeMessage("sendMessage")
   handleEvent(@MessageBody() data: string) {
