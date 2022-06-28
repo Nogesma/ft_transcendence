@@ -77,12 +77,12 @@
                   href="#/settings"
                   class="block text-sm text-gray-900 dark:text-white"
                 >
-                  {localStorage.getItem("displayname")}
+                  {localStorage.displayname}
                 </a>
                 <span
                   class="block text-sm font-medium text-{modeC}-500
                                 truncate dark:text-gray-400"
-                  >{localStorage.getItem("login")}@student.42lausanne.ch</span
+                  >{localStorage.login}@student.42lausanne.ch</span
                 >
               </div>
               <button

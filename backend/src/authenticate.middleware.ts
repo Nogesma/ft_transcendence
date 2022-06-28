@@ -6,7 +6,7 @@ import {
 } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
 import { SessionService } from "./models/session/session.service.js";
-import { Session } from "./models/session/session.model.js";
+import { type Session } from "./models/session/session.model.js";
 import { isExpired } from "./utils/date.js";
 
 declare module "express" {

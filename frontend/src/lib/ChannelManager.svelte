@@ -3,11 +3,11 @@
   import axios from "axios";
   import { push } from "svelte-spa-router";
 
-  export let channel = "";
+  export let channel = { name: "", id: -1 };
 
   let hasChat = false;
 
-  if (channel.length) hasChat = true;
+  if (channel.id != -1) hasChat = true;
 
   const getChannels = () =>
     axios.get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/channels`, {
@@ -25,14 +25,14 @@
           <span>Channels</span>
         </li>
       {/if}
-      {#each data as chan}
+      {#each data as { name, id }}
         <li>
           <button
             on:click={() => {
-              channel = chan;
+              channel = { name, id };
               hasChat = true;
             }}
-            >{chan}
+            >{id}:{name}
           </button>
         </li>
       {/each}
@@ -54,5 +54,5 @@
     <p>{err}</p>
   {/await}
 {:else}
-  <Chat channelName={channel} />
+  <Chat {channel} />
 {/if}
