@@ -3,6 +3,7 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  ConnectedSocket,
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 
@@ -16,9 +17,9 @@ export interface ExtendedError extends Error {
 }
 
 declare module "http" {
-  export interface IncomingMessage {
-    id: number;
+  interface IncomingMessage {
     signedCookies: { token: string };
+    userId: number;
   }
 }
 
@@ -42,10 +43,11 @@ export class ChatGateway {
 
       const session = await sessionService.getSession(token);
 
-      if (!session || !session.id || isExpired(session.expires))
+      if (!session || !session.user || isExpired(session.expires))
         return next(new Error("Invalid token"));
 
-      socket.request.id = session.id;
+      socket.request.userId = session.user;
+
       next();
     };
 
@@ -55,11 +57,26 @@ export class ChatGateway {
   }
 
   handleConnection(socket: Socket) {
-    socket.join("room1");
+    socket.join(String(socket.request.userId));
     this.server.sockets
       .to("room1")
-      .emit("newMessage", `User: ${socket.request.id} joined the room`);
-    console.log(socket.request.id);
+      .emit("newMessage", `User: ${socket.request.userId} joined the room`);
+    console.log(socket.request.userId);
+  }
+
+  @SubscribeMessage("joinRoom")
+  handleRoomJoin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("id") id: number
+  ) {
+    console.log({ id });
+    console.log(client.request.signedCookies.token);
+    console.log(client.request.userId);
+  }
+
+  @SubscribeMessage("leaveRoom")
+  handleRoomLeave(@MessageBody() data: string) {
+    this.server.sockets.to("room1").emit("newMessage", data);
   }
 
   @SubscribeMessage("sendMessage")

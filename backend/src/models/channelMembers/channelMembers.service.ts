@@ -12,6 +12,9 @@ export class ChannelMembersService {
   addMember = (chan: number, user: number) =>
     this.channelMembersModel.create({ chan, user });
 
-  getUser = (user: number) => this.channelMembersModel.findByPk(user);
-  getAllUser = () => this.channelMembersModel.findAll();
+  getMember = (chan: number, user: number) =>
+    this.channelMembersModel.findOne({ where: { chan, user } });
+
+  getAllChanMember = (chan: number) =>
+    this.channelMembersModel.findAll({ where: { chan } });
 }

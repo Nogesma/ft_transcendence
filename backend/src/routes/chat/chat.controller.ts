@@ -7,7 +7,10 @@ export class ChatController {
 
   @Get("channels")
   async getUserChannels() {
-    return ["admin", "test", "42"];
+    return [
+      { name: "42", id: 1 },
+      { name: "Hello", id: 2 },
+    ];
   }
 
   @Get("public")
