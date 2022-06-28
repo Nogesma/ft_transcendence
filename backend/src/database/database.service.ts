@@ -7,18 +7,21 @@ import { Channel } from "../models/channel/channel.model.js";
 import { ChannelAdmin } from "../models/channelAdmin/channelAdmin.model.js";
 import { ChannelBan } from "../models/channelBan/channelBan.model.js";
 import { UserBlock } from "../models/userBlock/userBlock.model.js";
+import { ChannelMember } from "../models/channelMember/channelMember.model.js";
 
+// todo: disable alter for prod
 @Injectable()
 export class DatabaseService {
   sync = () =>
     Promise.all([
-      User.sync(),
-      Session.sync(),
-      TFASession.sync(),
-      TFASecret.sync(),
-      Channel.sync(),
-      ChannelAdmin.sync(),
-      ChannelBan.sync(),
-      UserBlock.sync(),
+      User.sync({ alter: true }),
+      Session.sync({ alter: true }),
+      TFASession.sync({ alter: true }),
+      TFASecret.sync({ alter: true }),
+      Channel.sync({ alter: true }),
+      ChannelAdmin.sync({ alter: true }),
+      ChannelBan.sync({ alter: true }),
+      UserBlock.sync({ alter: true }),
+      ChannelMember.sync({ alter: true }),
     ]);
 }

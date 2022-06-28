@@ -1,36 +1,29 @@
 import {
   AllowNull,
   Column,
-  Default,
   ForeignKey,
+  HasOne,
   Model,
-  PrimaryKey,
   Table,
+  Unique,
 } from "sequelize-typescript";
 import { User } from "../user/user.model.js";
 
 @Table({ timestamps: false })
 export class Channel extends Model {
-  @PrimaryKey
   @AllowNull(false)
-  @Column
-  id: number;
-
-  @AllowNull(false)
+  @Unique
   @Column
   name: string;
 
   @AllowNull(false)
-  @Default(false)
   @Column
-  publicChannel: boolean;
+  public: boolean;
 
-  @Default(false)
   @Column
-  password: boolean;
+  password: string;
 
-  @ForeignKey(() => User)
-  @PrimaryKey
+  @HasOne(() => User)
   @Column
   owner: number;
 }

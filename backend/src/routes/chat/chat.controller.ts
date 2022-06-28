@@ -1,25 +1,39 @@
-import { Controller, Get, Post } from "@nestjs/common";
+import { Controller, Get, Param, Post, Req } from "@nestjs/common";
 import { ChatService } from "./chat.service.js";
+import { MessageBody } from "@nestjs/websockets";
+import { Request } from "express";
 
 @Controller("chat")
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @Get("channels")
-  async getUserChannels() {
-    return [
-      { name: "42", id: 1 },
-      { name: "Hello", id: 2 },
-    ];
+  async getUserChannels(@Req() req: Request) {
+    return this.chatService.getJoinedChannels(req.id);
   }
 
   @Get("public")
   async getPublicChannels() {
-    return ["public", "channels"];
+    return this.chatService.getPublicChannels();
   }
 
-  @Post("join")
-  async joinChannel() {
-    return true;
+  @Post("join/:name")
+  async joinChannel(
+    @Req() req: Request,
+    @Param("name") name: string,
+    @MessageBody("password") password: string,
+    @MessageBody("public") pub: boolean
+  ) {
+    return this.chatService.joinChannel(name, pub, password, req.id);
+  }
+
+  @Post("create/:name")
+  async createChannel(
+    @Req() req: Request,
+    @Param("name") name: string,
+    @MessageBody("password") password: string,
+    @MessageBody("public") pub: boolean
+  ) {
+    return this.chatService.createChannel(name, pub, password, req.id);
   }
 }

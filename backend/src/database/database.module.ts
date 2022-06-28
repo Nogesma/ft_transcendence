@@ -10,6 +10,7 @@ import { Channel } from "../models/channel/channel.model.js";
 import { ChannelAdmin } from "../models/channelAdmin/channelAdmin.model.js";
 import { ChannelBan } from "../models/channelBan/channelBan.model.js";
 import { UserBlock } from "../models/userBlock/userBlock.model.js";
+import { ChannelMember } from "../models/channelMember/channelMember.model.js";
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { UserBlock } from "../models/userBlock/userBlock.model.js";
           ChannelAdmin,
           ChannelBan,
           UserBlock,
+          ChannelMember,
         ],
       }),
     }),
