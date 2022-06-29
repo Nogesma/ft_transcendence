@@ -12,6 +12,7 @@ import cookieParser from "../../utils/socket-cookie-parser.js";
 import { isExpired } from "../../utils/date.js";
 import { SessionService } from "../../models/session/session.service.js";
 
+
 export interface ExtendedError extends Error {
   data?: never;
 }
@@ -75,12 +76,16 @@ export class ChatGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: string
   ) {
-    this.server.sockets.to(String(client.request.userId)).emit("newMessage", data);
+    console.log("left");
+    this.server.sockets
+      .to(String(client.request.userId))
+      .emit("newMessage", `User : ${client.request.userId} left the room`);
   }
 
   @SubscribeMessage("sendMessage")
   handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data: string) {
-    console.log("test");
-    this.server.sockets.to(String(client.request.userId)).emit("newMessage", data);
+    this.server.sockets
+      .to(String(client.request.userId))
+      .emit("newMessage", data);
   }
 }
