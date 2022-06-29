@@ -2,6 +2,8 @@
   import Chat from "./Chat.svelte";
   import axios from "axios";
   import { push } from "svelte-spa-router";
+  import JoinChannel from "./JoinChannel.svelte";
+  import CreateChannel from "./CreateChannel.svelte";
 
   export let channel = { name: "", id: -1 };
 
@@ -19,37 +21,19 @@
   {#await getChannels()}
     <p>waiting...</p>
   {:then { data }}
-    <ul class="menu bg-base-100 w-56 rounded-box">
-      {#if data.length}
-        <li class="menu-title">
-          <span>Channels</span>
-        </li>
-      {/if}
-      {#each data as { name, id }}
-        <li>
-          <button
-            on:click={() => {
-              channel = { name, id };
-              hasChat = true;
-            }}
-            >{id}:{name}
-          </button>
-        </li>
-      {/each}
-      <li class="menu-title">
-        <span>Manage Channels</span>
-      </li>
-      <li>
-        <button on:click={() => push("/chat/join")}>Join new channel</button>
-      </li>
-      <li>
-        <button on:click={() => push("/chat/create")}>Create new channel</button
-        >
-      </li>
-      <li>
-        <button on:click={() => push("/chat/leave")}>Leave channel</button>
-      </li>
-    </ul>
+    {#each data as { name, id }}
+      <button
+        class="btn"
+        on:click={() => {
+          channel = { name, id };
+          hasChat = true;
+        }}
+        >{id}:{name}
+      </button>
+    {/each}
+    <JoinChannel />
+    <CreateChannel />
+    <!--    <LeaveChannel />-->
   {:catch err}
     <p>{err}</p>
   {/await}
