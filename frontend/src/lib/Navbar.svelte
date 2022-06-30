@@ -1,7 +1,8 @@
 <script lang="ts">
   import penguin from "../assets/Penguins.png";
-  import { scale } from "svelte/transition";
+  import ProfilePic from "./ProfilePic.svelte";
   import { push } from "svelte-spa-router";
+  import { scale } from "svelte/transition";
 
   let show = false; // menu state
   let menu: HTMLElement; // menu wrapper DOM reference
@@ -39,7 +40,7 @@
 
 <nav class="bg-white border-gray-300 px-10 sm:px-10 py-2.5 dark:bg-gray-900">
   <div class="container flex flex-wrap justify-between items-center mx-auto">
-    <a href="/" class="flex items-center">
+    <a href="#/" class="flex items-center">
       <img src={penguin} class="mr-3 h-6 sm:h-9" alt="Logo" />
       <span
         class="self-center text-xl font-semibold whitespace-nowrap dark:text-white"
@@ -47,11 +48,7 @@
       >
     </a>
     <div class="flex items-center md:order-2">
-      <button
-        class="darkmodeButton bg-white bg-clip-border text-{modeC}-900
-                                      p-1 flex items-center m-2"
-        on:click={toggle}>{modeName} mode</button
-      >
+      <button on:click={toggle}>{modeName} mode</button>
       <div class="relative" bind:this={menu}>
         <div>
           <button
@@ -62,14 +59,7 @@
             aria-expanded="false"
             type="button"
           >
-            <img
-              class="w-10 h-10 rounded-full object-cover
-                                        border border-b-gray-100 shadow-sm"
-              src={`${
-                import.meta.env.VITE_WEBSERV_URI
-              }/users/${localStorage.getItem("login")}.jpg`}
-              alt="userPFP"
-            />
+            <ProfilePic height="h-10" width="w-10" />
           </button>
           {#if show}
             <div

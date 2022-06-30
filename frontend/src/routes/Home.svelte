@@ -3,12 +3,7 @@
   import { onMount } from "svelte";
   import axios from "axios";
   import Pong from "../lib/Pong/Pong.svelte";
-  import Navbar from "../lib/Navbar.svelte";
-
-  let login: string, displayname: string, error: string, file: FileList;
-
-  let t = 0;
-
+  import ChannelManager from "../lib/ChannelManager.svelte";
 
   const getUserData = async () =>
     axios
@@ -24,36 +19,11 @@
   onMount(getUserData);
 </script>
 
-<header>
-  <Navbar />
-</header>
 <main class="flex flex-col">
   <h1 class="m-auto text-5xl font-bold">
     {localStorage.getItem("displayname")}
   </h1>
-  <div class="m-auto mt-10">
-    <Pong height="500" width="1000" />
-  </div>
-
-  <!--    <h3 class="m-auto">{error ?? ""}</h3>-->
-
-  <!--    <div class="m-auto mt-10">-->
-  <!--      <label-->
-  <!--        for="avatar_upload"-->
-  <!--        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"-->
-  <!--      >-->
-  <!--        Choose avatar...-->
-  <!--      </label>-->
-  <!--      <input-->
-  <!--        class="opacity-0"-->
-  <!--        type="file"-->
-  <!--        accept="image/jpeg"-->
-  <!--        id="avatar_upload"-->
-  <!--        bind:files={file}-->
-  <!--      />-->
-  <!--      <button-->
-  <!--        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-centers"-->
-  <!--        on:click={uploadAvatar}>Submit-->
-  <!--      </button>-->
-  <!--    </div>-->
+  <button on:click={() => push("/chat")}>Chat</button>
+  <ChannelManager />
+  <Pong/>
 </main>

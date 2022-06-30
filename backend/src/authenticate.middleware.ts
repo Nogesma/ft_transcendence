@@ -4,9 +4,9 @@ import {
   Injectable,
   NestMiddleware,
 } from "@nestjs/common";
-import dayjs from "dayjs";
 import { NextFunction, Request, Response } from "express";
-import { SessionService } from "./session/session.service.js";
+import { SessionService } from "./models/session/session.service.js";
+import { isExpired } from "./utils/date.js";
 
 declare module "express" {
   export interface Request {
@@ -29,9 +29,7 @@ export class AuthenticateMiddleware implements NestMiddleware {
     if (!session || !session.id || isExpired(session.expires))
       throw new HttpException("Invalid token", HttpStatus.UNAUTHORIZED);
 
-    req.id = session.id;
+    req.id = session.user;
     next();
   }
 }
-
-const isExpired = (date: Date) => dayjs(date).isBefore(dayjs());
