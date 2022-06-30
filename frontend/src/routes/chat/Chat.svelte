@@ -24,8 +24,8 @@
 
 </script>
 
-<div class="responsive">
-  <div class="drawer drawer-end relative max-h-96">
+<div class="responsive flex">
+  <div class="drawer drawer-end relative h-96">
     <input id="my-drawer-4" type="checkbox" class="drawer-toggle" />
     <div class="drawer-content absolute grid grid-cols-1 m-2">
       <label for="my-drawer-4" class="">

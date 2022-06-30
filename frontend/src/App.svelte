@@ -4,24 +4,20 @@
   import routes from "./routes";
   import Navbar from "./lib/Navbar.svelte";
   // import Chat from "./lib/Chat.svelte";
+  import ChannelManager from "./lib/ChannelManager.svelte";
 
   if (new URLSearchParams(window.location.search).has("code"))
     push("/auth/oauth2callback" + window.location.search);
 </script>
 
-<Navbar />
 
-<Router {routes} />
 
-<!--Dark mode style-->
-<style>
-  :global(body.light-mode) {
-    background-color: #f2eee2;
-    color: #0084f6;
-    transition: background-color 0.3s;
-  }
-  :global(body) {
-    background-color: #1d3040;
-    color: #bfc2c7;
-  }
-</style>
+<html class="dark" lang="en">
+<body>
+<div class="bg-white dark:bg-black">
+    <Navbar />
+    <Router {routes} />
+    <ChannelManager />
+</div>
+</body>
+</html>
