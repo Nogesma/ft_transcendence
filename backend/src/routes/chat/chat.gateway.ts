@@ -11,8 +11,8 @@ import { ConfigService } from "@nestjs/config";
 import cookieParser from "../../utils/socket-cookie-parser.js";
 import { isExpired } from "../../utils/date.js";
 import { SessionService } from "../../models/session/session.service.js";
-
-
+import { ChannelMemberService } from "../../models/channelMember/channelMember.service.js";
+import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
 export interface ExtendedError extends Error {
   data?: never;
 }
@@ -43,12 +43,9 @@ export class ChatGateway {
       if (!token) return next(new Error("Token not found"));
 
       const session = await sessionService.getSession(token);
-
       if (!session || !session.user || isExpired(session.expires))
         return next(new Error("Invalid token"));
-
       socket.request.userId = session.user;
-
       next();
     };
 
@@ -62,9 +59,16 @@ export class ChatGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody("id") id: number
   ) {
-    console.log({ id });
-    console.log(client.request.signedCookies.token);
-    console.log(client.request.userId);
+    const add_member = (Chan: ChannelMemberService, Ban: ChannelBanService) => {
+      if (!Ban.isBanned(id)) {
+        client.emit(
+          "newMessage",
+          `Error: Cannot join room because you are banned`
+        );
+        return;
+      }
+      Chan.addMember(client.request.userId, id);
+    };
     client.join(String(client.request.userId));
     this.server.sockets
       .to(String(client.request.userId))
@@ -84,6 +88,12 @@ export class ChatGateway {
 
   @SubscribeMessage("sendMessage")
   handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data: string) {
+    const can_talk = (Mute: ChannelBanService) => {
+      if (!Mute.isMuted(Number(client.id))) {
+        client.emit("newMessage", "you cannot talk because you are banned");
+        return;
+      }
+    };
     this.server.sockets
       .to(String(client.request.userId))
       .emit("newMessage", data);

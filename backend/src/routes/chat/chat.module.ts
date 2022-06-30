@@ -17,6 +17,6 @@ import { ChannelMemberModule } from "../../models/channelMember/channelMember.mo
     ChannelMemberModule,
   ],
   controllers: [ChatController],
-  providers: [ChatService, ChatGateway],
+  providers: [ChatService, ChatGateway, UserModule],
 })
 export class ChatModule {}
