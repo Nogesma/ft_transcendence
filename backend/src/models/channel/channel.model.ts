@@ -1,16 +1,15 @@
 import {
   AllowNull,
   BelongsTo,
+  BelongsToMany,
   Column,
   ForeignKey,
-  HasMany,
-  HasOne,
   Model,
   Table,
   Unique,
 } from "sequelize-typescript";
 import { User } from "../user/user.model.js";
-import { ChannelBan } from "../channelBan/channelBan.model.js";
+import { ChannelMember } from "../channelMember/channelMember.model.js";
 
 @Table({ timestamps: false })
 export class Channel extends Model {
@@ -26,23 +25,22 @@ export class Channel extends Model {
   @Column
   password: string;
 
+  @Column
+  salt: string;
+
   @ForeignKey(() => User)
   @Column
   ownerId: number;
 
   @BelongsTo(() => User)
-  @Column
-  owner: User;
+  owner: ReturnType<() => User>;
 
-  @HasMany(() => User)
-  @Column
-  admins: User[];
+  // @BelongsToMany(() => User, () => ChannelMember)
+  // members: User[];
 
-  @HasMany(() => User)
-  @Column
-  members: User[];
+  // @BelongsToMany(() => User, () => ChannelMember)
+  // admin: User[];
 
-  @HasMany(() => ChannelBan)
-  @Column
-  ban: ChannelBan[];
+  // @BelongsToMany(() => User, () => ChannelMember)
+  // bans: User[];
 }

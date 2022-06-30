@@ -1,5 +1,6 @@
 import {
   AllowNull,
+  BelongsTo,
   Column,
   ForeignKey,
   Model,
@@ -11,8 +12,12 @@ import { User } from "../user/user.model.js";
 @Table({ timestamps: false })
 export class Session extends Model {
   @ForeignKey(() => User)
+  @AllowNull(false)
   @Column
-  user: number;
+  userId: number;
+
+  @BelongsTo(() => User)
+  user: ReturnType<() => User>;
 
   @AllowNull(false)
   @Unique

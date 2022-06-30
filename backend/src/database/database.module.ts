@@ -8,6 +8,8 @@ import { TFASecret } from "../models/TFASecret/TFASecret.model.js";
 import { DatabaseService } from "./database.service.js";
 import { Channel } from "../models/channel/channel.model.js";
 import { ChannelBan } from "../models/channelBan/channelBan.model.js";
+import { ChannelMember } from "../models/channelMember/channelMember.model.js";
+import { BlockedUser } from "../models/blockedUser/blockedUser.model.js";
 
 @Module({
   imports: [
@@ -22,7 +24,16 @@ import { ChannelBan } from "../models/channelBan/channelBan.model.js";
         password: configService.get("DB_PASSWORD"),
         database: configService.get("DB_NAME"),
         logging: false,
-        models: [User, Session, TFASession, TFASecret, Channel, ChannelBan],
+        models: [
+          User,
+          Session,
+          TFASession,
+          TFASecret,
+          Channel,
+          // ChannelMember,
+          // ChannelBan,
+          // BlockedUser,
+        ],
       }),
     }),
   ],

@@ -7,10 +7,11 @@ import {
 import dayjs from "dayjs";
 import { NextFunction, Request, Response } from "express";
 import { SessionService } from "./models/session/session.service.js";
+import { Session } from "./models/session/session.model.js";
 
 declare module "express" {
   export interface Request {
-    id: number;
+    session: Session;
   }
 }
 
@@ -29,7 +30,7 @@ export class AuthenticateMiddleware implements NestMiddleware {
     if (!session || !session.id || isExpired(session.expires))
       throw new HttpException("Invalid token", HttpStatus.UNAUTHORIZED);
 
-    req.id = session.user;
+    req.session = session;
     next();
   }
 }

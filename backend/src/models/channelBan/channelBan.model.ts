@@ -5,11 +5,9 @@ import { Channel } from "../channel/channel.model.js";
 @Table({ timestamps: false })
 export class ChannelBan extends Model {
   @HasOne(() => Channel)
-  @Column
   chan: Channel;
 
   @HasOne(() => User)
-  @Column
   user: User;
 
   // type refers to ban (1) or mute (0)

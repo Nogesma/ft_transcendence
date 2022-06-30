@@ -4,12 +4,17 @@ import {
   Column,
   Default,
   HasMany,
+  HasOne,
   Model,
   PrimaryKey,
   Table,
   Unique,
 } from "sequelize-typescript";
 import { Channel } from "../channel/channel.model.js";
+import { TFASession } from "../TFASession/TFASession.model.js";
+import { TFASecret } from "../TFASecret/TFASecret.model.js";
+import { Session } from "../session/session.model.js";
+import { ChannelMember } from "../channelMember/channelMember.model.js";
 
 @Table({ timestamps: false })
 export class User extends Model {
@@ -32,15 +37,30 @@ export class User extends Model {
   @Column
   tfa: boolean;
 
-  @HasMany(() => Channel)
-  @Column
-  owned_channels: Channel[];
+  @HasMany(() => Session)
+  session: Session[];
+
+  @HasOne(() => TFASession)
+  tfa_session: TFASession;
+
+  @HasOne(() => TFASecret)
+  tfa_secret: TFASecret;
 
   @HasMany(() => Channel)
-  @Column
-  member_channels: Channel[];
+  channels: Channel[];
 
-  @HasMany(() => User)
-  @Column
-  blocked: User[];
+  // @BelongsToMany(() => Channel, () => ChannelMember)
+  // member: Channel[];
+
+  // @BelongsToMany(() => Channel, () => ChannelMember)
+  // admin: Channel[];
+  //
+  // @BelongsToMany(() => Channel, () => ChannelMember)
+  // banned: Channel[];
+  //
+  // @BelongsToMany(() => User, () => BlockedUser)
+  // blocked: User[];
+  //
+  // @BelongsToMany(() => User, () => BlockedUser)
+  // friend: User[];
 }

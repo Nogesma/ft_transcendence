@@ -18,17 +18,35 @@ export class SettingsController {
 
   @Get("me")
   async getUserData(@Req() req: Request) {
-    return this.userService.getUserData(req.id);
+    const user = await req.session.$get("user");
+    if (!user)
+      throw new HttpException(
+        "Could not find user",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    return this.userService.getUserData(user);
   }
 
   @Get("2fa")
   async generateNew2FA(@Req() req: Request) {
-    return this.userService.generateNew2FA(req.id);
+    const user = await req.session.$get("user");
+    if (!user)
+      throw new HttpException(
+        "Could not find user",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    return this.userService.generateNew2FA(user);
   }
 
   @Post("2fa/:code")
   async validate2FA(@Req() req: Request, @Param("code") code: string) {
-    return this.userService.validate2FA(req.id, code);
+    const user = await req.session.$get("user");
+    if (!user)
+      throw new HttpException(
+        "Could not find user",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    return this.userService.validate2FA(user, code);
   }
 
   @Post("name")
@@ -36,14 +54,29 @@ export class SettingsController {
     @Req() req: Request,
     @Body() body: { name: string | undefined }
   ) {
+    const user = await req.session.$get("user");
+    if (!user)
+      throw new HttpException(
+        "Could not find user",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+
+    await user.$create("channels", { name: "42", public: true });
+
     if (!body.name)
       throw new HttpException("Missing name in body", HttpStatus.BAD_REQUEST);
 
-    return this.userService.postDisplayName(req.id, body.name);
+    return this.userService.postDisplayName(req.session.userId, body.name);
   }
 
   @Post("avatar")
   async postAvatar(@Req() req: Request, @Res() res: Response) {
-    return this.userService.postAvatar(req, res, req.id);
+    const login = (await req.session.$get("user"))?.login;
+    if (!login)
+      throw new HttpException(
+        "Could not find user",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    return this.userService.postAvatar(req, res, login);
   }
 }
