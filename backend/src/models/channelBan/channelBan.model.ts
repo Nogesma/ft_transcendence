@@ -1,22 +1,16 @@
-import {
-  AllowNull,
-  Column,
-  ForeignKey,
-  Model,
-  Table,
-} from "sequelize-typescript";
+import { AllowNull, Column, Model, Table, HasOne } from "sequelize-typescript";
 import { User } from "../user/user.model.js";
 import { Channel } from "../channel/channel.model.js";
 
 @Table({ timestamps: false })
 export class ChannelBan extends Model {
-  @ForeignKey(() => Channel)
+  @HasOne(() => Channel)
   @Column
-  chan: number;
+  chan: Channel;
 
-  @ForeignKey(() => User)
+  @HasOne(() => User)
   @Column
-  user: number;
+  user: User;
 
   // type refers to ban (1) or mute (0)
   @AllowNull(false)
