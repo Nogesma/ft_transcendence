@@ -3,6 +3,7 @@
   import Router, { push } from "svelte-spa-router";
   import routes from "./routes";
   import Navbar from "./lib/Navbar.svelte";
+  // import Chat from "./lib/Chat.svelte";
 
   if (new URLSearchParams(window.location.search).has("code"))
     push("/auth/oauth2callback" + window.location.search);

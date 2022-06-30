@@ -18,7 +18,7 @@
   onMount(getUserData);
 </script>
 
-<main class="flex flex-col">
+<main class="flex flex-col md:flex">
   <h1 class="m-auto text-5xl font-bold">
     {localStorage.getItem("displayname")}
   </h1>
