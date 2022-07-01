@@ -10,6 +10,7 @@ import { ConfigService } from "@nestjs/config";
 import cookieParser from "../../utils/socket-cookie-parser.js";
 import { isExpired } from "../../utils/date.js";
 import { SessionService } from "../../models/session/session.service.js";
+import { type Session } from "../../models/session/session.model.js";
 
 export interface ExtendedError extends Error {
   data?: never;
@@ -17,7 +18,7 @@ export interface ExtendedError extends Error {
 
 declare module "http" {
   export interface IncomingMessage {
-    id: number;
+    session: Session;
     signedCookies: { token: string };
   }
 }
@@ -42,10 +43,10 @@ export class ChatGateway {
 
       const session = await sessionService.getSession(token);
 
-      if (!session || !session.id || isExpired(session.expires))
+      if (!session || isExpired(session.expires))
         return next(new Error("Invalid token"));
 
-      socket.request.id = session.id;
+      socket.request.session = session;
       next();
     };
 
@@ -58,8 +59,11 @@ export class ChatGateway {
     socket.join("room1");
     this.server.sockets
       .to("room1")
-      .emit("newMessage", `User: ${socket.request.id} joined the room`);
-    console.log(socket.request.id);
+      .emit(
+        "newMessage",
+        `User: ${socket.request.session.userId} joined the room`
+      );
+    console.log(socket.request.session.userId);
   }
 
   @SubscribeMessage("sendMessage")

@@ -27,7 +27,7 @@ export class AuthenticateMiddleware implements NestMiddleware {
 
     const session = await this.sessionService.getSession(token);
 
-    if (!session || !session.id || isExpired(session.expires))
+    if (!session || isExpired(session.expires))
       throw new HttpException("Invalid token", HttpStatus.UNAUTHORIZED);
 
     req.session = session;
