@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { replace } from "svelte-spa-router";
   import axios from "axios";
+  import { replace } from "svelte-spa-router";
 
   export let url: string;
 
   let s: string;
-  let error: string = "";
+  let error = "";
 
   const post2FA = async () =>
     axios

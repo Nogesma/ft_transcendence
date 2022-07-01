@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { SequelizeModule } from "@nestjs/sequelize";
-import { TFASecretService } from "./TFASecret.service.js";
 import { TFASecret } from "./TFASecret.model.js";
+import { TFASecretService } from "./TFASecret.service.js";
 
 @Module({
   imports: [SequelizeModule.forFeature([TFASecret])],

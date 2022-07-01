@@ -1,18 +1,19 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { equals } from "ramda";
-  import { loc, push, querystring, replace } from "svelte-spa-router";
+  import { push, querystring, replace } from "svelte-spa-router";
   import axios from "axios";
+  import { equals } from "ramda";
+  import { onMount } from "svelte";
 
   const urlParams = new URLSearchParams($querystring);
   const code = urlParams.get("code");
 
-  if (code !== null) {
+  if (code) {
+    const localState = localStorage.getItem("state");
+
     const state = urlParams.get("state");
 
-    console.log({ state, localState: localStorage.state, code });
-    if (state !== null && state === localStorage.state)
-      onMount(() => postOauth(code, localStorage.state));
+    if (state && state === localState)
+      onMount(() => postOauth(code, localState));
 
     localStorage.removeItem("state");
   }
