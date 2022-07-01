@@ -1,5 +1,6 @@
 import {
   AllowNull,
+  BelongsTo,
   Column,
   ForeignKey,
   Model,
@@ -13,7 +14,10 @@ import { User } from "../user/user.model.js";
 export class TFASession extends Model {
   @ForeignKey(() => User)
   @Column
-  user: number;
+  userId: number;
+
+  @BelongsTo(() => User)
+  user: ReturnType<() => User>;
 
   @AllowNull(false)
   @Unique

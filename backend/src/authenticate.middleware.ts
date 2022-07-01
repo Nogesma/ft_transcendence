@@ -6,11 +6,12 @@ import {
 } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
 import { SessionService } from "./models/session/session.service.js";
+import { Session } from "./models/session/session.model.js";
 import { isExpired } from "./utils/date.js";
 
 declare module "express" {
   export interface Request {
-    id: number;
+    session: Session;
   }
 }
 
@@ -26,10 +27,10 @@ export class AuthenticateMiddleware implements NestMiddleware {
 
     const session = await this.sessionService.getSession(token);
 
-    if (!session || !session.id || isExpired(session.expires))
+    if (!session || isExpired(session.expires))
       throw new HttpException("Invalid token", HttpStatus.UNAUTHORIZED);
 
-    req.id = session.user;
+    req.session = session;
     next();
   }
 }

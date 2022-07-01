@@ -1,8 +1,8 @@
 localhost {
-    encode zstd gzip
-    root * dist
-    file_server {
-        precompressed br zstd gzip
-    }
-    reverse_proxy /api/* localhost:3000
+	encode gzip
+	root * dist
+	file_server {
+		precompressed br gzip
+	}
+	reverse_proxy /api/* localhost:3000
 }
