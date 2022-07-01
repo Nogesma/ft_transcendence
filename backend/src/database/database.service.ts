@@ -6,6 +6,7 @@ import { TFASecret } from "../models/TFASecret/TFASecret.model.js";
 import { Channel } from "../models/channel/channel.model.js";
 import { ChannelBan } from "../models/channelBan/channelBan.model.js";
 import { ChannelMember } from "../models/channelMember/channelMember.model.js";
+import { ChannelAdmin } from "../models/channelAdmin/channelAdmin.model.js";
 
 @Injectable()
 export class DatabaseService {
@@ -16,7 +17,8 @@ export class DatabaseService {
       TFASession.sync({ alter: true }),
       TFASecret.sync({ alter: true }),
       Channel.sync({ alter: true }),
-      // ChannelMember.sync({ alter: true }),
-      // ChannelBan.sync(),
+      ChannelMember.sync({ alter: true }),
+      ChannelAdmin.sync({ alter: true }),
+      ChannelBan.sync({ alter: true }),
     ]);
 }

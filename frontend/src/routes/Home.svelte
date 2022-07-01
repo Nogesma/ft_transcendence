@@ -15,7 +15,9 @@
       })
       .catch(() => push("/auth/login"));
 
-  onMount(getUserData);
+  if (new URLSearchParams(window.location.search).has("code"))
+    push("/auth/oauth2callback" + window.location.search);
+  else onMount(getUserData);
 </script>
 
 <main class="flex flex-col">

@@ -11,10 +11,14 @@ import {
 } from "@nestjs/common";
 import { Request, Response } from "express";
 import { SettingsService } from "./settings.service.js";
+import { ChannelService } from "../../models/channel/channel.service.js";
 
 @Controller("user")
 export class SettingsController {
-  constructor(private readonly userService: SettingsService) {}
+  constructor(
+    private readonly userService: SettingsService,
+    private readonly channelService: ChannelService
+  ) {}
 
   @Get("me")
   async getUserData(@Req() req: Request) {
@@ -54,15 +58,6 @@ export class SettingsController {
     @Req() req: Request,
     @Body() body: { name: string | undefined }
   ) {
-    const user = await req.session.$get("user");
-    if (!user)
-      throw new HttpException(
-        "Could not find user",
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-
-    await user.$create("channels", { name: "42", public: true });
-
     if (!body.name)
       throw new HttpException("Missing name in body", HttpStatus.BAD_REQUEST);
 

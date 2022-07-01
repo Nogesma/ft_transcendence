@@ -9,7 +9,7 @@ import { DatabaseService } from "./database.service.js";
 import { Channel } from "../models/channel/channel.model.js";
 import { ChannelBan } from "../models/channelBan/channelBan.model.js";
 import { ChannelMember } from "../models/channelMember/channelMember.model.js";
-import { BlockedUser } from "../models/blockedUser/blockedUser.model.js";
+import { ChannelAdmin } from "../models/channelAdmin/channelAdmin.model.js";
 
 @Module({
   imports: [
@@ -30,9 +30,9 @@ import { BlockedUser } from "../models/blockedUser/blockedUser.model.js";
           TFASession,
           TFASecret,
           Channel,
-          // ChannelMember,
-          // ChannelBan,
-          // BlockedUser,
+          ChannelMember,
+          ChannelBan,
+          ChannelAdmin,
         ],
       }),
     }),

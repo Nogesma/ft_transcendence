@@ -10,6 +10,8 @@ import {
 } from "sequelize-typescript";
 import { User } from "../user/user.model.js";
 import { ChannelMember } from "../channelMember/channelMember.model.js";
+import { ChannelBan } from "../channelBan/channelBan.model.js";
+import { ChannelAdmin } from "../channelAdmin/channelAdmin.model.js";
 
 @Table({ timestamps: false })
 export class Channel extends Model {
@@ -35,12 +37,12 @@ export class Channel extends Model {
   @BelongsTo(() => User)
   owner: ReturnType<() => User>;
 
-  // @BelongsToMany(() => User, () => ChannelMember)
-  // members: User[];
+  @BelongsToMany(() => User, () => ChannelMember)
+  members: User[];
 
-  // @BelongsToMany(() => User, () => ChannelMember)
-  // admin: User[];
+  @BelongsToMany(() => User, () => ChannelAdmin)
+  admin: User[];
 
-  // @BelongsToMany(() => User, () => ChannelMember)
-  // bans: User[];
+  @BelongsToMany(() => User, () => ChannelBan)
+  bans: User[];
 }
