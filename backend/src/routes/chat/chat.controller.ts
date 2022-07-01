@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Post, Req } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+  Req,
+} from "@nestjs/common";
 import { ChatService } from "./chat.service.js";
 import { MessageBody } from "@nestjs/websockets";
 import { Request } from "express";
@@ -9,7 +17,13 @@ export class ChatController {
 
   @Get("channels")
   async getUserChannels(@Req() req: Request) {
-    return this.chatService.getJoinedChannels(req.id);
+    const user = await req.session.$get("user");
+    if (!user)
+      throw new HttpException(
+        "Could not find user",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    return this.chatService.getJoinedChannels(user);
   }
 
   @Get("public")
@@ -24,7 +38,12 @@ export class ChatController {
     @MessageBody("password") password: string,
     @MessageBody("public") pub: boolean
   ) {
-    return this.chatService.joinChannel(name, pub, password, req.id);
+    return this.chatService.joinChannel(
+      name,
+      pub,
+      password,
+      req.session.userId
+    );
   }
 
   @Post("create/:name")
@@ -34,6 +53,11 @@ export class ChatController {
     @MessageBody("password") password: string,
     @MessageBody("public") pub: boolean
   ) {
-    return this.chatService.createChannel(name, pub, password, req.id);
+    return this.chatService.createChannel(
+      name,
+      pub,
+      password,
+      req.session.userId
+    );
   }
 }

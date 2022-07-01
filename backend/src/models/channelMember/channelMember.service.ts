@@ -1,10 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { ChannelMember } from "./channelMember.model.js";
-<<<<<<< HEAD
-=======
-import { Channel } from "../channel/channel.model.js";
->>>>>>> Implement needed functions to create and join channels, need to refactor SQL Models
 
 @Injectable()
 export class ChannelMemberService {

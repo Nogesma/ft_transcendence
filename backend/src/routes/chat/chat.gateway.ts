@@ -65,7 +65,6 @@ export class ChatGateway {
         `User: ${socket.request.session.userId} joined the room`
       );
     console.log(socket.request.session.userId);
-      .emit("newMessage", `User: ${socket.request.userId} joined the room`);
   }
 
   @SubscribeMessage("joinRoom")

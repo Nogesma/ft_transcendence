@@ -4,6 +4,7 @@ import { UserService } from "../../models/user/user.service.js";
 import { isEmpty, map, pick } from "ramda";
 import { ChannelService } from "../../models/channel/channel.service.js";
 import { ChannelMemberService } from "../../models/channelMember/channelMember.service.js";
+import { type User } from "../../models/user/user.model.js";
 
 @Injectable()
 export class ChatService {
@@ -14,15 +15,14 @@ export class ChatService {
     private readonly channelMemberService: ChannelMemberService
   ) {}
 
-  getJoinedChannels = async (id: number) => {
-    const channels = await this.channelMemberService.getAllChanMember(id);
-
-    console.log(channels[0].user);
+  getJoinedChannels = async (user: User) => {
+    const channels = await user.$get("member");
+    console.log(channels);
     return map(pick(["name", "id"]), channels);
   };
 
   getPublicChannels = async () => {
-    const channels = await this.channelService.getPubblicChannels();
+    const channels = await this.channelService.getPublicChannels();
 
     return map(pick(["name", "id"]), channels);
   };
@@ -39,6 +39,7 @@ export class ChatService {
       throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
 
     if (!channel.public) {
+      //todo: bcrypt
       if (password !== channel.password)
         throw new HttpException("Wrong password", HttpStatus.UNAUTHORIZED);
     }
@@ -60,27 +61,36 @@ export class ChatService {
         HttpStatus.BAD_REQUEST
       );
 
-    if (!pub && !password)
-      throw new HttpException(
-        "Password can not be empty",
-        HttpStatus.BAD_REQUEST
-      );
-
     if (await this.channelService.getChannelByName(name))
       throw new HttpException("Channel already exist", HttpStatus.BAD_REQUEST);
 
-    // todo: hash password
+    if (pub) {
+      const channel = await this.channelService.createChannel(
+        name,
+        pub,
+        id,
+        undefined,
+        undefined
+      );
 
-    const channel = await this.channelService.createChannel(
-      name,
-      pub,
-      password,
-      id
-    );
+      return pick(["name", "id"], channel);
+    } else {
+      // todo: hash password
+      if (!password)
+        throw new HttpException(
+          "Password can not be empty",
+          HttpStatus.BAD_REQUEST
+        );
 
-    console.log(channel);
-    console.log(pick(["name", "id"], channel));
+      const channel = await this.channelService.createChannel(
+        name,
+        pub,
+        id,
+        password,
+        undefined
+      );
 
-    return pick(["name", "id"], channel);
+      return pick(["name", "id"], channel);
+    }
   };
 }
