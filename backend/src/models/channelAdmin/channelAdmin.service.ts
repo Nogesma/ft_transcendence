@@ -6,14 +6,19 @@ import { ChannelAdmin } from "./channelAdmin.model.js";
 export class ChannelAdminService {
   constructor(
     @InjectModel(ChannelAdmin)
-    private channelAdminModel: typeof ChannelAdmin
+    private channelBanModel: typeof ChannelAdmin
   ) {}
 
-  addAdmin = (chan: number, user: number) =>
-    this.channelAdminModel.create({ chan, user });
+  banUser = (chan: number, user: number, type: boolean, expires: Date) =>
+    this.channelBanModel.create({ chan, user, type, expires });
 
-  getAdmin = (user: number) => this.channelAdminModel.findByPk(user);
+  getBanned = (user: number) =>
+    this.channelBanModel.findOne({ where: { id: user, type: true } });
+  getMuted = (user: number) =>
+    this.channelBanModel.findOne({ where: { id: user, type: false } });
 
-  removeAdmin = (user: number, chan: number) =>
-    this.channelAdminModel.destroy({ where: { id: user, channel: chan } });
+  getAllBanned = (chan: number) =>
+    this.channelBanModel.findAll({ where: { type: true, channel: chan } });
+  getAllMuted = (chan: number) =>
+    this.channelBanModel.findAll({ where: { type: false, channel: chan } });
 }

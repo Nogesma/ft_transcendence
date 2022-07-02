@@ -3,7 +3,7 @@ import { User } from "../user/user.model.js";
 import { Channel } from "../channel/channel.model.js";
 
 @Table({ timestamps: false })
-export class ChannelMembers extends Model {
+export class ChannelMember extends Model {
   @ForeignKey(() => Channel)
   @Column
   chan: number;
