@@ -3,7 +3,6 @@
     Canvas,
     Scene,
     PerspectiveCamera,
-    DirectionalLight,
     PointLight,
     PCFSoftShadowMap,
     AmbientLight,
@@ -13,7 +12,6 @@
     Mesh,
     MeshStandardMaterial,
     WebGLRenderer,
-    OrbitControls,
     DoubleSide,
     MathUtils,
   } from "svelthree";
@@ -23,99 +21,102 @@
   export let height;
   export let width;
 
-  const box_width = 15;
-  const box_len = 30;
-  const box_height = 3;
-  const wall_thick = 2;
-
-  const ball_rad = 1;
-  const speed = 0.2;
-
-  const tickSpeed = 33;
-
-  //KB
-  let keys = {
-    up: false,
-    down: false,
+  let params = {
+    box: {
+      width: 15,
+      len: 30,
+      height: 3,
+      thick: 2,
+    },
+    speed: 0.2,
+    tick_speed: 33,
   };
 
-  //todo Extremement moche a refactor!
-  let sphereGeometry = new SphereBufferGeometry(ball_rad, 25, 25);
-  let padGeometry = new BoxBufferGeometry(1, box_height / 1.2, box_width / 4);
+  let ball = {
+    pos: [0, 0, 0],
+    speed: [params.speed, 0, -params.speed],
+    rad: 1,
+  };
+
+  let padLeft = {
+    pos: [-(params.box.len / 2) + params.box.thick, 0, 0],
+    speed: [0, 0, 0.1],
+    dimensions: [1, params.box.height / 1.2, params.box.width / 4],
+  };
+
+  let padRight = {
+    pos: [params.box.len / 2 - params.box.thick, 0, 0],
+    speed: [0, 0, -0.1],
+    dimensions: [1, params.box.height / 1.2, params.box.width / 4],
+  };
+
+  let sphereGeometry = new SphereBufferGeometry(ball.rad, 25, 25);
+  let cubeGeometry = new BoxBufferGeometry(1, 1, 1);
   let sphereMaterial = new MeshStandardMaterial();
   let padMaterial = new MeshStandardMaterial();
   let floorGeometry = new PlaneBufferGeometry(
-    box_len + 0.1,
-    box_width + 0.1,
+    params.box.len + 0.1,
+    params.box.width + 0.1,
     1
   );
   let floorMaterial = new MeshStandardMaterial();
 
-  let padPos = [-(box_len / 2) + wall_thick, 0, 0];
-  let ballPos = [0, 0, 0];
-  let ball_speed = [speed, 0, -speed];
   let tickcount = 0;
 
-  function checkBall() {
-    let xlim = box_len / 2 - ball_rad;
-    let zlim = box_width / 2 - ball_rad;
-    let pad_lim = padPos[0] + ball_rad + 0.5;
+  const checkBall = () => {
+    let xlim = params.box.len / 2 - ball.rad;
+    let zlim = params.box.width / 2 - ball.rad;
+    let pad_lim = padLeft.pos[0] + ball.rad + 0.5;
     if (
-      (ballPos[0] > xlim && ball_speed[0] > 0) ||
-      (ballPos[0] < -xlim && ball_speed[0] < 0) ||
-      (ballPos[0] < pad_lim &&
-        ball_speed[0] < 0 &&
-        ballPos[0] > pad_lim - speed &&
-        ballPos[2] < padPos[2] + box_width / 8 &&
-        ballPos[2] > padPos[2] - box_width / 8)
+      (ball.pos[0] > xlim && ball.speed[0] > 0) ||
+      (ball.pos[0] < -xlim && ball.speed[0] < 0) ||
+      (ball.pos[0] < pad_lim &&
+        ball.speed[0] < 0 &&
+        ball.pos[0] > pad_lim - params.speed &&
+        ball.pos[2] < padLeft.pos[2] + params.box.width / 8 &&
+        ball.pos[2] > padLeft.pos[2] - params.box.width / 8)
     )
-      ball_speed[0] *= -1;
+      ball.speed[0] *= -1;
     if (
-      (ballPos[2] > zlim && ball_speed[2] > 0) ||
-      (ballPos[2] < -zlim && ball_speed[2] < 0)
+      (ball.pos[2] > zlim && ball.speed[2] > 0) ||
+      (ball.pos[2] < -zlim && ball.speed[2] < 0)
     )
-      ball_speed[2] *= -1;
-  }
+      ball.speed[2] *= -1;
+  };
 
-  function moveBall() {
-    ballPos[0] += ball_speed[0];
-    ballPos[1] += ball_speed[1];
-    ballPos[2] += ball_speed[2];
+  const advance = (obj) => {
+    obj.pos[0] += obj.speed[0];
+    obj.pos[1] += obj.speed[1];
+    obj.pos[2] += obj.speed[2];
+  };
+
+  const moveBall = () => {
+    advance(ball);
     tickcount += 1;
-    ballPos[1] =
-      (box_height - ball_rad * 2) *
+    ball.pos[1] =
+      (params.box.height - ball.rad * 2) *
       0.6 *
       Math.abs(Math.cos(0.1 * tickcount + 0.3));
-  }
+  };
 
-  function movePad() {
-    if (keys.up && padPos[2] > (-3 / 8) * box_width) padPos[2] -= 0.2;
-    if (keys.down && padPos[2] < (3 / 8) * box_width) padPos[2] += 0.2;
-  }
+  const movePad = () => {
+    advance(padLeft);
+    advance(padRight);
+  };
 
-  function main_loop() {
-    setTimeout(main_loop, tickSpeed);
+  const main_loop = () => {
+    setTimeout(main_loop, params.tick_speed);
     checkBall();
     movePad();
     moveBall();
-  }
-
-  function handleKeydown(event) {
-    if (event.key === "ArrowUp") keys.up = true;
-    else if (event.key === "ArrowDown") keys.down = true;
-  }
-
-  function handleKeyup(event) {
-    if (event.key === "ArrowUp") keys.up = false;
-    else if (event.key === "ArrowDown") keys.down = false;
-  }
+    padLeft.pos = padLeft.pos;
+    ball.pos = ball.pos;
+  };
 
   onMount(() => {
     main_loop();
   });
 </script>
-
-<svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
 <Canvas let:sti w={width} h={height}>
   <Scene {sti} let:scene id="scene1" props={{ background: 0xffffff }}>
@@ -135,7 +136,7 @@
       geometry={sphereGeometry}
       material={sphereMaterial}
       mat={{ roughness: 0.5, metalness: 0.5, color: 0xffffff }}
-      pos={ballPos}
+      pos={ball.pos}
       rot={[0, 0, 0]}
       castShadow
       receiveShadow
@@ -144,47 +145,63 @@
     <!--Pad left-->
     <Mesh
       {scene}
-      geometry={padGeometry}
+      geometry={cubeGeometry}
       material={padMaterial}
       mat={{ roughness: 0.5, metalness: 0.5, color: 0x00ffff }}
-      pos={padPos}
-      rot={[0, 0, 0]}
+      pos={padLeft.pos}
+      scale={padLeft.dimensions}
       castShadow
       receiveShadow
     />
 
-    <!--Walls-->
+    <!--    Walls-->
     <Wall
       {scene}
-      pos={[(box_len + wall_thick) / 2, box_height / 2 - ball_rad, 0]}
+      pos={[
+        (params.box.len + params.box.thick) / 2,
+        params.box.height / 2 - ball.rad,
+        0,
+      ]}
       rot={-90}
-      len={box_width + wall_thick * 2}
-      height={box_height}
-      thick={wall_thick}
+      len={params.box.width + params.box.thick * 2}
+      height={params.box.height}
+      thick={params.box.thick}
     />
     <Wall
       {scene}
-      pos={[-(box_len + wall_thick) / 2, box_height / 2 - ball_rad, 0]}
+      pos={[
+        -(params.box.len + params.box.thick) / 2,
+        params.box.height / 2 - ball.rad,
+        0,
+      ]}
       rot={-90}
-      len={box_width + wall_thick * 2}
-      height={box_height}
-      thick={wall_thick}
+      len={params.box.width + params.box.thick * 2}
+      height={params.box.height}
+      thick={params.box.thick}
     />
     <Wall
       {scene}
-      pos={[0, box_height / 2 - ball_rad, (box_width + wall_thick) / 2]}
+      pos={[
+        0,
+        params.box.height / 2 - ball.rad,
+        (params.box.width + params.box.thick) / 2,
+      ]}
       rot={0}
-      len={box_len + wall_thick * 2}
-      height={box_height}
-      thick={wall_thick}
+      len={params.box.len + params.box.thick * 2}
+      height={params.box.height}
+      thick={params.box.thick}
     />
     <Wall
       {scene}
-      pos={[0, box_height / 2 - ball_rad, -(box_width + wall_thick) / 2]}
+      pos={[
+        0,
+        params.box.height / 2 - ball.rad,
+        -(params.box.width + params.box.thick) / 2,
+      ]}
       rot={0}
-      len={box_len + wall_thick * 2}
-      height={box_height}
-      thick={wall_thick}
+      len={params.box.len + params.box.thick * 2}
+      height={params.box.height}
+      thick={params.box.thick}
     />
 
     <!--Floor-->
@@ -193,7 +210,7 @@
       geometry={floorGeometry}
       material={floorMaterial}
       mat={{ roughness: 2, metalness: 1, side: DoubleSide, color: 0xffffff }}
-      pos={[0, -ball_rad, 0]}
+      pos={[0, -ball.rad, 0]}
       rot={[MathUtils.degToRad(-90), 0, 0]}
       scale={[1, 1, 1]}
       receiveShadow
