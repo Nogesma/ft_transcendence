@@ -24,7 +24,7 @@
   export let params = {
     box: {
       width: 15,
-      len: 30,
+      length: 30,
       height: 3,
       thick: 2,
     },
@@ -39,13 +39,13 @@
   };
 
   let padLeft = {
-    pos: [-(params.box.len / 2) + params.box.thick, 0, 0],
+    pos: [-(params.box.length / 2) + params.box.thick, 0, 0],
     speed: [0, 0, 0.1],
     dimensions: [1, params.box.height / 1.2, params.box.width / 4],
   };
 
   let padRight = {
-    pos: [params.box.len / 2 - params.box.thick, 0, 0],
+    pos: [params.box.length / 2 - params.box.thick, 0, 0],
     speed: [0, 0, -0.1],
     dimensions: [1, params.box.height / 1.2, params.box.width / 4],
   };
@@ -55,7 +55,7 @@
   let sphereMaterial = new MeshStandardMaterial();
   let padMaterial = new MeshStandardMaterial();
   let floorGeometry = new PlaneBufferGeometry(
-    params.box.len + 0.1,
+    params.box.length + 0.1,
     params.box.width + 0.1,
     1
   );
@@ -64,7 +64,7 @@
   let tickcount = 0;
 
   const checkBall = () => {
-    let xlim = params.box.len / 2 - ball.rad;
+    let xlim = params.box.length / 2 - ball.rad;
     let zlim = params.box.width / 2 - ball.rad;
     let pad_lim = padLeft.pos[0] + ball.rad + 0.5;
     if (
@@ -114,6 +114,7 @@
   };
 
   onMount(() => {
+    console.log(params);
     main_loop();
   });
 </script>
@@ -158,7 +159,7 @@
     <Wall
       {scene}
       pos={[
-        (params.box.len + params.box.thick) / 2,
+        (params.box.length + params.box.thick) / 2,
         params.box.height / 2 - ball.rad,
         0,
       ]}
@@ -170,7 +171,7 @@
     <Wall
       {scene}
       pos={[
-        -(params.box.len + params.box.thick) / 2,
+        -(params.box.length + params.box.thick) / 2,
         params.box.height / 2 - ball.rad,
         0,
       ]}
@@ -187,7 +188,7 @@
         (params.box.width + params.box.thick) / 2,
       ]}
       rot={0}
-      len={params.box.len + params.box.thick * 2}
+      len={params.box.length + params.box.thick * 2}
       height={params.box.height}
       thick={params.box.thick}
     />
@@ -199,7 +200,7 @@
         -(params.box.width + params.box.thick) / 2,
       ]}
       rot={0}
-      len={params.box.len + params.box.thick * 2}
+      len={params.box.length + params.box.thick * 2}
       height={params.box.height}
       thick={params.box.thick}
     />

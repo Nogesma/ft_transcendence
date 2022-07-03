@@ -11,33 +11,28 @@
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   function handleKeyup() {}
 
-  let game = async () => {
+  const setupGame = async () => {
     return axios
       .get(`${import.meta.env.VITE_BACKEND_URI}/api/pong/game/new`)
       .then(({ data }) => {
-        return data;
+        gid = data.game_id;
+        return data.params;
       });
   };
 
-  const getGameData = async (game_id: string) => {
-    return axios
-      .get(`${import.meta.env.VITE_BACKEND_URI}/api/pong/game/${game_id}`)
-      .then((res) => {
-        return res.data;
-      });
-  };
+  let game;
 
-  onMount(() => (gid = game()));
+  onMount(() => (game = setupGame()));
 </script>
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
 <div>
-  {#await getGameData(gid)}
+  {#await game}
     <h1>Loading...</h1>
   {:then data}
-    <Pong width={500} height={250} params={data} />
+    <Pong width={1000} height={500} params={data} />
   {:catch err}
-    err
+    {err}
   {/await}
 </div>

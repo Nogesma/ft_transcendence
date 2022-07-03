@@ -16,8 +16,9 @@ export class PongService {
   };
 
   newGame = async () => {
-    const game = new Game(500, 250, 15);
+    const game = new Game(15, 30, 4, 2);
     this.games.push(game);
-    return game.game_id;
+    console.log(game.game_id);
+    return { game_id: game.game_id, params: game.get_params() };
   };
 }
