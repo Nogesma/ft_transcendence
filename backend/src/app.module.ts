@@ -8,6 +8,7 @@ import Joi from "joi";
 import { SessionModule } from "./models/session/session.module.js";
 import { SettingsController } from "./routes/settings/settings.controller.js";
 import { ChatModule } from "./routes/chat/chat.module.js";
+import { PongModule } from "./routes/pong/pong.module.js";
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ChatModule } from "./routes/chat/chat.module.js";
     SettingsModule,
     SessionModule,
     ChatModule,
+    PongModule,
   ],
 })
 export class AppModule implements NestModule {
