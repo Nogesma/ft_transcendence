@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { GameService } from "../../models/game/game.service.js";
+import { Game } from "../../game/game.js";
 
 @Injectable()
 export class PongService {
-  private games: Array<GameService> = [];
+  private games: Array<Game> = [];
 
   getGame = async (game_id: string) => {
     const game = this.games.find((game) => game.game_id === game_id);
@@ -16,7 +16,7 @@ export class PongService {
   };
 
   newGame = async () => {
-    const game = new GameService(500, 250, 15);
+    const game = new Game(500, 250, 15);
     this.games.push(game);
     return game.game_id;
   };

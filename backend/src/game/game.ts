@@ -1,8 +1,6 @@
-import { Injectable } from "@nestjs/common";
 import { nanoid } from "nanoid";
 
-@Injectable()
-export class GameService {
+export class Game {
   game_id: string;
   private box: {
     width: number;
@@ -12,7 +10,7 @@ export class GameService {
   private readonly speed: number = 33;
   private readonly tick_speed: number = 0.2;
 
-  constructor(w: number, l: number, h: number) {
+  constructor(w: number, h: number, l: number) {
     this.box.width = w;
     this.box.length = l;
     this.box.height = h;
