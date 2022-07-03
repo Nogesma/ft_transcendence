@@ -1,23 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { nanoid } from "nanoid";
-
-//put in models??
-export class Game {
-  game_id;
-  private width: number;
-  private length: number;
-  private height: number;
-  constructor(width: number, lenght: number, height: number) {
-    this.width = width;
-    this.length = lenght;
-    this.height = height;
-    this.game_id = nanoid();
-  }
-}
+import { GameService } from "../../models/game/game.service.js";
 
 @Injectable()
 export class PongService {
-  private games: Array<Game> = [];
+  private games: Array<GameService> = [];
 
   getGame = async (game_id: string) => {
     const game = this.games.find((game) => game.game_id === game_id);
@@ -26,11 +12,11 @@ export class PongService {
         "Could not find game",
         HttpStatus.INTERNAL_SERVER_ERROR
       );
-    return game;
+    return game.get_params();
   };
 
   newGame = async () => {
-    const game = new Game(100, 100, 100);
+    const game = new GameService(500, 250, 15);
     this.games.push(game);
     return game.game_id;
   };

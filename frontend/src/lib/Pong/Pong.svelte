@@ -21,7 +21,7 @@
   export let height;
   export let width;
 
-  let params = {
+  export let params = {
     box: {
       width: 15,
       len: 30,
