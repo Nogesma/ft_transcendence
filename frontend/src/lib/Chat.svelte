@@ -16,7 +16,7 @@
   socket.on("disconnect", () => {
     socket.emit("leaveRoom", {id: channel.id})
   })
-  onMount(() => socket.emit("joinRoom", { id: channel.id});
+  onMount(() => socket.emit("joinRoom", { id: channel.id}));
 
   onDestroy(() => socket.emit("leaveRoom", { id: channel.id }));
 
