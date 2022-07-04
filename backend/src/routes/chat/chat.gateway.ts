@@ -13,12 +13,18 @@ import { isExpired } from "../../utils/date.js";
 import { SessionService } from "../../models/session/session.service.js";
 import { ChannelMemberService } from "../../models/channelMember/channelMember.service.js";
 import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
+import { type Session } from "../../models/session/session.model.js";
 export interface ExtendedError extends Error {
   data?: never;
 }
 
 declare module "http" {
+<<<<<<< HEAD
   interface IncomingMessage {
+=======
+  export interface IncomingMessage {
+    session: Session;
+>>>>>>> main
     signedCookies: { token: string };
     userId: number;
   }
@@ -43,9 +49,17 @@ export class ChatGateway {
       if (!token) return next(new Error("Token not found"));
 
       const session = await sessionService.getSession(token);
+<<<<<<< HEAD
       if (!session || !session.user || isExpired(session.expires))
         return next(new Error("Invalid token"));
       socket.request.userId = session.user;
+=======
+
+      if (!session || isExpired(session.expires))
+        return next(new Error("Invalid token"));
+
+      socket.request.session = session;
+>>>>>>> main
       next();
     };
 
@@ -71,6 +85,7 @@ export class ChatGateway {
     };
     client.join(String(client.request.userId));
     this.server.sockets
+<<<<<<< HEAD
       .to(String(client.request.userId))
       .emit("newMessage", `User: ${client.request.userId} joined the room`);
   }
@@ -84,6 +99,14 @@ export class ChatGateway {
     this.server.sockets
       .to(String(client.request.userId))
       .emit("newMessage", `User : ${client.request.userId} left the room`);
+=======
+      .to("room1")
+      .emit(
+        "newMessage",
+        `User: ${socket.request.session.userId} joined the room`
+      );
+    console.log(socket.request.session.userId);
+>>>>>>> main
   }
 
   @SubscribeMessage("sendMessage")

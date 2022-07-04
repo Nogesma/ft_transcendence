@@ -9,6 +9,7 @@ import speakeasy from "speakeasy";
 import { ConfigService } from "@nestjs/config";
 import { UserService } from "../../models/user/user.service.js";
 import { TFASecretService } from "../../models/TFASecret/TFASecret.service.js";
+import { type User } from "../../models/user/user.model.js";
 
 @Injectable()
 export class SettingsService {
@@ -18,44 +19,36 @@ export class SettingsService {
     private readonly tfaSecretService: TFASecretService
   ) {}
 
-  getUserData = async (id: number) => {
-    const user = await this.userService.getUser(id);
+  getUserData = async (user: User) => {
     if (!user)
       throw new HttpException(
         "Could not find user",
         HttpStatus.INTERNAL_SERVER_ERROR
       );
 
-    return pick(["login", "displayname"], user.toJSON());
+    return pick(["login", "displayname"], user);
   };
 
-  generateNew2FA = async (id: number) => {
-    if (await this.tfaSecretService.getTFASecret(id))
+  generateNew2FA = async (user: User) => {
+    if (await user.tfa_secret)
       throw new HttpException("2FA already enabled", HttpStatus.BAD_REQUEST);
 
     const secret = speakeasy.generateSecret().base32;
-    await this.tfaSecretService.createTFASecret(id, secret, true);
-
-    const login = await this.userService.getUserLogin(id);
-    if (!login)
-      throw new HttpException(
-        "Could not retrieve user login",
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
+    await this.tfaSecretService.createTFASecret(user, secret, true);
 
     const otpauthURL = speakeasy.otpauthURL({
       secret: secret,
       encoding: "base32",
       algorithm: "sha512",
-      label: login,
+      label: user.login,
       issuer: "ft_transcendence",
     });
 
     return { otpauthURL };
   };
 
-  validate2FA = async (id: number, token: string) => {
-    const tfaSecret = await this.tfaSecretService.getTFASecret(id);
+  validate2FA = async (user: User, token: string) => {
+    const tfaSecret = user.tfa_secret;
     if (!tfaSecret)
       throw new HttpException(
         "Could not retrieve 2FA Secret",
@@ -76,13 +69,14 @@ export class SettingsService {
     tfaSecret.temp = false;
     await tfaSecret.save();
 
-    await this.userService.setUser2FA(id, true);
+    user.tfa = true;
+    await user.save();
   };
 
   postDisplayName = (id: number, name: string) =>
     this.userService.setUserDisplayName(id, name);
 
-  postAvatar = (req: Request, res: Response, id: number) => {
+  postAvatar = (req: Request, res: Response, login: string) => {
     const bb = busboy({
       headers: req.headers,
       limits: { files: 1, fileSize: 1024 ** 2 }, // 1MB Max Size
@@ -101,13 +95,6 @@ export class SettingsService {
         const fileTypeResult = await fileTypeFromBuffer(magicNumber);
         if (!fileTypeResult || fileTypeResult.ext !== "jpg")
           throw new HttpException("Image is not jpeg", HttpStatus.BAD_REQUEST);
-
-        const login = await this.userService.getUserLogin(id);
-        if (!login)
-          throw new HttpException(
-            "Could not find user",
-            HttpStatus.INTERNAL_SERVER_ERROR
-          );
 
         const imagePath = path.join(
           this.configService.get("AVATAR_UPLOAD_PATH"),

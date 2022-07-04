@@ -1,4 +1,4 @@
-import { Column, ForeignKey, Model, Table } from "sequelize-typescript";
+import { Column, Model, Table, ForeignKey } from "sequelize-typescript";
 import { User } from "../user/user.model.js";
 import { Channel } from "../channel/channel.model.js";
 

@@ -1,5 +1,6 @@
 import {
   AllowNull,
+  BelongsTo,
   Column,
   Default,
   ForeignKey,
@@ -15,9 +16,11 @@ import { User } from "../user/user.model.js";
 export class TFASecret extends Model {
   @ForeignKey(() => User)
   @PrimaryKey
-  @Unique
   @Column
-  user: number;
+  id: number;
+
+  @BelongsTo(() => User)
+  user: ReturnType<() => User>;
 
   @AllowNull(false)
   @Unique

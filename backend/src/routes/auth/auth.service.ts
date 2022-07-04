@@ -9,6 +9,7 @@ import { UserService } from "../../models/user/user.service.js";
 import { SessionService } from "../../models/session/session.service.js";
 import { TFASessionService } from "../../models/TFASession/TFASession.service.js";
 import { TFASecretService } from "../../models/TFASecret/TFASecret.service.js";
+import { type User } from "../../models/user/user.model.js";
 
 @Injectable()
 export class AuthService {
@@ -49,7 +50,7 @@ export class AuthService {
 
     if (user.tfa) return this.createTFASession(res, user.id);
 
-    return this.createUserSession(res, user.id);
+    return this.createUserSession(res, user);
   };
 
   authenticate2FA = async (res: Response, token: string, code: string) => {
@@ -60,9 +61,9 @@ export class AuthService {
         HttpStatus.UNAUTHORIZED
       );
 
-    const id = tfaSession.id;
+    const user = tfaSession.user;
 
-    const TFA = await this.tfaSecretService.getTFASecret(id);
+    const TFA = user.tfa_secret;
     if (!TFA)
       throw new HttpException(
         "Could not find 2FA Secret",
@@ -87,14 +88,14 @@ export class AuthService {
     await tfaSession.destroy();
     res.clearCookie("2fa");
 
-    return this.createUserSession(res, id);
+    return this.createUserSession(res, user);
   };
 
-  createUserSession = async (response: Response, id: number) => {
+  createUserSession = async (response: Response, user: User) => {
     const token = nanoid();
     const expires = dayjs().add(1, "M").toDate();
 
-    await this.sessionService.createSession(id, token, expires);
+    await this.sessionService.createSession(user, token, expires);
 
     response.cookie("token", token, {
       expires,
