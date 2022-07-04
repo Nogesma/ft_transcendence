@@ -8,6 +8,7 @@ import Joi from "joi";
 import { SessionModule } from "./models/session/session.module.js";
 import { SettingsController } from "./routes/settings/settings.controller.js";
 import { ChatModule } from "./routes/chat/chat.module.js";
+import { ChatController } from "./routes/chat/chat.controller.js";
 
 @Module({
   imports: [
@@ -33,6 +34,8 @@ import { ChatModule } from "./routes/chat/chat.module.js";
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthenticateMiddleware).forRoutes(SettingsController);
+    consumer
+      .apply(AuthenticateMiddleware)
+      .forRoutes(SettingsController, ChatController);
   }
 }

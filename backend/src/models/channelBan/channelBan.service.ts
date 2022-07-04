@@ -12,9 +12,9 @@ export class ChannelBanService {
   banUser = (chan: number, user: number, type: boolean, expires: Date) =>
     this.channelBanModel.create({ chan, user, type, expires });
 
-  getBanned = (user: number) =>
+  isBanned = (user: number) =>
     this.channelBanModel.findOne({ where: { id: user, type: true } });
-  getMuted = (user: number) =>
+  isMuted = (user: number) =>
     this.channelBanModel.findOne({ where: { id: user, type: false } });
 
   getAllBanned = (chan: number) =>

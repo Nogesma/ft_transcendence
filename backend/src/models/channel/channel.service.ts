@@ -10,34 +10,21 @@ export class ChannelService {
   ) {}
 
   createChannel = (
-    id: number,
     name: string,
-    publicChannel: boolean,
-    password: boolean,
-    owner: number
-  ) => this.channelModel.create({ id, name, publicChannel, password, owner });
+    pub: boolean,
+    ownerId: number,
+    password: string | undefined,
+    salt: string | undefined
+  ) =>
+    this.channelModel
+      .create({ name, public: pub, ownerId, password, salt })
+      .catch(console.error);
 
-  createChannelIfNotExist = async ({
-    id,
-    name,
-    publicChannel,
-    password,
-    owner,
-  }: {
-    id: number;
-    name: string;
-    publicChannel: boolean;
-    password: boolean;
-    owner: number;
-  }) => {
-    const channel = await this.getChannel(id);
-    if (!channel)
-      return this.createChannel(id, name, publicChannel, password, owner);
+  getChannelById = (id: number) => this.channelModel.findByPk(id);
 
-    return channel;
-  };
+  getChannelByName = (name: string) =>
+    this.channelModel.findOne({ where: { name } });
 
-  getPubChannel = () => this.channelModel.findAll({ where: { public: true } });
-  getChannel = (id: number) => this.channelModel.findByPk(id);
-  findChannelByName = (name: string) => this.channelModel.findByPk(name);
+  getPublicChannels = () =>
+    this.channelModel.findAll({ where: { public: true } });
 }

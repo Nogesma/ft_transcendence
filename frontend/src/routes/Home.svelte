@@ -1,10 +1,11 @@
 <script lang="ts">
+  import ChannelManager from "../lib/ChannelManager.svelte";
+  import axios from "axios";
   import { push } from "svelte-spa-router";
   import { onMount } from "svelte";
-  import axios from "axios";
-  import ChannelManager from "../lib/ChannelManager.svelte";
+  import { login } from "../stores/settings";
 
-  const getUserData = async () =>
+  const authenticate = async () =>
     axios
       .get(`${import.meta.env.VITE_BACKEND_URI}/api/user/me`, {
         withCredentials: true,
@@ -12,16 +13,21 @@
       .then(({ data }) => {
         localStorage.displayname = data.displayname;
         localStorage.login = data.login;
+        $login = true;
       })
-      .catch(() => push("/auth/login"));
+      .catch(() => {
+        $login = false;
+        push("/auth/login");
+      });
 
-  onMount(getUserData);
+  if (new URLSearchParams(window.location.search).has("code"))
+    push("/auth/oauth2callback" + window.location.search);
+  else onMount(authenticate);
 </script>
 
 <main class="flex flex-col md:flex">
   <h1 class="m-auto text-5xl font-bold">
-    {localStorage.getItem("displayname")}
+    {localStorage.displayname}
   </h1>
-  <button on:click={() => push("/chat")}>Chat</button>
   <ChannelManager />
 </main>

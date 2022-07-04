@@ -9,14 +9,12 @@
   let menu: HTMLElement; // menu wrapper DOM reference
 
   const handleOutsideClick = (event: MouseEvent) => {
-    console.log(typeof Event);
     if (!menu.contains(event.target as Node)) show = false;
   };
 
   const handleEscape = (event: KeyboardEvent) => {
     if (event.key === "Escape") show = false;
   };
-
 </script>
 
 <svelte:window on:click={handleOutsideClick} on:keyup={handleEscape} />
@@ -59,11 +57,11 @@
                   href="#/settings"
                   class="block text-sm text-gray-900 dark:text-white"
                 >
-                  {localStorage.getItem("displayname")}
+                  {localStorage.displayname}
                 </a>
                 <span
                   class="block text-sm font-medium truncate dark:text-gray-400"
-                  >{localStorage.getItem("login")}@student.42lausanne.ch</span
+                  >{localStorage.login}@student.42lausanne.ch</span
                 >
               </div>
               <button
