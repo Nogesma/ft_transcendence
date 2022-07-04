@@ -5,6 +5,11 @@
   import Navbar from "./lib/Navbar.svelte";
 </script>
 
-<Navbar />
-
-<Router {routes} />
+<html class="dark" lang="en">
+  <body>
+    <div class="bg-white dark:bg-black">
+      <Navbar />
+      <Router {routes} />
+    </div>
+  </body>
+</html>
