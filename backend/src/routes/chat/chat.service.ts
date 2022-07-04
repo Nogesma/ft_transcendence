@@ -22,7 +22,7 @@ export class ChatService {
   };
 
   getPublicChannels = async () => {
-    const channels = await this.channelService.getPubblicChannels();
+    const channels = await this.channelService.getPubChannel();
 
     return map(pick(["name", "id"]), channels);
   };
@@ -33,7 +33,7 @@ export class ChatService {
     password: string,
     id: number
   ) => {
-    const channel = await this.channelService.getChannelByName(name);
+    const channel = await this.channelService.findChannelByName(name);
 
     if (!channel)
       throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
@@ -66,7 +66,7 @@ export class ChatService {
         HttpStatus.BAD_REQUEST
       );
 
-    if (await this.channelService.getChannelByName(name))
+    if (await this.channelService.findChannelByName(name))
       throw new HttpException("Channel already exist", HttpStatus.BAD_REQUEST);
 
     // todo: hash password
@@ -74,8 +74,9 @@ export class ChatService {
     const channel = await this.channelService.createChannel(
       name,
       pub,
+      id,
       password,
-      id
+      "test"
     );
 
     console.log(channel);

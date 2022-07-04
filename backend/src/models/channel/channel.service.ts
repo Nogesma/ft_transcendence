@@ -12,12 +12,6 @@ export class ChannelService {
   createChannel = (
     name: string,
     pub: boolean,
-    password: string,
-    owner: number
-  ) => this.channelModel.create({ name, public: pub, password, owner });
-
-  getPubblicChannels = () =>
-    this.channelModel.findAll({ where: { public: true } });
     ownerId: number,
     password: string | undefined,
     salt: string | undefined
@@ -33,10 +27,10 @@ export class ChannelService {
     const channel = await this.findChannelByName(name);
     if (!channel) return this.createChannel(name, pub, ownerId, password, salt);
 
-  getChannelById = (id: number) => this.channelModel.findByPk(id);
+    return channel;
+  };
 
-  getChannelByName = (name: string) =>
-    this.channelModel.findOne({ where: { name } });
-
+  getPubChannel = () => this.channelModel.findAll({ where: { public: true } });
+  getChannel = (id: number) => this.channelModel.findByPk(id);
   findChannelByName = (name: string) => this.channelModel.findByPk(name);
 }

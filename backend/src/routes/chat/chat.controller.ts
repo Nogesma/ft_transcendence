@@ -9,7 +9,7 @@ export class ChatController {
 
   @Get("channels")
   async getUserChannels(@Req() req: Request) {
-    return this.chatService.getJoinedChannels(req.id);
+    return this.chatService.getJoinedChannels(req.userId);
   }
 
   @Get("public")
@@ -24,7 +24,7 @@ export class ChatController {
     @MessageBody("password") password: string,
     @MessageBody("public") pub: boolean
   ) {
-    return this.chatService.joinChannel(name, pub, password, req.id);
+    return this.chatService.joinChannel(name, pub, password, req.userId);
   }
 
   @Post("create/:name")
@@ -34,6 +34,6 @@ export class ChatController {
     @MessageBody("password") password: string,
     @MessageBody("public") pub: boolean
   ) {
-    return this.chatService.createChannel(name, pub, password, req.id);
+    return this.chatService.createChannel(name, pub, password, req.userId);
   }
 }

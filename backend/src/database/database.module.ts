@@ -33,12 +33,8 @@ import { ChannelAdmin } from "../models/channelAdmin/channelAdmin.model.js";
           Channel,
           ChannelMember,
           ChannelBan,
-<<<<<<< HEAD
-          UserBlock,
           ChannelMember,
-=======
           ChannelAdmin,
->>>>>>> main
         ],
       }),
     }),

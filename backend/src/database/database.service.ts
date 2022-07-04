@@ -19,15 +19,10 @@ export class DatabaseService {
       TFASession.sync({ alter: true }),
       TFASecret.sync({ alter: true }),
       Channel.sync({ alter: true }),
-<<<<<<< HEAD
       ChannelAdmin.sync({ alter: true }),
       ChannelBan.sync({ alter: true }),
-      UserBlock.sync({ alter: true }),
-      ChannelMember.sync({ alter: true }),
-=======
       ChannelMember.sync({ alter: true }),
       ChannelAdmin.sync({ alter: true }),
       ChannelBan.sync({ alter: true }),
->>>>>>> main
     ]);
 }
