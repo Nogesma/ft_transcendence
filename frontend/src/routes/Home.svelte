@@ -25,7 +25,7 @@
   else onMount(authenticate);
 </script>
 
-<main class="flex flex-col md:flex">
+<main class="container flex flex-col md:flex">
   <h1 class="m-auto text-5xl font-bold">
     {localStorage.displayname}
   </h1>
