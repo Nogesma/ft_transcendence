@@ -4,7 +4,6 @@ import {
   BelongsToMany,
   Column,
   ForeignKey,
-  HasOne,
   Model,
   Table,
   Unique,
@@ -22,7 +21,6 @@ export class Channel extends Model {
   name: string;
 
   @AllowNull(false)
-  @Unique
   @Column
   public: boolean;
 
@@ -33,6 +31,7 @@ export class Channel extends Model {
   salt: string;
 
   @ForeignKey(() => User)
+  @AllowNull(false)
   @Column
   ownerId: number;
 

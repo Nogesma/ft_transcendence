@@ -15,7 +15,10 @@ export class ChannelService {
     ownerId: number,
     password: string | undefined,
     salt: string | undefined
-  ) => this.channelModel.create({ name, public: pub, ownerId, password, salt });
+  ) =>
+    this.channelModel
+      .create({ name, public: pub, ownerId, password, salt })
+      .catch(console.error);
 
   getChannelById = (id: number) => this.channelModel.findByPk(id);
 

@@ -65,6 +65,7 @@ export class ChatService {
       throw new HttpException("Channel already exist", HttpStatus.BAD_REQUEST);
 
     if (pub) {
+      console.log({ name, pub, id });
       const channel = await this.channelService.createChannel(
         name,
         pub,
