@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import * as bcrypt from "bcrypt";
 import { UserService } from "../../models/user/user.service.js";
 import { isEmpty, map, pick } from "ramda";
 import { ChannelService } from "../../models/channel/channel.service.js";
@@ -39,11 +40,10 @@ export class ChatService {
       throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
 
     if (!channel.public) {
-      //todo: bcrypt
-      if (password !== channel.password)
+      const dec = await bcrypt.compare(password, channel.password);
+      if (!dec)
         throw new HttpException("Wrong password", HttpStatus.UNAUTHORIZED);
     }
-
     await this.channelMemberService.addMember(channel.id, id);
 
     return true;
@@ -76,13 +76,13 @@ export class ChatService {
 
       return pick(["name", "id"], channel);
     } else {
-      // todo: hash password
-      if (!password)
+      if (!password) {
         throw new HttpException(
           "Password can not be empty",
           HttpStatus.BAD_REQUEST
         );
-
+      }
+      password = await bcrypt.hash(password, 10);
       const channel = await this.channelService.createChannel(
         name,
         pub,
