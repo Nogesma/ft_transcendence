@@ -23,6 +23,7 @@ export class SettingsController {
 
   @Get("me")
   async getUserData(@Req() req: Request) {
+    console.log("aaaaaa");
     const user = await req.session.$get("user");
     if (!user)
       throw new HttpException(
