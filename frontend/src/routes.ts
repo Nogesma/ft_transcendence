@@ -8,10 +8,8 @@ import Authenticate2FA from "./routes/auth/TwoFactorAuth.svelte";
 import Manage2FA from "./routes/settings/Manage2FA.svelte";
 import ManageUserName from "./routes/settings/ManageUserName.svelte";
 import JoinChannel from "./lib/JoinChannel.svelte";
-
 export default {
   "/": Home,
-  "/chat/join": JoinChannel,
   "/settings": wrap({
     asyncComponent: () => import("./routes/settings/Settings.svelte"),
   }),

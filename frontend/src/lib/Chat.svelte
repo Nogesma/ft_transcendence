@@ -13,11 +13,13 @@
   socket.on("connect", () => {
     console.log("connected");
   });
+
+  onMount(() => socket.emit("joinRoom", { id: channel.id }));
+
   socket.on("disconnect", () => {
     socket.emit("leaveRoom", {id: channel.id})
   })
   onMount(() => socket.emit("joinRoom", { id: channel.id}));
-
   onDestroy(() => socket.emit("leaveRoom", { id: channel.id }));
 
   socket.on("newMessage", (event) => {

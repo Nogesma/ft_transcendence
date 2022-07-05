@@ -1,10 +1,11 @@
 <script lang="ts">
+  import ChannelManager from "../lib/ChannelManager.svelte";
+  import axios from "axios";
   import { push } from "svelte-spa-router";
   import { onMount } from "svelte";
-  import axios from "axios";
-  import ChannelManager from "../lib/ChannelManager.svelte";
+  import { login } from "../stores/settings";
 
-  const getUserData = async () =>
+  const authenticate = async () =>
     axios
       .get(`${import.meta.env.VITE_BACKEND_URI}/api/user/me`, {
         withCredentials: true,
@@ -12,15 +13,19 @@
       .then(({ data }) => {
         localStorage.displayname = data.displayname;
         localStorage.login = data.login;
+        $login = true;
       })
-      .catch(() => push("/auth/login"));
+      .catch(() => {
+        $login = false;
+        push("/auth/login");
+      });
 
   if (new URLSearchParams(window.location.search).has("code"))
     push("/auth/oauth2callback" + window.location.search);
-  else onMount(getUserData);
+  else onMount(authenticate);
 </script>
 
-<main class="flex flex-col">
+<main class="container flex flex-col md:flex">
   <h1 class="m-auto text-5xl font-bold">
     {localStorage.displayname}
   </h1>

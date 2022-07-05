@@ -79,6 +79,15 @@ export class ChatGateway {
       .emit("newMessage", `User: ${client.request.userId} joined the room`);
   }
 
+  @SubscribeMessage("joinRoom")
+  handleRoomJoin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("id") id: number
+  ) {
+    console.log({ id });
+    console.log(client.request.signedCookies.token);
+    console.log(client.request.session);
+  }
   @SubscribeMessage("leaveRoom")
   handleRoomLeave(
     @ConnectedSocket() client: Socket,

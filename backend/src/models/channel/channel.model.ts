@@ -31,6 +31,7 @@ export class Channel extends Model {
   salt: string;
 
   @ForeignKey(() => User)
+  @AllowNull(false)
   @Column
   ownerId: number;
 

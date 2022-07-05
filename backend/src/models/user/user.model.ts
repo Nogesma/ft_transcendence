@@ -16,6 +16,7 @@ import { TFASecret } from "../TFASecret/TFASecret.model.js";
 import { Session } from "../session/session.model.js";
 import { ChannelMember } from "../channelMember/channelMember.model.js";
 import { ChannelBan } from "../channelBan/channelBan.model.js";
+import { ChannelAdmin } from "../channelAdmin/channelAdmin.model.js";
 
 @Table({ timestamps: false })
 export class User extends Model {
@@ -53,7 +54,7 @@ export class User extends Model {
   @BelongsToMany(() => Channel, () => ChannelMember)
   member: Channel[];
 
-  @BelongsToMany(() => Channel, () => ChannelMember)
+  @BelongsToMany(() => Channel, () => ChannelAdmin)
   admin: Channel[];
 
   @BelongsToMany(() => Channel, () => ChannelBan)

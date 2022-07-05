@@ -1,8 +1,7 @@
 <script lang="ts">
-  import penguin from "../assets/Penguins.png";
   import ProfilePic from "./ProfilePic.svelte";
   import { push } from "svelte-spa-router";
-  import { scale } from "svelte/transition";
+  import { login } from "../stores/settings.js";
 
   let show = false; // menu state
   let menu: HTMLElement; // menu wrapper DOM reference
@@ -14,50 +13,19 @@
   const handleEscape = (event: KeyboardEvent) => {
     if (event.key === "Escape") show = false;
   };
-
-  // Dark mode toggle
-  let modeName: string;
-  let modeC: string;
-  let mode = false;
-  // let modeName = "light";
-  function toggle() {
-    window.document.body.classList.toggle("light-mode");
-    mode = !mode;
-    if (!mode) {
-      modeName = "light";
-      modeC = "gray";
-    } else {
-      modeName = "dark";
-      modeC = "green";
-    }
-  }
-  !mode ? (modeName = "light") : (modeName = "dark");
-  !mode ? (modeC = "green") : (modeC = "gray");
 </script>
 
 <svelte:window on:click={handleOutsideClick} on:keyup={handleEscape} />
 
-<nav class="bg-white border-gray-300 px-10 sm:px-10 py-2.5 dark:bg-gray-900">
-  <div class="container flex flex-wrap justify-between items-center mx-auto">
-    <a href="#/" class="flex items-center">
-      <img src={penguin} class="mr-3 h-6 sm:h-9" alt="Logo" />
-      <span
-        class="self-center text-xl font-semibold whitespace-nowrap dark:text-white"
-        >penguins</span
-      >
-    </a>
-    <div class="flex items-center md:order-2">
-      <button on:click={toggle}>{modeName} mode</button>
-      <div class="relative" bind:this={menu}>
-        <div>
-          <button
-            on:click={() => (show = !show)}
-            class="flex mr-3 text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4
-                                    focus:ring-gray-300 dark:focus:ring-gray-600"
-            id="user-menu-button"
-            aria-expanded="false"
-            type="button"
-          >
+<div class="navbar bg-base-100">
+  <div class="flex-1">
+    <a href="#/" class="btn btn-ghost normal-case text-xl">Transcendence</a>
+  </div>
+  {#if $login}
+    <div class="flex-none">
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" class="btn btn-ghost btn-circle avatar">
+          <div class="w-10 rounded-full">
             <ProfilePic height="h-10" width="w-10" />
           </button>
           {#if show}
@@ -94,7 +62,18 @@
             </div>
           {/if}
         </div>
+        <ul
+          tabindex="0"
+          class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+        >
+          <li>
+            <button on:click={() => push("/settings")}
+              >{localStorage.login}@student.42lausanne.ch</button
+            >
+          </li>
+          <li><button on:click={() => push("/logout")}>Logout</button></li>
+        </ul>
       </div>
     </div>
-  </div>
-</nav>
+  {/if}
+</div>

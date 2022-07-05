@@ -3,7 +3,6 @@
   export let height: string;
   let imgURL = `/imgs/${localStorage.login}.jpg`;
 </script>
-
 <img
   class="{width} {height} rounded-full object-cover border border-b-gray-100 shadow-sm"
   src={imgURL}
