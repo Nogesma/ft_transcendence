@@ -11,6 +11,7 @@ import { ChannelBan } from "../models/channelBan/channelBan.model.js";
 import { ChannelMember } from "../models/channelMember/channelMember.model.js";
 import { ChannelAdmin } from "../models/channelAdmin/channelAdmin.model.js";
 
+
 @Module({
   imports: [
     SequelizeModule.forRootAsync({
@@ -32,6 +33,7 @@ import { ChannelAdmin } from "../models/channelAdmin/channelAdmin.model.js";
           Channel,
           ChannelMember,
           ChannelBan,
+          ChannelMember,
           ChannelAdmin,
         ],
       }),

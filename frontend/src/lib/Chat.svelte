@@ -1,7 +1,6 @@
 <script lang="ts">
   import { io } from "socket.io-client";
   import { onDestroy, onMount } from "svelte";
-
   export let channel = { name: "", id: -1 };
 
   let msg: string;
@@ -17,6 +16,10 @@
 
   onMount(() => socket.emit("joinRoom", { id: channel.id }));
 
+  socket.on("disconnect", () => {
+    socket.emit("leaveRoom", {id: channel.id})
+  })
+  onMount(() => socket.emit("joinRoom", { id: channel.id}));
   onDestroy(() => socket.emit("leaveRoom", { id: channel.id }));
 
   socket.on("newMessage", (event) => {
@@ -37,4 +40,4 @@
 <h1>Hello world</h1>
 <br /><br />
 <input bind:value={msg} />
-<button on:click={sendmsg}> send message </button>
+<button class="btn" on:click={sendmsg}> send message </button>
