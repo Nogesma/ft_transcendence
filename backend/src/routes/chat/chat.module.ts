@@ -7,6 +7,7 @@ import { SessionModule } from "../../models/session/session.module.js";
 import { UserModule } from "../../models/user/user.module.js";
 import { ChannelModule } from "../../models/channel/channel.module.js";
 import { ChannelMemberModule } from "../../models/channelMember/channelMember.module.js";
+import { ChannelAdminModule } from "../../models/channelAdmin/channelAdmin.module.js";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ChannelMemberModule } from "../../models/channelMember/channelMember.mo
     UserModule,
     ChannelModule,
     ChannelMemberModule,
+    ChannelAdminModule,
   ],
   controllers: [ChatController],
   providers: [ChatService, ChatGateway],

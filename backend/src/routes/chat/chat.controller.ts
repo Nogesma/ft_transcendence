@@ -10,6 +10,7 @@ import {
 import { ChatService } from "./chat.service.js";
 import { MessageBody } from "@nestjs/websockets";
 import { Request } from "express";
+import { boolean } from "joi";
 
 @Controller("chat")
 export class ChatController {
@@ -46,6 +47,11 @@ export class ChatController {
     );
   }
 
+  @Post("leave/:name")
+  async leaveChannel(@Req() req: Request, @Param("name") name: string) {
+    return this.chatService.leaveChannel(name, req.session.userId);
+  }
+
   @Post("create/:name")
   async createChannel(
     @Req() req: Request,
@@ -59,5 +65,9 @@ export class ChatController {
       password,
       req.session.userId
     );
+  }
+  @Post("delete/:name")
+  async deleteChannel(@Req() req: Request, @Param("name") name: string) {
+    return this.chatService.deleteChannel(name, req.session.userId);
   }
 }

@@ -64,7 +64,7 @@ export class ChatGateway {
         "newMessage",
         `User: ${socket.request.session.userId} joined the room`
       );
-    console.log(socket.request.session.userId);
+    // console.log(socket.request.session.userId);
   }
 
   @SubscribeMessage("joinRoom")
@@ -72,9 +72,9 @@ export class ChatGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody("id") id: number
   ) {
-    console.log({ id });
-    console.log(client.request.signedCookies.token);
-    console.log(client.request.session);
+    // console.log({ id });
+    // console.log(client.request.signedCookies.token);
+    // console.log(client.request.session);
   }
 
   @SubscribeMessage("leaveRoom")

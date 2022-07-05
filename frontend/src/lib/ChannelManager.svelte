@@ -4,6 +4,7 @@
   import { push } from "svelte-spa-router";
   import JoinChannel from "./JoinChannel.svelte";
   import CreateChannel from "./CreateChannel.svelte";
+  import DeleteChannel from "./DeleteChannel.svelte";
 
   export let channel = { name: "", id: -1 };
 
@@ -33,6 +34,7 @@
     {/each}
     <JoinChannel />
     <CreateChannel />
+    <DeleteChannel  />
     <!--    <LeaveChannel />-->
   {:catch err}
     <p>{err}</p>
