@@ -18,7 +18,6 @@ export class ChatService {
 
   getJoinedChannels = async (user: User) => {
     const channels = await user.$get("member");
-    console.log(channels);
     return map(pick(["name", "id"]), channels);
   };
 

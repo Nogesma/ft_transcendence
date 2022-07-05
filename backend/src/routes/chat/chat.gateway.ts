@@ -14,16 +14,17 @@ import { SessionService } from "../../models/session/session.service.js";
 import { ChannelMemberService } from "../../models/channelMember/channelMember.service.js";
 import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
 import { type Session } from "../../models/session/session.model.js";
+import { UserService } from "../../models/user/user.service.js";
+import { User } from "../../models/user/user.model.js";
+
 export interface ExtendedError extends Error {
   data?: never;
 }
 
 declare module "http" {
-
   export interface IncomingMessage {
     session: Session;
     signedCookies: { token: string };
-    userId: number;
   }
 }
 
@@ -36,7 +37,8 @@ export class ChatGateway {
 
   constructor(
     private readonly configService: ConfigService<EnvironmentVariables, true>,
-    private readonly sessionService: SessionService
+    private readonly sessionService: SessionService,
+    private readonly userService: UserService
   ) {}
 
   socketUse =
@@ -59,10 +61,13 @@ export class ChatGateway {
   }
 
   @SubscribeMessage("joinRoom")
-  handleRoomJoin(
+  async handleRoomJoin(
     @ConnectedSocket() client: Socket,
     @MessageBody("id") id: number
   ) {
+    const usr = await this.userService.getUserLogin(
+      client.request.session.userId
+    );
     const add_member = (Chan: ChannelMemberService, Ban: ChannelBanService) => {
       if (!Ban.isBanned(id)) {
         client.emit(
@@ -71,33 +76,45 @@ export class ChatGateway {
         );
         return;
       }
-      Chan.addMember(client.request.userId, id);
+      Chan.addMember(client.request.session.userId, id);
     };
-    client.join(String(client.request.userId));
-    this.server.sockets
-      .to(String(client.request.userId))
-      .emit("newMessage", `User: ${client.request.userId} joined the room`);
+    client.join(String(client.request.session.userId));
+    client
+      .to(String(client.request.session.userId))
+      .emit("newMessage", `User: ${usr} joined the room`);
   }
 
   @SubscribeMessage("leaveRoom")
-  handleRoomLeave(
+  async handleRoomLeave(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: string
   ) {
     console.log("left");
-    this.server.sockets.emit("newMessage", `User : ${client.request.userId} left the room`)
-    console.log(client.request.session.userId);
+    this.server.sockets.emit(
+      "newMessage",
+      `User : ${await this.userService.getUserLogin(
+        client.request.session.userId
+      )} left the room`
+    );
   }
   @SubscribeMessage("sendMessage")
-  handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data: string) {
+  async handleEvent(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: string
+  ) {
     const can_talk = (Mute: ChannelBanService) => {
       if (!Mute.isMuted(Number(client.id))) {
         client.emit("newMessage", "you cannot talk because you are banned");
-        return;
+        return true;
       }
     };
     this.server.sockets
-      .to(String(client.request.userId))
-      .emit("newMessage", data);
+      .to(String(client.request.session.userId))
+      .emit(
+        "newMessage",
+        `${await this.userService.getUserLogin(
+          client.request.session.userId
+        )}: ${data}`
+      );
   }
 }
