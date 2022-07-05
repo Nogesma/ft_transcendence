@@ -32,14 +32,13 @@ export class ChatService {
 
   getJoinedChannels = async (user: User) => {
     const channels = await user.$get("member");
-    // console.log(channels);
-    return map(pick(["name", "id"]), channels);
+    return map(pick(["name"]), channels);
   };
 
   getPublicChannels = async () => {
     const channels = await this.channelService.getPublicChannels();
 
-    return map(pick(["name", "id"]), channels);
+    return map(pick(["name"]), channels);
   };
 
   joinChannel = async (
@@ -131,8 +130,9 @@ export class ChatService {
       );
     }
     await this.channelAdminService.addAdmin(channel.id, id);
+    await this.channelMemberService.addMember(channel.id, id);
 
-    return pick(["name", "id"], channel);
+    return pick(["name"], channel);
   };
 
   deleteChannel = async (name: string, id: number) => {
@@ -140,13 +140,12 @@ export class ChatService {
 
     if (!channel)
       throw new HttpException("Channel does not exist", HttpStatus.BAD_REQUEST);
-    if (id === channel.ownerId) {
-      await this.channelService.deleteChannel(name);
-    } else {
+
+    if (id === channel.ownerId) await this.channelService.deleteChannel(name);
+    else
       throw new HttpException(
-        "Only admins can delete c channel",
+        "Channel can only be deleted by it's owner",
         HttpStatus.BAD_REQUEST
       );
-    }
   };
 }

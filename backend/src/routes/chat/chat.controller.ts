@@ -10,7 +10,6 @@ import {
 import { ChatService } from "./chat.service.js";
 import { MessageBody } from "@nestjs/websockets";
 import { Request } from "express";
-import { boolean } from "joi";
 
 @Controller("chat")
 export class ChatController {

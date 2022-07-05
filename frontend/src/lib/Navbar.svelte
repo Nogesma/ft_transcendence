@@ -2,20 +2,7 @@
   import ProfilePic from "./ProfilePic.svelte";
   import { push } from "svelte-spa-router";
   import { login } from "../stores/settings.js";
-
-  let show = false; // menu state
-  let menu: HTMLElement; // menu wrapper DOM reference
-
-  const handleOutsideClick = (event: MouseEvent) => {
-    if (!menu.contains(event.target as Node)) show = false;
-  };
-
-  const handleEscape = (event: KeyboardEvent) => {
-    if (event.key === "Escape") show = false;
-  };
 </script>
-
-<svelte:window on:click={handleOutsideClick} on:keyup={handleEscape} />
 
 <div class="navbar bg-base-100">
   <div class="flex-1">

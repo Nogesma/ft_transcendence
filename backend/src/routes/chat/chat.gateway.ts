@@ -72,9 +72,9 @@ export class ChatGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody("id") id: number
   ) {
-    // console.log({ id });
-    // console.log(client.request.signedCookies.token);
-    // console.log(client.request.session);
+    console.log({ id });
+    console.log(client.request.signedCookies.token);
+    console.log(client.request.session);
   }
 
   @SubscribeMessage("leaveRoom")

@@ -2,7 +2,7 @@
   import { io } from "socket.io-client";
   import { onDestroy, onMount } from "svelte";
 
-  export let channel = { name: "", id: -1 };
+  export let channel = "";
 
   let msg: string;
   let messagesList: Array<string> = [];
@@ -15,9 +15,9 @@
     console.log("connected");
   });
 
-  onMount(() => socket.emit("joinRoom", { id: channel.id }));
+  onMount(() => socket.emit("joinRoom", { name: channel }));
 
-  onDestroy(() => socket.emit("leaveRoom", { id: channel.id }));
+  onDestroy(() => socket.emit("leaveRoom", { name: channel }));
 
   socket.on("newMessage", (event) => {
     messagesList.push(event);
