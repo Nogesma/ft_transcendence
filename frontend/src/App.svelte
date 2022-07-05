@@ -5,6 +5,7 @@
   import Navbar from "./lib/Navbar.svelte";
 </script>
 
-<Navbar />
-
-<Router {routes} />
+<div>
+  <Navbar />
+  <Router {routes} />
+</div>
