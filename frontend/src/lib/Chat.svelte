@@ -21,13 +21,15 @@
     messagesList = messagesList;
     msg = "";
   });
-
   const sendmsg = () => socket.emit("sendMessage", msg);
 </script>
 <br /><br />
 {#each messagesList as item, ina}
   <li>{ina + 1}: {item}</li>
 {/each}
-<br>
-<input bind:value={msg} />
-<p><button class="btn" on:click={sendmsg}> send message </button></p>
+<form class="pt-40" on:submit|preventDefault={() => msg = ''}>
+  <label>
+    <p><input bind:value={msg}></p>
+  </label>
+  <button id="send" on:click={sendmsg}> send message </button>
+</form>
