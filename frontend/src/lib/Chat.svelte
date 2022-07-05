@@ -28,7 +28,6 @@
 {#each messagesList as item, ina}
   <li>{ina + 1}: {item}</li>
 {/each}
-<br /><br />
-<br><br />
+<br>
 <input bind:value={msg} />
-<button class="btn" on:click={sendmsg}> send message </button>
+<p><button class="btn" on:click={sendmsg}> send message </button></p>
