@@ -78,9 +78,9 @@ export class ChatGateway {
       }
       Chan.addMember(client.request.session.userId, id);
     };
-    client.join(String(client.request.session.userId));
-    client
-      .to(String(client.request.session.userId))
+    client.join(client.request.session.userId.toString());
+    client.broadcast
+      .to(client.request.session.userId.toString())
       .emit("newMessage", `User: ${usr} joined the room`);
   }
 
