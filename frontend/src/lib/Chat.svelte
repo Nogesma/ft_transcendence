@@ -26,8 +26,13 @@
   });
 
   const sendmsg = () => socket.emit("sendMessage", msg);
+
+  import { createEventDispatcher } from "svelte";
+
+  const dispatch = createEventDispatcher();
 </script>
 
+<button on:click={() => dispatch("back", "back button")}>Back</button>
 <h1>test</h1>
 <br /><br />
 {#each messagesList as item, ina}

@@ -40,5 +40,5 @@
     <p>{err}</p>
   {/await}
 {:else}
-  <Chat {channel} />
+  <Chat on:back={() => (hasChat = false)} {channel} />
 {/if}
