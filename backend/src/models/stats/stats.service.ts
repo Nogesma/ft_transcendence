@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Stats } from "./stats.model.js";
-import { getNewElo } from "../../utils/elo.js";
 
 @Injectable()
 export class StatsService {
@@ -19,21 +18,18 @@ export class StatsService {
       userId,
     });
 
-  updateStats = async (player: Stats, opponent: Stats, win: boolean) => {
+  updateStats = async (
+    player: Stats,
+    opponent: Stats,
+    win: boolean,
+    score: number
+  ) => {
     if (win) player.win++;
     else player.losses++;
 
-    const newElo = getNewElo(
-      player.win + player.losses,
-      player.highestElo,
-      player.elo,
-      opponent.elo,
-      win
-    );
+    player.elo += score;
 
-    if (newElo > player.highestElo) player.highestElo = newElo;
-
-    player.elo = newElo;
+    if (player.elo > player.highestElo) player.highestElo = player.elo;
 
     await player.save();
   };

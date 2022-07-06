@@ -1,4 +1,4 @@
-const getNewElo = (
+const getElo = (
   numberOfGames: number,
   highestElo: number,
   playerElo: number,
@@ -8,15 +8,15 @@ const getNewElo = (
   const winProbability =
     1 / (1 + Math.pow(10, (opponentElo - playerElo) / 400));
 
-  const getElo = (K: number) =>
-    playerElo + Math.ceil(K * (Number(win) - winProbability));
+  const applyKFactor = (K: number) =>
+    Math.ceil(K * (Number(win) - winProbability));
 
   // Using FIDE K-Factor
-  if (numberOfGames <= 30) return getElo(40);
+  if (numberOfGames <= 30) return applyKFactor(40);
 
-  if (highestElo < 2400) return getElo(20);
+  if (highestElo < 2400) return applyKFactor(20);
 
-  return getElo(10);
+  return applyKFactor(10);
 };
 
-export { getNewElo };
+export { getElo };

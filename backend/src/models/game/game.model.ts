@@ -20,7 +20,15 @@ export class Game extends Model {
 
   @AllowNull(false)
   @Column
-  opponentElo: string;
+  opponentElo: number;
+
+  @AllowNull(false)
+  @Column
+  playerScore: number;
+
+  @AllowNull(false)
+  @Column
+  opponentScore: number;
 
   @ForeignKey(() => User)
   @AllowNull(false)
@@ -37,4 +45,8 @@ export class Game extends Model {
 
   @BelongsTo(() => User, "opponentId")
   opponent: ReturnType<() => User>;
+
+  @AllowNull(false)
+  @Column
+  date: Date;
 }

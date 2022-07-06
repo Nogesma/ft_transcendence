@@ -13,7 +13,7 @@
       <div class="dropdown dropdown-end">
         <div tabindex="0" class="btn btn-ghost btn-circle avatar">
           <div class="w-10 rounded-full">
-            <ProfilePic height="h-10" width="w-10" />
+            <ProfilePic attributes="h-10 w-10 rounded-full" />
           </div>
         </div>
         <ul
@@ -21,9 +21,7 @@
           class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
         >
           <li>
-            <button on:click={() => push("/settings")}
-              >{localStorage.login}@student.42lausanne.ch</button
-            >
+            <button on:click={() => push("/settings")}>Settings</button>
           </li>
           <li><button on:click={() => push("/logout")}>Logout</button></li>
         </ul>

@@ -8,6 +8,7 @@ import { SessionModule } from "./models/session/session.module.js";
 import { ChatModule } from "./routes/chat/chat.module.js";
 import { APP_GUARD } from "@nestjs/core";
 import { AuthGuard } from "./authenticate.guard.js";
+import { InfoModule } from "./routes/info/info.module.js";
 
 @Module({
   providers: [
@@ -35,6 +36,7 @@ import { AuthGuard } from "./authenticate.guard.js";
     SettingsModule,
     SessionModule,
     ChatModule,
+    InfoModule,
   ],
 })
 export class AppModule {}
