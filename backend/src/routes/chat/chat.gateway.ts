@@ -76,11 +76,14 @@ export class ChatGateway {
         );
         return;
       }
-      Chan.addMember(client.request.session.userId, id);
+      Chan.addMember(client.request.session.id, id);
     };
-    client.join(client.request.session.userId.toString());
+
+    client.join(id.toString());
+    const it = client.rooms.values();
+    it.next();
     client.broadcast
-      .to(client.request.session.userId.toString())
+      .to(it.next().value)
       .emit("newMessage", `User: ${usr} joined the room`);
   }
 
@@ -102,14 +105,10 @@ export class ChatGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: string
   ) {
-    const can_talk = (Mute: ChannelBanService) => {
-      if (!Mute.isMuted(Number(client.id))) {
-        client.emit("newMessage", "you cannot talk because you are banned");
-        return true;
-      }
-    };
+    const it = client.rooms.values();
+    it.next();
     this.server.sockets
-      .to(String(client.request.session.userId))
+      .to(it.next().value)
       .emit(
         "newMessage",
         `${await this.userService.getUserLogin(
