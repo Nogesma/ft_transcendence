@@ -28,6 +28,7 @@
       .then(({ data }) => {
         localStorage.displayname = data.displayname;
         localStorage.login = data.login;
+        localStorage.id = data.id;
         $login = true;
       })
       .catch(() => {

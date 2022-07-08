@@ -8,7 +8,7 @@ export class InfoController {
 
   @Get(":id")
   async getUserData(@Param("id") id: number) {
-    return this.infoService.getUserData(id);
+    return this.infoService.getUserStats(id);
   }
 
   @Get("/game/history/:id")

@@ -33,4 +33,7 @@ export class StatsService {
 
     await player.save();
   };
+
+  getStats = async (userId: number) =>
+    this.statsModel.findOne({ where: { userId } });
 }

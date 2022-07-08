@@ -1,5 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { andThen, map, mergeLeft, pick, pipe } from "ramda";
+import {
+  andThen,
+  ifElse,
+  isNil,
+  map,
+  mergeLeft,
+  omit,
+  pick,
+  pipe,
+} from "ramda";
 import { ConfigService } from "@nestjs/config";
 import { UserService } from "../../models/user/user.service.js";
 import { FriendService } from "../../models/friend/friend.service.js";
@@ -16,6 +25,24 @@ export class InfoService {
     private readonly blockService: BlockService
   ) {}
 
+  getUserStats = pipe(
+    this.userService.getUser,
+    andThen(
+      ifElse(
+        isNil,
+        () => {
+          throw new HttpException("User not found", HttpStatus.NOT_FOUND);
+        },
+        (y) =>
+          pipe(
+            async (x) => (await x.$get("stats")).toJSON(),
+            andThen(omit(["userId"])),
+            andThen(mergeLeft(pick(["login", "displayname"], y.toJSON())))
+          )(y)
+      )
+    )
+  );
+
   getUserData = async (id: number) => {
     const user = this.userService.getUser(id);
 
@@ -30,7 +57,7 @@ export class InfoService {
     andThen(
       map((y) =>
         pipe(
-          (x) => x.$get("opponent"),
+          async (x) => (await x.$get("opponent")).toJSON(),
           andThen(pick(["login", "displayname"])),
           andThen(mergeLeft(y.toJSON()))
         )(y)

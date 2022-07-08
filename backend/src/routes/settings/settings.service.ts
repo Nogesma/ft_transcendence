@@ -30,7 +30,7 @@ export class SettingsService {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
 
-    return pick(["login", "displayname"], user);
+    return pick(["login", "displayname", "id"], user);
   };
 
   generateNew2FA = async (user: User) => {

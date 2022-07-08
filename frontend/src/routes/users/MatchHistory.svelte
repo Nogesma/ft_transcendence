@@ -1,5 +1,9 @@
 <script lang="ts">
   import axios from "axios";
+  import dayjs from "dayjs";
+  import relativeTime from "dayjs/plugin/relativeTime";
+
+  dayjs.extend(relativeTime);
   import ProfilePic from "../../lib/ProfilePic.svelte";
 
   export let params: { id: number };
@@ -24,7 +28,7 @@
       </tr>
     </thead>
     <tbody>
-      {#each matches as { login: opponentLogin, displayname: opponentDisplayname, win, playerElo, opponentElo, playerScore, opponentScore }, i}
+      {#each matches as { login: opponentLogin, displayname: opponentDisplayname, win, playerElo, opponentElo, playerScore, opponentScore, date }, i}
         <tr>
           <td class="text-xs text-center">
             <i>{playerElo}</i>
@@ -42,7 +46,12 @@
               </div>
             </div>
           </td>
-          <td class="text-center">{win ? "VICTORY" : "DEFEAT"}</td>
+          <td class="text-center">
+            {win ? "VICTORY" : "DEFEAT"}<br />
+            <div class="tooltip" data-tip={dayjs(date).format()}>
+              {dayjs(date).fromNow()}
+            </div>
+          </td>
           <td>
             <div class="flex content-center flex-row-reverse">
               <div class="avatar px-5">

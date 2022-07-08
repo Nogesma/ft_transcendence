@@ -6,6 +6,9 @@ export default {
   "/settings": wrap({
     asyncComponent: () => import("./routes/settings/Settings.svelte"),
   }),
+  "/users/:id": wrap({
+    asyncComponent: () => import("./routes/users/Profile.svelte"),
+  }),
   "/users/history/:id": wrap({
     asyncComponent: () => import("./routes/users/MatchHistory.svelte"),
   }),
