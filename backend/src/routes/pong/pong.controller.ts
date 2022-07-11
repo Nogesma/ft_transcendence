@@ -3,7 +3,6 @@ import { PongService } from "./pong.service.js";
 
 @Controller("pong")
 export class PongController {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor(private readonly pong_service: PongService) {}
 
   @Get("game/new")

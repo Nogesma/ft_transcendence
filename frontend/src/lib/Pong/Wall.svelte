@@ -1,13 +1,14 @@
-<script>
+<script lang="ts">
   import {
     BoxBufferGeometry,
     MathUtils,
     Mesh,
     MeshStandardMaterial,
   } from "svelthree";
+  import type { Scene } from "svelthree-three";
 
-  export let scene;
-  export let pos = [0, 0, 0];
+  export let scene: Scene;
+  export let pos: [number, number, number] = [0, 0, 0];
   export let rot = 0;
   export let len = 5;
   export let height = 2;

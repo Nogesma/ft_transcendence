@@ -18,8 +18,8 @@
   import { onMount } from "svelte";
   import Wall from "./Wall.svelte";
 
-  export let height;
-  export let width;
+  export let height: number;
+  export let width: number;
 
   export let params = {
     box: {
@@ -32,13 +32,17 @@
     tick_speed: 33,
   };
 
-  let ball = {
+  let ball: { pos: [number, number, number]; speed: number[]; rad: number } = {
     pos: [0, 0, 0],
     speed: [params.speed, 0, -params.speed],
     rad: 1,
   };
 
-  let padLeft = {
+  let padLeft: {
+    pos: [number, number, number];
+    speed: number[];
+    dimensions: [number, number, number];
+  } = {
     pos: [-(params.box.length / 2) + params.box.thick, 0, 0],
     speed: [0, 0, 0.1],
     dimensions: [1, params.box.height / 1.2, params.box.width / 4],
@@ -84,7 +88,7 @@
       ball.speed[2] *= -1;
   };
 
-  const advance = (obj) => {
+  const advance = (obj: { pos: number[]; speed: number[] }) => {
     obj.pos[0] += obj.speed[0];
     obj.pos[1] += obj.speed[1];
     obj.pos[2] += obj.speed[2];

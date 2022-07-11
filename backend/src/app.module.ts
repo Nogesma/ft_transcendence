@@ -1,16 +1,23 @@
-import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import { AuthModule } from "./routes/auth/auth.module.js";
 import { SettingsModule } from "./routes/settings/settings.module.js";
-import { AuthenticateMiddleware } from "./authenticate.middleware.js";
 import { DatabaseModule } from "./database/database.module.js";
 import { ConfigModule } from "@nestjs/config";
 import Joi from "joi";
 import { SessionModule } from "./models/session/session.module.js";
-import { SettingsController } from "./routes/settings/settings.controller.js";
 import { ChatModule } from "./routes/chat/chat.module.js";
 import { PongModule } from "./routes/pong/pong.module.js";
+import { APP_GUARD } from "@nestjs/core";
+import { AuthGuard } from "./authenticate.guard.js";
+import { InfoModule } from "./routes/info/info.module.js";
 
 @Module({
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
@@ -31,10 +38,7 @@ import { PongModule } from "./routes/pong/pong.module.js";
     SessionModule,
     ChatModule,
     PongModule,
+    InfoModule,
   ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthenticateMiddleware).forRoutes(SettingsController);
-  }
-}
+export class AppModule {}

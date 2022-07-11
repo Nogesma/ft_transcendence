@@ -1,16 +1,28 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { User } from "./user.model.js";
+import { StatsService } from "../stats/stats.service.js";
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User)
-    private userModel: typeof User
+    private userModel: typeof User,
+    private readonly statsService: StatsService
   ) {}
 
-  createUser = (id: number, login: string, displayname: string, tfa: boolean) =>
-    this.userModel.create({ id, login, displayname, tfa });
+  createUser = async (
+    id: number,
+    login: string,
+    displayname: string,
+    tfa: boolean
+  ) => {
+    const user = await this.userModel.create({ id, login, displayname, tfa });
+
+    await this.statsService.initStats(id);
+
+    return user;
+  };
 
   createUserIfNotExist = async ({
     id,

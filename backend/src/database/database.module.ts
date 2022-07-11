@@ -10,6 +10,10 @@ import { Channel } from "../models/channel/channel.model.js";
 import { ChannelBan } from "../models/channelBan/channelBan.model.js";
 import { ChannelMember } from "../models/channelMember/channelMember.model.js";
 import { ChannelAdmin } from "../models/channelAdmin/channelAdmin.model.js";
+import { Game } from "../models/game/game.model.js";
+import { Stats } from "../models/stats/stats.model.js";
+import { Friend } from "../models/friend/friend.model.js";
+import { Block } from "../models/block/block.model.js";
 
 @Module({
   imports: [
@@ -33,6 +37,10 @@ import { ChannelAdmin } from "../models/channelAdmin/channelAdmin.model.js";
           ChannelMember,
           ChannelBan,
           ChannelAdmin,
+          Game,
+          Stats,
+          Friend,
+          Block,
         ],
       }),
     }),
