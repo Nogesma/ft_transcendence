@@ -11,8 +11,8 @@
   onMount(() => socket.emit("joinRoom", { id: channel.id }));
 
   socket.on("disconnect", () => {
-    socket.emit("leaveRoom", {id: channel.id})
-  })
+    socket.emit("leaveRoom", { id: channel.id });
+  });
   onDestroy(() => socket.emit("leaveRoom", { id: channel.id }));
 
   socket.on("connect", () => {
@@ -24,18 +24,17 @@
     msg = "";
   });
   const sendmsg = () => socket.emit("sendMessage", msg);
-
-  import { createEventDispatcher } from "svelte";
-
-  const dispatch = createEventDispatcher();
 </script>
+
 <br /><br />
 {#each messagesList as item, ina}
   <li>{ina + 1}: {item}</li>
 {/each}
-<form class="pt-40" on:submit|preventDefault={() => msg = ''}>
-  <label>
-    <p><input bind:value={msg}></p>
+<form class="pt-40" on:submit|preventDefault={() => (msg = "")}>
+  <label for="send">
+    <p>
+      <input bind:value={msg} />
+    </p>
   </label>
   <button id="send" on:click={sendmsg}> send message </button>
 </form>

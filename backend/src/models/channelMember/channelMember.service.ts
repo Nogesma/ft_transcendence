@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { ChannelMember } from "./channelMember.model.js";
-import { Channel } from "../channel/channel.model.js";
 
 @Injectable()
 export class ChannelMemberService {

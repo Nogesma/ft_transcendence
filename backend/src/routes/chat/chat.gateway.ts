@@ -11,11 +11,8 @@ import { ConfigService } from "@nestjs/config";
 import cookieParser from "../../utils/socket-cookie-parser.js";
 import { isExpired } from "../../utils/date.js";
 import { SessionService } from "../../models/session/session.service.js";
-import { ChannelMemberService } from "../../models/channelMember/channelMember.service.js";
-import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
 import { type Session } from "../../models/session/session.model.js";
 import { UserService } from "../../models/user/user.service.js";
-import { User } from "../../models/user/user.model.js";
 
 export interface ExtendedError extends Error {
   data?: never;
@@ -68,17 +65,6 @@ export class ChatGateway {
     const usr = await this.userService.getUserLogin(
       client.request.session.userId
     );
-    const add_member = (Chan: ChannelMemberService, Ban: ChannelBanService) => {
-      if (!Ban.isBanned(id)) {
-        client.emit(
-          "newMessage",
-          `Error: Cannot join room because you are banned`
-        );
-        return;
-      }
-      Chan.addMember(client.request.session.id, id);
-    };
-
     client.join(id.toString());
     const it = client.rooms.values();
     it.next();
@@ -88,10 +74,7 @@ export class ChatGateway {
   }
 
   @SubscribeMessage("leaveRoom")
-  async handleRoomLeave(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: string
-  ) {
+  async handleRoomLeave(@ConnectedSocket() client: Socket) {
     console.log("left");
     this.server.sockets.emit(
       "newMessage",

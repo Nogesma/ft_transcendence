@@ -1,13 +1,6 @@
 import { wrap } from "svelte-spa-router/wrap";
 import Home from "./routes/Home.svelte";
-import NotFound from "./routes/404.svelte";
-import Login from "./routes/auth/Login.svelte";
-import Callback from "./routes/auth/Callback.svelte";
-import Settings from "./routes/settings/Settings.svelte";
-import Authenticate2FA from "./routes/auth/TwoFactorAuth.svelte";
-import Manage2FA from "./routes/settings/Manage2FA.svelte";
-import ManageUserName from "./routes/settings/ManageUserName.svelte";
-import JoinChannel from "./lib/JoinChannel.svelte";
+
 export default {
   "/": Home,
   "/settings": wrap({
