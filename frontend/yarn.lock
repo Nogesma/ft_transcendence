@@ -200,12 +200,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ramda@npm:^0.28.14":
-  version: 0.28.14
-  resolution: "@types/ramda@npm:0.28.14"
+"@types/ramda@npm:^0.28.15":
+  version: 0.28.15
+  resolution: "@types/ramda@npm:0.28.15"
   dependencies:
     ts-toolbelt: ^6.15.1
-  checksum: b962383ba6615a68670e1a24958df25835070d72433b95761c9d3e554bc999cb30c99acd63cbc056537b6e002355a407061c33a407e9cc574b2cde3dabbd31b8
+  checksum: f96576c78a3bfdc8d0675a7c5fb237a56fe76b1d380578f63e59185bd1938c38729d7051d92750e6773bc2ea9c64e5d63bdbd7b95c92f5d400d3d5ce850a6dbd
   languageName: node
   linkType: hard
 
@@ -797,9 +797,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"daisyui@npm:^2.18.1":
-  version: 2.18.1
-  resolution: "daisyui@npm:2.18.1"
+"daisyui@npm:^2.19.0":
+  version: 2.19.0
+  resolution: "daisyui@npm:2.19.0"
   dependencies:
     color: ^4.2
     css-selector-tokenizer: ^0.8.0
@@ -808,7 +808,7 @@ __metadata:
   peerDependencies:
     autoprefixer: ^10.0.2
     postcss: ^8.1.6
-  checksum: c9ac89931fdd7655c289094b0b3a347af21c27aac9238971dc17672cd78a74787fd6cac81d746a01fbc354c4212f46b163080d51ff174d28a8f3dc6bdda99cfa
+  checksum: 10928efa8e3cf36070b88250f3160345f2dfe8d51758b7a8e3b16963558995a0905f51321c7c8c51187c5ee6059c276a0c42f93a2d9e81b8538c76bd1313eec6
   languageName: node
   linkType: hard
 
@@ -1533,12 +1533,12 @@ __metadata:
     "@sveltejs/vite-plugin-svelte": ^1.0.0-next.49
     "@tsconfig/svelte": ^3.0.0
     "@types/qrcode": ^1.4.2
-    "@types/ramda": ^0.28.14
+    "@types/ramda": ^0.28.15
     "@typescript-eslint/eslint-plugin": ^5.30.5
     "@typescript-eslint/parser": ^5.30.5
     autoprefixer: ^10.4.7
     axios: ^0.27.2
-    daisyui: ^2.18.1
+    daisyui: ^2.19.0
     dayjs: ^1.11.3
     eslint: ^8.19.0
     eslint-config-prettier: ^8.5.0

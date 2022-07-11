@@ -884,9 +884,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/common@npm:^9.0.1":
-  version: 9.0.1
-  resolution: "@nestjs/common@npm:9.0.1"
+"@nestjs/common@npm:^9.0.2":
+  version: 9.0.2
+  resolution: "@nestjs/common@npm:9.0.2"
   dependencies:
     iterare: 1.2.1
     tslib: 2.4.0
@@ -904,29 +904,29 @@ __metadata:
       optional: true
     class-validator:
       optional: true
-  checksum: 3a93824bda59b911dd6d3b4f0f833138dd997b2f330596f0e1bbb76a3a18d82664c8bd75c40f7f9a840e3e83e2db2c2033d0b9d1b667121c2823e9ead1d0b46e
+  checksum: 3c342d60f089c19766671a7d3f4e6414f97bc588ae8572a898801108b70445bb9ffeafbac788e2b85995af5605ce36221c3895657c5fb662744d089ab6b1623d
   languageName: node
   linkType: hard
 
-"@nestjs/config@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "@nestjs/config@npm:2.1.0"
+"@nestjs/config@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@nestjs/config@npm:2.2.0"
   dependencies:
     dotenv: 16.0.1
     dotenv-expand: 8.0.3
     lodash: 4.17.21
     uuid: 8.3.2
   peerDependencies:
-    "@nestjs/common": ^7.0.0 || ^8.0.0
+    "@nestjs/common": ^7.0.0 || ^8.0.0 || ^9.0.0
     reflect-metadata: ^0.1.13
     rxjs: ^6.0.0 || ^7.2.0
-  checksum: 6e7af8a981d315f0ada49b7d9b833e6e716eb84e5a087810042bb05dd560b4aba1b3c92a177fde9b073f1865bee13dc00c7903ebee0a390bfda0dd41c1fa3575
+  checksum: 42b9d8014da51ee76621f705d3783d10fbcaa8362881ecd591b8c9542e8067d3e61258bb01556694c355471ea6af8485c05ba85d1326f54f810bff19bfefef2e
   languageName: node
   linkType: hard
 
-"@nestjs/core@npm:^9.0.1":
-  version: 9.0.1
-  resolution: "@nestjs/core@npm:9.0.1"
+"@nestjs/core@npm:^9.0.2":
+  version: 9.0.2
+  resolution: "@nestjs/core@npm:9.0.2"
   dependencies:
     "@nuxtjs/opencollective": 0.3.2
     fast-safe-stringify: 2.1.1
@@ -949,13 +949,13 @@ __metadata:
       optional: true
     "@nestjs/websockets":
       optional: true
-  checksum: fa9a6e49a3303621582dac0ebbc21537bb1add42190b20bea9b4e02e96e7112d74b9261e10b1300951254ca99ba6f891db7bfc581e9310d97b5f20b95326a2af
+  checksum: 0bc1f8aadce54044fb5428e73979fbb6b821712cfbf3e039d7442a5e8cc6e7e6873144f711d188e6e7793e53f53dce6b1089cafbf3a115fc922043abe12ccc62
   languageName: node
   linkType: hard
 
-"@nestjs/platform-express@npm:^9.0.1":
-  version: 9.0.1
-  resolution: "@nestjs/platform-express@npm:9.0.1"
+"@nestjs/platform-express@npm:^9.0.2":
+  version: 9.0.2
+  resolution: "@nestjs/platform-express@npm:9.0.2"
   dependencies:
     body-parser: 1.20.0
     cors: 2.8.5
@@ -965,13 +965,13 @@ __metadata:
   peerDependencies:
     "@nestjs/common": ^9.0.0
     "@nestjs/core": ^9.0.0
-  checksum: 7cc00dc640189598a9daf64b094689706a405c1a298531ccd83bdd1017252fb18b4f9fb49a253212190fe8c73cc9adc1283728cd250c9d9385f5a6aa3e902691
+  checksum: 9f18ce907a7b243c6df4cc5964cb7d8de4b415852e3b4571950e305019967563a18bbc9f61fff88c3640d7fa78b4dc3a3b3dee6e30963b825565efec11303393
   languageName: node
   linkType: hard
 
-"@nestjs/platform-socket.io@npm:^9.0.1":
-  version: 9.0.1
-  resolution: "@nestjs/platform-socket.io@npm:9.0.1"
+"@nestjs/platform-socket.io@npm:^9.0.2":
+  version: 9.0.2
+  resolution: "@nestjs/platform-socket.io@npm:9.0.2"
   dependencies:
     socket.io: 4.5.1
     tslib: 2.4.0
@@ -979,7 +979,7 @@ __metadata:
     "@nestjs/common": ^9.0.0
     "@nestjs/websockets": ^9.0.0
     rxjs: ^7.1.0
-  checksum: 0ddce1cfecdd4130399bdf24310d5ade650232d8dc36a132537a641a34f32ccd738b3164d73abb64aedb1892a9b6725d0c1e9cfd623c55578edbdb98c5ea02d7
+  checksum: 59c2b454be353faf01c9cb188a3582548c147684bf606206f42158d30a9085ebe40d5ac86b4a60a94e0b747f8aab9e840be858c4ee7547ef5f0da9fd8f6b24d5
   languageName: node
   linkType: hard
 
@@ -998,25 +998,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/sequelize@npm:^8.0.1":
-  version: 8.0.1
-  resolution: "@nestjs/sequelize@npm:8.0.1"
+"@nestjs/sequelize@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "@nestjs/sequelize@npm:9.0.0"
   dependencies:
     uuid: 8.3.2
   peerDependencies:
-    "@nestjs/common": ^8.0.0
-    "@nestjs/core": ^8.0.0
+    "@nestjs/common": ^8.0.0 || ^9.0.0
+    "@nestjs/core": ^8.0.0 || ^9.0.0
     reflect-metadata: ^0.1.13
     rxjs: ^7.2.0
     sequelize: ^6.3.5
     sequelize-typescript: ^2.0.0
-  checksum: c5d1fb8c4fa16b99a6ed2923d82257e848d8aa0fc893e8c4e41d532052dda5be1f5bbedc2dc5d8e527631d1011762a4c5e9d298b433fa31648ff93fabcae8774
+  checksum: 5e35488d5e1c7009ba90cf0bd16928b1bc79ddbc1bf175303a3ceee6c1615196aa307af16e27c99c4671a6799b55a333e15670c489e0fb98e18b7f8c5cdfc055
   languageName: node
   linkType: hard
 
-"@nestjs/testing@npm:^9.0.1":
-  version: 9.0.1
-  resolution: "@nestjs/testing@npm:9.0.1"
+"@nestjs/testing@npm:^9.0.2":
+  version: 9.0.2
+  resolution: "@nestjs/testing@npm:9.0.2"
   dependencies:
     tslib: 2.4.0
   peerDependencies:
@@ -1029,13 +1029,13 @@ __metadata:
       optional: true
     "@nestjs/platform-express":
       optional: true
-  checksum: 6bde9566299344fb020342ea32f8db2b2eb805cb5556cfbd3ed6696f6422229955bdb1460cbef27398a6878d38d014e56e17788a556fc8004c373d95cb8e814d
+  checksum: 4dc4964935247662af5e4ee1bea034cdd54253823d06d7bcce540a5ae2b79de3c800d8644e5b36942845c74c4b9b2fefc27309fd893b6acee1c83d44a6d9e2bc
   languageName: node
   linkType: hard
 
-"@nestjs/websockets@npm:^9.0.1":
-  version: 9.0.1
-  resolution: "@nestjs/websockets@npm:9.0.1"
+"@nestjs/websockets@npm:^9.0.2":
+  version: 9.0.2
+  resolution: "@nestjs/websockets@npm:9.0.2"
   dependencies:
     iterare: 1.2.1
     object-hash: 3.0.0
@@ -1049,7 +1049,7 @@ __metadata:
   peerDependenciesMeta:
     "@nestjs/platform-socket.io":
       optional: true
-  checksum: ce0c8e9b973f973578e955014cd2ee1e12a809967a1c0327116c56326247b4261dd185a905614d347042c5824676879d875ad8bae567938c8d4bdfe1452a52e7
+  checksum: 3a158c484ea0156f4b84f88ab88b11cc02994b11ed3627a0f5b7caf8e934cb5da997a2de64c5ec1f784f570c7da0588f33bab12ee4574915695e8f208fc366c4
   languageName: node
   linkType: hard
 
@@ -1523,12 +1523,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ramda@npm:^0.28.14":
-  version: 0.28.14
-  resolution: "@types/ramda@npm:0.28.14"
+"@types/ramda@npm:^0.28.15":
+  version: 0.28.15
+  resolution: "@types/ramda@npm:0.28.15"
   dependencies:
     ts-toolbelt: ^6.15.1
-  checksum: b962383ba6615a68670e1a24958df25835070d72433b95761c9d3e554bc999cb30c99acd63cbc056537b6e002355a407061c33a407e9cc574b2cde3dabbd31b8
+  checksum: f96576c78a3bfdc8d0675a7c5fb237a56fe76b1d380578f63e59185bd1938c38729d7051d92750e6773bc2ea9c64e5d63bdbd7b95c92f5d400d3d5ce850a6dbd
   languageName: node
   linkType: hard
 
@@ -2270,15 +2270,15 @@ __metadata:
   resolution: "backend@workspace:."
   dependencies:
     "@nestjs/cli": ^9.0.0
-    "@nestjs/common": ^9.0.1
-    "@nestjs/config": ^2.1.0
-    "@nestjs/core": ^9.0.1
-    "@nestjs/platform-express": ^9.0.1
-    "@nestjs/platform-socket.io": ^9.0.1
+    "@nestjs/common": ^9.0.2
+    "@nestjs/config": ^2.2.0
+    "@nestjs/core": ^9.0.2
+    "@nestjs/platform-express": ^9.0.2
+    "@nestjs/platform-socket.io": ^9.0.2
     "@nestjs/schematics": ^9.0.1
-    "@nestjs/sequelize": ^8.0.1
-    "@nestjs/testing": ^9.0.1
-    "@nestjs/websockets": ^9.0.1
+    "@nestjs/sequelize": ^9.0.0
+    "@nestjs/testing": ^9.0.2
+    "@nestjs/websockets": ^9.0.2
     "@tsconfig/node16": ^1.0.3
     "@types/bcrypt": ^5.0.0
     "@types/busboy": ^1.5.0
@@ -2287,7 +2287,7 @@ __metadata:
     "@types/jest": 28.1.4
     "@types/joi": ^17.2.3
     "@types/node": ^18.0.3
-    "@types/ramda": ^0.28.14
+    "@types/ramda": ^0.28.15
     "@types/sequelize": ^4.28.14
     "@types/speakeasy": ^2.0.7
     "@types/supertest": ^2.0.12
@@ -2309,7 +2309,7 @@ __metadata:
     prettier: ^2.7.1
     ramda: ^0.28.0
     reflect-metadata: ^0.1.13
-    rxjs: ^7.5.5
+    rxjs: ^7.5.6
     sequelize: ^6.21.2
     sequelize-cli: ^6.4.1
     sequelize-typescript: ^2.1.3
@@ -6585,6 +6585,15 @@ __metadata:
   dependencies:
     tslib: ^2.1.0
   checksum: e034f60805210cce756dd2f49664a8108780b117cf5d0e2281506e9e6387f7b4f1532d974a8c8b09314fa7a16dd2f6cff3462072a5789672b5dcb45c4173f3c6
+  languageName: node
+  linkType: hard
+
+"rxjs@npm:^7.5.6":
+  version: 7.5.6
+  resolution: "rxjs@npm:7.5.6"
+  dependencies:
+    tslib: ^2.1.0
+  checksum: fc05f01364a74dac57490fb3e07ea63b422af04017fae1db641a009073f902ef69f285c5daac31359620dc8d9aee7d81e42b370ca2a8573d1feae0b04329383b
   languageName: node
   linkType: hard
 

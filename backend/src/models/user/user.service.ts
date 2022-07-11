@@ -17,8 +17,11 @@ export class UserService {
     displayname: string,
     tfa: boolean
   ) => {
+    const user = await this.userModel.create({ id, login, displayname, tfa });
+
     await this.statsService.initStats(id);
-    return this.userModel.create({ id, login, displayname, tfa });
+
+    return user;
   };
 
   createUserIfNotExist = async ({

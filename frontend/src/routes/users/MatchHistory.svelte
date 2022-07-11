@@ -28,7 +28,7 @@
       </tr>
     </thead>
     <tbody>
-      {#each matches as { login: opponentLogin, displayname: opponentDisplayname, win, playerElo, opponentElo, playerScore, opponentScore, date }, i}
+      {#each matches as { login: opponentLogin, displayname: opponentDisplayname, win, playerElo, opponentElo, playerScore, opponentScore, date }}
         <tr>
           <td class="text-xs text-center">
             <i>{playerElo}</i>

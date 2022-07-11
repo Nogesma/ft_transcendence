@@ -3,5 +3,5 @@
   import Setting from "../../lib/Setting.svelte";
 </script>
 
-<Profile />
+<Profile params={{ id: localStorage.id }} />
 <Setting />

@@ -38,7 +38,7 @@
           style="font-size: 15px;"
         >
           <span class="m-1">
-            <ProfilePic height="h-6" width="w-6" />
+            <ProfilePic attributes="h-6 w-6" />
           </span>
           <span class="m-1">
             : {item}
