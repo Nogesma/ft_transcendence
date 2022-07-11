@@ -6,6 +6,7 @@ import { ConfigModule } from "@nestjs/config";
 import Joi from "joi";
 import { SessionModule } from "./models/session/session.module.js";
 import { ChatModule } from "./routes/chat/chat.module.js";
+import { PongModule } from "./routes/pong/pong.module.js";
 import { APP_GUARD } from "@nestjs/core";
 import { AuthGuard } from "./authenticate.guard.js";
 import { InfoModule } from "./routes/info/info.module.js";
@@ -36,6 +37,7 @@ import { InfoModule } from "./routes/info/info.module.js";
     SettingsModule,
     SessionModule,
     ChatModule,
+    PongModule,
     InfoModule,
   ],
 })
