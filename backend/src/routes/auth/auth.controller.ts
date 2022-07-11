@@ -10,7 +10,9 @@ import {
 import { Request, Response } from "express";
 
 import { AuthService } from "./auth.service.js";
+import { Public } from "../../authenticate.guard.js";
 
+@Public()
 @Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

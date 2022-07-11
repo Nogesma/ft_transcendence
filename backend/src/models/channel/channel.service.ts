@@ -9,28 +9,29 @@ export class ChannelService {
     private channelModel: typeof Channel
   ) {}
 
-  createChannel = (
-    name: string,
-    pub: boolean,
-    ownerId: number,
-    password: string | undefined,
-    salt: string | undefined
-  ) => this.channelModel.create({ name, public: pub, ownerId, password, salt });
+  createChannel = ({
+    name,
+    pub,
+    ownerId,
+    password,
+  }: {
+    name: string;
+    pub: boolean;
+    ownerId: number;
+    password: string | undefined;
+  }) =>
+    this.channelModel
+      .create({ name, public: pub, ownerId, password })
+      .catch(console.error);
 
-  createChannelIfNotExist = async (
-    name: string,
-    pub: boolean,
-    ownerId: number,
-    password: string | undefined,
-    salt: string | undefined
-  ) => {
-    const channel = await this.findChannelByName(name);
-    if (!channel) return this.createChannel(name, pub, ownerId, password, salt);
+  deleteChannel = (name: string) =>
+    this.channelModel.destroy({ where: { name } }).catch(console.error);
 
-    return channel;
-  };
+  getChannelById = (id: number) => this.channelModel.findByPk(id);
 
-  getPubChannel = () => this.channelModel.findAll({ where: { public: true } });
-  getChannel = (id: number) => this.channelModel.findByPk(id);
-  findChannelByName = (name: string) => this.channelModel.findByPk(name);
+  getChannelByName = (name: string) =>
+    this.channelModel.findOne({ where: { name } });
+
+  getPublicChannels = () =>
+    this.channelModel.findAll({ where: { public: true } });
 }

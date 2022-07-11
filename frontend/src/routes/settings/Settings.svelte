@@ -1,7 +1,7 @@
 <script>
-  import Profile from "../../lib/Profile.svelte";
+  import Profile from "../users/Profile.svelte";
   import Setting from "../../lib/Setting.svelte";
 </script>
 
-<Profile />
+<Profile params={{ id: localStorage.id }} />
 <Setting />

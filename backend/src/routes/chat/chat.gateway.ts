@@ -3,6 +3,7 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  ConnectedSocket,
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 
@@ -56,14 +57,29 @@ export class ChatGateway {
   }
 
   handleConnection(socket: Socket) {
-    socket.join("room1");
+    socket.join(String(socket.request.session.userId));
     this.server.sockets
       .to("room1")
       .emit(
         "newMessage",
         `User: ${socket.request.session.userId} joined the room`
       );
-    console.log(socket.request.session.userId);
+    // console.log(socket.request.session.userId);
+  }
+
+  @SubscribeMessage("joinRoom")
+  handleRoomJoin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("id") id: number
+  ) {
+    console.log({ id });
+    console.log(client.request.signedCookies.token);
+    console.log(client.request.session);
+  }
+
+  @SubscribeMessage("leaveRoom")
+  handleRoomLeave(@MessageBody() data: string) {
+    this.server.sockets.to("room1").emit("newMessage", data);
   }
 
   @SubscribeMessage("sendMessage")

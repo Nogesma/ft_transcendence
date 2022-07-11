@@ -75,4 +75,34 @@ export class SettingsController {
       );
     return this.userService.postAvatar(req, res, login);
   }
+
+  @Get("friend/requests")
+  async getPendingFriendRequests(@Req() req: Request) {
+    return this.userService.getPendingFriendRequests(req.session.userId);
+  }
+
+  @Post("friend/add/:id")
+  async addFriend(@Req() req: Request, @Param("id") id: number) {
+    await this.userService.addFriend(req.session.userId, id);
+  }
+
+  @Post("friend/requests/accept/:id")
+  async acceptFriendRequest(@Req() req: Request, @Param("id") id: number) {
+    await this.userService.acceptFriendRequest(req.session.userId, id);
+  }
+
+  @Post("friend/requests/deny/:id")
+  async denyFriendRequest(@Req() req: Request, @Param("id") id: number) {
+    await this.userService.denyFriendRequest(req.session.userId, id);
+  }
+
+  @Post("block/:id")
+  async blockUser(@Req() req: Request, @Param("id") id: number) {
+    await this.userService.block(req.session.userId, id);
+  }
+
+  @Post("unblock/:id")
+  async unblockUser(@Req() req: Request, @Param("id") id: number) {
+    await this.userService.unblock(req.session.userId, id);
+  }
 }
