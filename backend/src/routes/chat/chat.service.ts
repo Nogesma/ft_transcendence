@@ -2,10 +2,23 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import * as bcrypt from "bcrypt";
 import { UserService } from "../../models/user/user.service.js";
-import { isEmpty, map, pick } from "ramda";
+import {
+  either,
+  ifElse,
+  isEmpty,
+  isNil,
+  lensProp,
+  map,
+  over,
+  pick,
+  pipe,
+  prop,
+} from "ramda";
 import { ChannelService } from "../../models/channel/channel.service.js";
 import { ChannelMemberService } from "../../models/channelMember/channelMember.service.js";
-import { User } from "../../models/user/user.model.js";
+import { type User } from "../../models/user/user.model.js";
+import { ChannelAdminService } from "../../models/channelAdmin/channelAdmin.service.js";
+import { type Channel } from "../../models/channel/channel.model.js";
 
 @Injectable()
 export class ChatService {
@@ -13,17 +26,19 @@ export class ChatService {
     private readonly configService: ConfigService<EnvironmentVariables, true>,
     private readonly userService: UserService,
     private readonly channelService: ChannelService,
-    private readonly channelMemberService: ChannelMemberService
+    private readonly channelMemberService: ChannelMemberService,
+    private readonly channelAdminService: ChannelAdminService
   ) {}
 
   getJoinedChannels = async (user: User) => {
     const channels = await user.$get("member");
-    return map(pick(["name", "id"]), channels);
+    return map(pick(["name"]), channels);
   };
 
   getPublicChannels = async () => {
     const channels = await this.channelService.getPublicChannels();
-    return map(pick(["name", "id"]), channels);
+
+    return map(pick(["name"]), channels);
   };
 
   joinChannel = async (
@@ -38,14 +53,58 @@ export class ChatService {
       throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
 
     if (!channel.public) {
-      if (password !== channel.password)
+      const dec = await bcrypt.compare(password, channel.password);
+      if (!dec)
         throw new HttpException("Wrong password", HttpStatus.UNAUTHORIZED);
     }
-
     await this.channelMemberService.addMember(channel.id, id);
 
     return true;
   };
+
+  leaveChannel = async (name: string, id: number) => {
+    const channel = await this.channelService.getChannelByName(name);
+
+    if (!channel)
+      throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
+    await this.channelMemberService.removeMember(channel.id, id);
+
+    return true;
+  };
+
+  newChannel = ifElse(
+    prop("pub"),
+    this.channelService.createChannel,
+    ifElse(
+      pipe(prop("password"), either(isNil, isEmpty)),
+      () => {
+        throw new HttpException(
+          "Password can not be empty",
+          HttpStatus.BAD_REQUEST
+        );
+      },
+      pipe<
+        [
+          {
+            name: string;
+            pub: boolean;
+            ownerId: number;
+            password: string;
+          }
+        ],
+        {
+          name: string;
+          pub: boolean;
+          ownerId: number;
+          password: string;
+        },
+        Promise<Channel | void>
+      >(
+        over(lensProp("password"), (pass) => bcrypt.hashSync(pass, 10)),
+        this.channelService.createChannel
+      )
+    )
+  );
 
   createChannel = async (
     name: string,
@@ -62,57 +121,31 @@ export class ChatService {
     if (await this.channelService.getChannelByName(name))
       throw new HttpException("Channel already exist", HttpStatus.BAD_REQUEST);
 
-    if (pub) {
-      console.log({ name, pub, id });
-      const channel = await this.channelService.createChannel(
-        name,
-        pub,
-        id,
-        undefined,
-        undefined
-      );
+    const channel = await this.newChannel({ name, pub, ownerId: id, password });
 
-      return pick(["name", "id"], channel);
-    } else {
-      if (!password) {
-        throw new HttpException(
-          "Password can not be empty",
-          HttpStatus.BAD_REQUEST
-        );
-      }
-      password = await bcrypt.hash(password, 10);
-      const channel = await this.channelService.createChannel(
-        name,
-        pub,
-        id,
-        password,
-        undefined
-      );
-
-      return pick(["name", "id"], channel);
-    }
-    if (!pub && !password)
+    if (!channel) {
       throw new HttpException(
-        "Password can not be empty",
+        "Could not create channel",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+    await this.channelAdminService.addAdmin(channel.id, id);
+    await this.channelMemberService.addMember(channel.id, id);
+
+    return pick(["name"], channel);
+  };
+
+  deleteChannel = async (name: string, id: number) => {
+    const channel = await this.channelService.getChannelByName(name);
+
+    if (!channel)
+      throw new HttpException("Channel does not exist", HttpStatus.BAD_REQUEST);
+
+    if (id === channel.ownerId) await this.channelService.deleteChannel(name);
+    else
+      throw new HttpException(
+        "Channel can only be deleted by it's owner",
         HttpStatus.BAD_REQUEST
       );
-
-    if (await this.channelService.getChannelByName(name))
-      throw new HttpException("Channel already exist", HttpStatus.BAD_REQUEST);
-
-    // todo: hash password
-
-    const channel = await this.channelService.createChannel(
-      name,
-      pub,
-      id,
-      password,
-      "test"
-    );
-
-    console.log(channel);
-    console.log(pick(["name", "id"], channel));
-
-    return pick(["name", "id"], channel);
   };
 }

@@ -17,6 +17,10 @@ import { Session } from "../session/session.model.js";
 import { ChannelMember } from "../channelMember/channelMember.model.js";
 import { ChannelBan } from "../channelBan/channelBan.model.js";
 import { ChannelAdmin } from "../channelAdmin/channelAdmin.model.js";
+import { Game } from "../game/game.model.js";
+import { Stats } from "../stats/stats.model.js";
+import { Friend } from "../friend/friend.model.js";
+import { Block } from "../block/block.model.js";
 
 @Table({ timestamps: false })
 export class User extends Model {
@@ -60,9 +64,18 @@ export class User extends Model {
   @BelongsToMany(() => Channel, () => ChannelBan)
   banned: Channel[];
 
-  // @BelongsToMany(() => User, () => BlockedUser)
-  // blocked: User[];
-  //
-  // @BelongsToMany(() => User, () => BlockedUser)
-  // friend: User[];
+  @HasMany(() => Game, "playerId")
+  games: Game[];
+
+  @HasOne(() => Stats)
+  stats: Stats;
+
+  @BelongsToMany(() => User, () => Friend, "user")
+  friend: User[];
+
+  @BelongsToMany(() => User, () => Block, "user")
+  block: User[];
+
+  @BelongsToMany(() => User, () => Block, "block")
+  blocked_by: User[];
 }

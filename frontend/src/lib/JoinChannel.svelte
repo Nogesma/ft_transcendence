@@ -13,14 +13,12 @@
       {
         password: channelPassword,
         public: channelType == "Public",
-        id: channelId,
       },
       {
         withCredentials: true,
       }
     );
   let channelType: string;
-  let channelId = -1;
   let channelName: string;
 
   // Clear password when type changes
@@ -31,12 +29,12 @@
 
 <input type="checkbox" id="join-modal" class="modal-toggle" />
 <label for="join-modal" class="modal cursor-pointer">
-  <label class="modal-box relative">
+  <label class="modal-box relative" for="join-modal">
     <label for="join-modal" class="btn btn-sm btn-circle absolute right-2 top-2"
       >✕</label
     >
     <div class="flex flex-col">
-      <h3 class="justify-around text-lg font-bold pb-4">Join channel</h3>
+      <h3 class="text-lg font-bold pb-4">Join channel</h3>
       <select bind:value={channelType} class="select select-bordered">
         <option disabled selected>Choose channel type</option>
         <option>Public</option>
@@ -47,18 +45,15 @@
         {#await getPublicChannels()}
           <p>waiting...</p>
         {:then { data }}
-          <div
-            class="flex flex-row flex-wrap justify-around content-evenly mt-4 flex-auto space-x-4"
-          >
-            {#each data as { name, id }}
+          <div class="flex flex-row flex-wrap mt-4 -ml-4 -mb-4 flex-auto">
+            {#each data as { name }}
               <label
                 for="join-modal"
-                class="btn flex-auto"
+                class="btn flex-auto mb-4 ml-4"
                 on:click={() => {
                   channelName = name;
-                  channelId = id;
                   joinChannel();
-                }}>{id}:{name}</label
+                }}>{name}</label
               >
             {/each}
           </div>

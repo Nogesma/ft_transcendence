@@ -13,15 +13,21 @@ export default {
   "/settings": wrap({
     asyncComponent: () => import("./routes/settings/Settings.svelte"),
   }),
-  "/settings/2fa": Manage2FA,
-  "/settings/username": ManageUserName,
+  "/users/:id": wrap({
+    asyncComponent: () => import("./routes/users/Profile.svelte"),
+  }),
+  "/users/history/:id": wrap({
+    asyncComponent: () => import("./routes/users/MatchHistory.svelte"),
+  }),
   "/auth/login": wrap({
     asyncComponent: () => import("./routes/auth/Login.svelte"),
   }),
   "/auth/oauth2callback": wrap({
     asyncComponent: () => import("./routes/auth/Callback.svelte"),
   }),
-  "/auth/2fa": Authenticate2FA,
+  "/auth/2fa": wrap({
+    asyncComponent: () => import("./routes/auth/TwoFactorAuth.svelte"),
+  }),
   "*": wrap({
     asyncComponent: () => import("./routes/404.svelte"),
   }),

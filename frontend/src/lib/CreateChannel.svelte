@@ -23,58 +23,58 @@
   $: channelPassword = "" && channelPublic;
 </script>
 
-<!-- The button to open modal -->
 <label for="create-modal" class="modal-button btn">Create Channel</label>
 
-<!-- Put this part before </body> tag -->
 <input type="checkbox" id="create-modal" class="modal-toggle" />
 <label for="create-modal" class="modal cursor-pointer">
-  <label class="modal-box relative" for="">
+  <label class="modal-box relative" for="create-modal">
     <label
       for="create-modal"
       class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
     >
-    <h3 class="text-lg font-bold">Create channel</h3>
-    <div class="form-control">
-      <label class="input-group">
-        <span>Name</span>
-        <input
-          bind:value={channelName}
-          type="text"
-          placeholder=""
-          class="input input-bordered"
-        />
-      </label>
-    </div>
-    <div class="form-control">
-      <label class="label cursor-pointer">
-        <span class="label-text">Public channel</span>
-        <input
-          type="checkbox"
-          bind:checked={channelPublic}
-          class="toggle toggle-primary"
-        />
-      </label>
-    </div>
-    {#if !channelPublic}
+    <div class="flex flex-col space-y-4">
+      <h3 class="text-lg font-bold">Create channel</h3>
       <div class="form-control">
         <label class="input-group">
-          <span>Password</span>
+          <span>Name</span>
           <input
-            bind:value={channelPassword}
-            type="password"
+            bind:value={channelName}
+            type="text"
             placeholder=""
-            class="input input-bordered"
+            class="input input-bordered flex-auto"
           />
         </label>
       </div>
-    {/if}
-    <div class="modal-action">
-      <label
-        for="create-modal"
-        class="btn btn-active btn-primary"
-        on:click={createChannel}>Create</label
-      >
+      <div class="form-control">
+        <label class="label cursor-pointer">
+          <span class="label-text">Public channel</span>
+          <input
+            type="checkbox"
+            bind:checked={channelPublic}
+            class="toggle toggle-primary"
+          />
+        </label>
+      </div>
+      {#if !channelPublic}
+        <div class="form-control">
+          <label class="input-group">
+            <span>Password</span>
+            <input
+              bind:value={channelPassword}
+              type="password"
+              placeholder=""
+              class="input input-bordered flex-auto"
+            />
+          </label>
+        </div>
+      {/if}
+      <div class="modal-action">
+        <label
+          for="create-modal"
+          class="btn btn-active btn-primary"
+          on:click={createChannel}>Create</label
+        >
+      </div>
     </div>
   </label>
 </label>

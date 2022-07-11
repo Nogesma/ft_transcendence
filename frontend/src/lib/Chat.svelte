@@ -2,7 +2,6 @@
   import { io } from "socket.io-client";
   import { onDestroy, onMount } from "svelte";
   export let channel = { name: "", id: -1 };
-
   let msg: string;
   let messagesList: Array<string> = [];
 
@@ -16,12 +15,19 @@
   })
   onDestroy(() => socket.emit("leaveRoom", { id: channel.id }));
 
+  socket.on("connect", () => {
+    console.log("connected");
+  });
   socket.on("newMessage", (event) => {
     messagesList.push(event);
     messagesList = messagesList;
     msg = "";
   });
   const sendmsg = () => socket.emit("sendMessage", msg);
+
+  import { createEventDispatcher } from "svelte";
+
+  const dispatch = createEventDispatcher();
 </script>
 <br /><br />
 {#each messagesList as item, ina}

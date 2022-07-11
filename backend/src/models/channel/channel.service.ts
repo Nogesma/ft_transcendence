@@ -9,16 +9,23 @@ export class ChannelService {
     private channelModel: typeof Channel
   ) {}
 
-  createChannel = (
-    name: string,
-    pub: boolean,
-    ownerId: number,
-    password: string | undefined,
-    salt: string | undefined
-  ) =>
+  createChannel = ({
+    name,
+    pub,
+    ownerId,
+    password,
+  }: {
+    name: string;
+    pub: boolean;
+    ownerId: number;
+    password: string | undefined;
+  }) =>
     this.channelModel
-      .create({ name, public: pub, ownerId, password, salt })
+      .create({ name, public: pub, ownerId, password })
       .catch(console.error);
+
+  deleteChannel = (name: string) =>
+    this.channelModel.destroy({ where: { name } }).catch(console.error);
 
   getChannelById = (id: number) => this.channelModel.findByPk(id);
 

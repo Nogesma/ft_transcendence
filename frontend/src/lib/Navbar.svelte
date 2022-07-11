@@ -12,8 +12,6 @@
   };
 </script>
 
-<svelte:window on:click={handleOutsideClick} on:keyup={handleEscape} />
-
 <div class="navbar bg-base-100">
   <div class="flex-1">
     <a href="#/" class="btn btn-ghost normal-case text-xl">Transcendence</a>
@@ -23,7 +21,7 @@
       <div class="dropdown dropdown-end">
         <div tabindex="0" class="btn btn-ghost btn-circle avatar">
           <div class="w-10 rounded-full">
-            <ProfilePic height="h-10" width="w-10" />
+            <ProfilePic attributes="h-10 w-10 rounded-full" />
           </div>
         </div>
         <ul

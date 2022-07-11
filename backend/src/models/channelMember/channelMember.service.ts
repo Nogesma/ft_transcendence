@@ -13,6 +13,9 @@ export class ChannelMemberService {
   addMember = (chan: number, user: number) =>
     this.channelMemberModel.create({ chan, user });
 
+  removeMember = (chan: number, user: number) =>
+    this.channelMemberModel.destroy({ where: { chan, user } });
+
   getMember = (chan: number, user: number) =>
     this.channelMemberModel.findOne({ where: { chan, user } });
 

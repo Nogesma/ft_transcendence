@@ -1,15 +1,16 @@
 <script lang="ts">
   import Chat from "./Chat.svelte";
   import axios from "axios";
-  import { push } from "svelte-spa-router";
   import JoinChannel from "./JoinChannel.svelte";
   import CreateChannel from "./CreateChannel.svelte";
+  import DeleteChannel from "./DeleteChannel.svelte";
+  import { isEmpty } from "ramda";
 
-  export let channel = { name: "", id: -1 };
+  export let channel = "";
 
   let hasChat = false;
 
-  if (channel.id != -1) hasChat = true;
+  if (!isEmpty(channel)) hasChat = true;
 
   const getChannels = () =>
     axios.get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/channels`, {
@@ -21,22 +22,23 @@
   {#await getChannels()}
     <p>waiting...</p>
   {:then { data }}
-    {#each data as { name, id }}
+    {#each data as { name }}
       <button
         class="btn"
         on:click={() => {
-          channel = { name, id };
+          channel = name;
           hasChat = true;
         }}
-        >{id}:{name}
+        >{name}
       </button>
     {/each}
     <JoinChannel />
     <CreateChannel />
+    <DeleteChannel />
     <!--    <LeaveChannel />-->
   {:catch err}
     <p>{err}</p>
   {/await}
 {:else}
-  <Chat {channel} />
+  <Chat on:back={() => (hasChat = false)} {channel} />
 {/if}
