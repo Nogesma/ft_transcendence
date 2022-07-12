@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Chat from "./Chat.svelte";
   import axios from "axios";
   import JoinChannel from "./JoinChannel.svelte";
   import CreateChannel from "./CreateChannel.svelte";
@@ -13,6 +12,7 @@
       withCredentials: true,
     });
 </script>
+
 {#if !hasChat}
   {#await getChannels()}
     <p>waiting...</p>
