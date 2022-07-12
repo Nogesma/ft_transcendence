@@ -3,6 +3,30 @@
   import axios from "axios";
   import { push } from "svelte-spa-router";
   import { onMount } from "svelte";
+  import PongClient from "../lib/Pong/PongClient.svelte";
+
+  // let games = [];
+  // let createGame = async () => {
+  //   axios
+  //     .get(`${import.meta.env.VITE_BACKEND_URI}/api/pong/game/new`)
+  //     .then((res) => {
+  //       games.push(res.data);
+  //       games = games;
+  //     });
+  // };
+  //
+  // const getGameData = (game_id: string) => {
+  //   return axios
+  //     .get(`${import.meta.env.VITE_BACKEND_URI}/api/pong/game/${game_id}`)
+  //     .then((res) => {
+  //       return res.data;
+  //     });
+  // };
+  //
+  // const loop = () => {
+  //   setTimeout(loop, 1000);
+  //   console.log(games);
+  // };
   import { login } from "../stores/settings";
   import { isNil, when } from "ramda";
 
@@ -46,4 +70,7 @@
     {localStorage.displayname}
   </h1>
   <ChannelManager />
+  <div class="flex flex-auto justify-center content-center">
+    <PongClient />
+  </div>
 </main>
