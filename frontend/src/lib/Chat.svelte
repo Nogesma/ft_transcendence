@@ -1,45 +1,40 @@
 <script lang="ts">
   import { io } from "socket.io-client";
   import { onDestroy, onMount } from "svelte";
-
-  export let channel = "";
-
+  export let channel = { name: "", id: -1 };
   let msg: string;
   let messagesList: Array<string> = [];
 
   const socket = io(import.meta.env.VITE_BACKEND_URI, {
     withCredentials: true,
   });
+  onMount(() => socket.emit("joinRoom", { id: channel.id }));
+
+  socket.on("disconnect", () => {
+    socket.emit("leaveRoom", { id: channel.id });
+  });
+  onDestroy(() => socket.emit("leaveRoom", { id: channel.id }));
 
   socket.on("connect", () => {
     console.log("connected");
   });
-
-  onMount(() => socket.emit("joinRoom", { name: channel }));
-
-  onDestroy(() => socket.emit("leaveRoom", { name: channel }));
-
   socket.on("newMessage", (event) => {
     messagesList.push(event);
     messagesList = messagesList;
     msg = "";
   });
-
   const sendmsg = () => socket.emit("sendMessage", msg);
-
-  import { createEventDispatcher } from "svelte";
-
-  const dispatch = createEventDispatcher();
 </script>
 
-<button on:click={() => dispatch("back", "back button")}>Back</button>
-<h1>test</h1>
 <br /><br />
 {#each messagesList as item, ina}
   <li>{ina + 1}: {item}</li>
 {/each}
-<br /><br />
-<h1>Hello world</h1>
-<br /><br />
-<input bind:value={msg} />
-<button on:click={sendmsg}> send message </button>
+<form class="pt-40" on:submit|preventDefault={() => (msg = "")}>
+  <label for="send">
+    <p>
+      <input bind:value={msg} />
+    </p>
+  </label>
+  <button id="send" on:click={sendmsg}> send message </button>
+</form>

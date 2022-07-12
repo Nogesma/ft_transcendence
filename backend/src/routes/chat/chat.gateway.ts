@@ -12,6 +12,7 @@ import cookieParser from "../../utils/socket-cookie-parser.js";
 import { isExpired } from "../../utils/date.js";
 import { SessionService } from "../../models/session/session.service.js";
 import { type Session } from "../../models/session/session.model.js";
+import { UserService } from "../../models/user/user.service.js";
 
 export interface ExtendedError extends Error {
   data?: never;
@@ -33,7 +34,8 @@ export class ChatGateway {
 
   constructor(
     private readonly configService: ConfigService<EnvironmentVariables, true>,
-    private readonly sessionService: SessionService
+    private readonly sessionService: SessionService,
+    private readonly userService: UserService
   ) {}
 
   socketUse =
@@ -43,7 +45,6 @@ export class ChatGateway {
       if (!token) return next(new Error("Token not found"));
 
       const session = await sessionService.getSession(token);
-
       if (!session || isExpired(session.expires))
         return next(new Error("Invalid token"));
 
@@ -56,34 +57,46 @@ export class ChatGateway {
     this.server.use(this.socketUse(this.sessionService));
   }
 
-  handleConnection(socket: Socket) {
-    socket.join(String(socket.request.session.userId));
-    this.server.sockets
-      .to("room1")
-      .emit(
-        "newMessage",
-        `User: ${socket.request.session.userId} joined the room`
-      );
-    // console.log(socket.request.session.userId);
-  }
-
   @SubscribeMessage("joinRoom")
-  handleRoomJoin(
+  async handleRoomJoin(
     @ConnectedSocket() client: Socket,
     @MessageBody("id") id: number
   ) {
-    console.log({ id });
-    console.log(client.request.signedCookies.token);
-    console.log(client.request.session);
+    const usr = await this.userService.getUserLogin(
+      client.request.session.userId
+    );
+    client.join(id.toString());
+    const it = client.rooms.values();
+    it.next();
+    client.broadcast
+      .to(it.next().value)
+      .emit("newMessage", `User: ${usr} joined the room`);
   }
 
   @SubscribeMessage("leaveRoom")
-  handleRoomLeave(@MessageBody() data: string) {
-    this.server.sockets.to("room1").emit("newMessage", data);
+  async handleRoomLeave(@ConnectedSocket() client: Socket) {
+    console.log("left");
+    this.server.sockets.emit(
+      "newMessage",
+      `User : ${await this.userService.getUserLogin(
+        client.request.session.userId
+      )} left the room`
+    );
   }
-
   @SubscribeMessage("sendMessage")
-  handleEvent(@MessageBody() data: string) {
-    this.server.sockets.to("room1").emit("newMessage", data);
+  async handleEvent(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: string
+  ) {
+    const it = client.rooms.values();
+    it.next();
+    this.server.sockets
+      .to(it.next().value)
+      .emit(
+        "newMessage",
+        `${await this.userService.getUserLogin(
+          client.request.session.userId
+        )}: ${data}`
+      );
   }
 }

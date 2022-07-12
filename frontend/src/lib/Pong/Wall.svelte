@@ -6,7 +6,6 @@
     MeshStandardMaterial,
   } from "svelthree";
   import type { Scene } from "svelthree-three";
-
   export let scene: Scene;
   export let pos: [number, number, number] = [0, 0, 0];
   export let rot = 0;
@@ -14,7 +13,6 @@
   export let height = 2;
   export let thick = 0.2;
   export let color = 0x7424ff;
-
   let wallGeometry = new BoxBufferGeometry(len, height, thick);
   let wallMaterial = new MeshStandardMaterial();
 </script>

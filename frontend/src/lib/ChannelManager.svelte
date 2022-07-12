@@ -1,17 +1,12 @@
 <script lang="ts">
-  import Chat from "./Chat.svelte";
   import axios from "axios";
   import JoinChannel from "./JoinChannel.svelte";
   import CreateChannel from "./CreateChannel.svelte";
   import DeleteChannel from "./DeleteChannel.svelte";
   import { isEmpty } from "ramda";
-
   export let channel = "";
-
   let hasChat = false;
-
   if (!isEmpty(channel)) hasChat = true;
-
   const getChannels = () =>
     axios.get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/channels`, {
       withCredentials: true,
@@ -39,6 +34,4 @@
   {:catch err}
     <p>{err}</p>
   {/await}
-{:else}
-  <Chat on:back={() => (hasChat = false)} {channel} />
 {/if}
