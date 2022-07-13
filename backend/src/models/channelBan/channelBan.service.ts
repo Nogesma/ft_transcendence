@@ -9,8 +9,9 @@ export class ChannelBanService {
     private channelBanModel: typeof ChannelBan
   ) {}
 
-  banUser = (chan: number, user: number, type: boolean, expires: Date) =>
-    this.channelBanModel.create({ chan, user, type, expires });
+  // TODO add back expires to create {expires: Date}, maybe?
+  banUser = (chan: number, user: number, type: boolean) =>
+    this.channelBanModel.create({ chan, user, type });
 
   isBanned = (user: number) =>
     this.channelBanModel.findOne({ where: { id: user, type: true } });

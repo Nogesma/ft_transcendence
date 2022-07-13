@@ -19,6 +19,7 @@ import { ChannelMemberService } from "../../models/channelMember/channelMember.s
 import { type User } from "../../models/user/user.model.js";
 import { ChannelAdminService } from "../../models/channelAdmin/channelAdmin.service.js";
 import { type Channel } from "../../models/channel/channel.model.js";
+import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
 
 @Injectable()
 export class ChatService {
@@ -27,7 +28,8 @@ export class ChatService {
     private readonly userService: UserService,
     private readonly channelService: ChannelService,
     private readonly channelMemberService: ChannelMemberService,
-    private readonly channelAdminService: ChannelAdminService
+    private readonly channelAdminService: ChannelAdminService,
+    private readonly channelBanService: ChannelBanService
   ) {}
 
   getJoinedChannels = async (user: User) => {
@@ -147,5 +149,36 @@ export class ChatService {
         "Channel can only be deleted by it's owner",
         HttpStatus.BAD_REQUEST
       );
+  };
+
+  /* Ban routes */
+  banUser = async (oid: number, name: string, id: number, type: boolean) => {
+    const channel = await this.channelService.getChannelByName(name);
+    if (!channel)
+      throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
+
+    if (oid === channel.ownerId) {
+      if (await this.channelMemberService.getMember(channel.id, id))
+        await this.channelBanService.banUser(channel.id, id, type);
+      else {
+        throw new HttpException(
+          "Member is not in the channel",
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      console.log(oid);
+    } else
+      throw new HttpException(
+        "Member can only be banned by an admin",
+        HttpStatus.BAD_REQUEST
+      );
+  };
+
+  isBanned = async (name: string, id: number) => {
+    const channel = await this.channelService.getChannelByName(name);
+
+    if (!channel)
+      throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
+    return this.channelBanService.isBanned(id);
   };
 }

@@ -4,6 +4,7 @@
   import CreateChannel from "./CreateChannel.svelte";
   import DeleteChannel from "./DeleteChannel.svelte";
   import { isEmpty } from "ramda";
+  import BanUser from "./BanUser.svelte";
   export let channel = "";
   let hasChat = false;
   if (!isEmpty(channel)) hasChat = true;
@@ -30,6 +31,7 @@
     <JoinChannel />
     <CreateChannel />
     <DeleteChannel />
+    <BanUser />
     <!--    <LeaveChannel />-->
   {:catch err}
     <p>{err}</p>

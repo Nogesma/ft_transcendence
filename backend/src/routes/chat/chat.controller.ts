@@ -69,4 +69,13 @@ export class ChatController {
   async deleteChannel(@Req() req: Request, @Param("name") name: string) {
     return this.chatService.deleteChannel(name, req.session.userId);
   }
+
+  @Post("ban/:name/:user")
+  async banUser(
+    @Req() req: Request,
+    @Param("name/user") name: string,
+    user: number
+  ) {
+    return this.chatService.banUser(req.session.userId, name, user, true);
+  }
 }
