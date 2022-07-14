@@ -2,6 +2,11 @@
   import ProfilePic from "./ProfilePic.svelte";
   import { push } from "svelte-spa-router";
   import { login } from "../stores/settings.js";
+
+  const logout = () => {
+    push("/auth/login")
+  }
+
 </script>
 
 <div class="navbar bg-base-100">
@@ -23,7 +28,7 @@
           <li>
             <button on:click={() => push("/settings")}>Settings</button>
           </li>
-          <li><button on:click={() => push("/logout")}>Logout</button></li>
+          <li><button on:click={logout}>Logout</button></li>
         </ul>
       </div>
     </div>
