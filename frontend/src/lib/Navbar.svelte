@@ -2,6 +2,16 @@
   import ProfilePic from "./ProfilePic.svelte";
   import { push } from "svelte-spa-router";
   import { login } from "../stores/settings.js";
+  import axios from "axios";
+  const logout = () => {
+    axios
+      .post(
+        `${import.meta.env.VITE_BACKEND_URI}/api/auth/logout`,
+        {},
+        { withCredentials: true }
+      )
+      .then(() => location.reload());
+  };
 </script>
 
 <div class="navbar bg-base-100">
@@ -23,7 +33,7 @@
           <li>
             <button on:click={() => push("/settings")}>Settings</button>
           </li>
-          <li><button on:click={() => push("/logout")}>Logout</button></li>
+          <li><button on:click={logout}>Logout</button></li>
         </ul>
       </div>
     </div>
