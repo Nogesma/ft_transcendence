@@ -2,11 +2,11 @@
   import ProfilePic from "./ProfilePic.svelte";
   import { push } from "svelte-spa-router";
   import { login } from "../stores/settings.js";
-
-  const logout = () => {
-    push("/auth/login")
-  }
-
+  import axios from "axios";
+// WIP functions as I'm sure it's more complex than that
+ const logout = () => {
+   axios.post(`${import.meta.env.VITE_BACKEND_URI}/api/auth/logout`, {}, {withCredentials: true}).then(() => location.reload())
+ }
 </script>
 
 <div class="navbar bg-base-100">

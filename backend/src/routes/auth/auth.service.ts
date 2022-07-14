@@ -90,7 +90,6 @@ export class AuthService {
 
     return this.createUserSession(res, user);
   };
-
   createUserSession = async (response: Response, user: User) => {
     const token = nanoid();
     const expires = dayjs().add(1, "M").toDate();
