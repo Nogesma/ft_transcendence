@@ -1,31 +1,33 @@
 <script lang="ts">
   import { io } from "socket.io-client";
-  import { onDestroy, onMount } from "svelte";
-  export let channel = { name: "", id: -1 };
+  import { onMount } from "svelte";
+  export let channel = "";
   let msg: string;
   let messagesList: Array<string> = [];
 
   const socket = io(import.meta.env.VITE_BACKEND_URI, {
     withCredentials: true,
   });
-  onMount(() => socket.emit("joinRoom", { id: channel.id }));
-
-  socket.on("disconnect", () => {
-    socket.emit("leaveRoom", { id: channel.id });
-  });
-  onDestroy(() => socket.emit("leaveRoom", { id: channel.id }));
+  onMount(() => socket.emit("joinRoom", { channel }));
 
   socket.on("connect", () => {
     console.log("connected");
   });
+
   socket.on("newMessage", (event) => {
     messagesList.push(event);
     messagesList = messagesList;
-    msg = "";
   });
-  const sendmsg = () => socket.emit("sendMessage", msg);
+
+  const sendmsg = () => {
+    socket.emit("sendMessage", { channel, msg });
+    messagesList.push(msg);
+    messagesList = messagesList;
+    msg = "";
+  };
 </script>
 
+<h1>{channel}</h1>
 <br /><br />
 {#each messagesList as item, ina}
   <li>{ina + 1}: {item}</li>

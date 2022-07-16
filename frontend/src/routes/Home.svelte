@@ -3,7 +3,6 @@
   import axios from "axios";
   import { push } from "svelte-spa-router";
   import { onMount } from "svelte";
-  import PongClient from "../lib/Pong/PongClient.svelte";
 
   // let games = [];
   // let createGame = async () => {
@@ -70,7 +69,4 @@
     {localStorage.displayname}
   </h1>
   <ChannelManager />
-  <div class="flex flex-auto justify-center content-center">
-    <PongClient />
-  </div>
 </main>
