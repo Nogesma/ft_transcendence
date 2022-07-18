@@ -79,7 +79,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
 
   handleConnection(@ConnectedSocket() client: Socket) {
     client.on("disconnecting", async () => {
-      const username = client.request.user.login;
+      const username = client.request.user.displayname;
       client.rooms.forEach((r) =>
         client.to(r).emit("newMessage", `User : ${username} left the room`)
       );
@@ -94,7 +94,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     const channel = client.request.channels.find((x) => x.name == channelName);
     if (!channel) return;
 
-    const username = client.request.user.login;
+    const username = client.request.user.displayname;
 
     client.join(channel.id);
     client
@@ -111,7 +111,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     const channel = client.request.channels.find((x) => x.name == channelName);
     if (!channel) return;
 
-    const username = client.request.user.login;
+    const username = client.request.user.displayname;
 
     client.to(channel.id).emit("newMessage", `${username}: ${message}`);
   }

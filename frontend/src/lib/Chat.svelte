@@ -21,7 +21,7 @@
 
   const sendmsg = () => {
     socket.emit("sendMessage", { channel, msg });
-    messagesList.push(msg);
+    messagesList.push(`${localStorage.getItem("displayname")}: ${msg}`);
     messagesList = messagesList;
     msg = "";
   };
