@@ -1,9 +1,66 @@
+<style type="text/css">
+  .context-menu {
+    position: absolute;
+    text-align: center;
+    background: lightgray;
+    border: 1px solid black;
+  }
+
+  .context-menu ul {
+    padding: 0px;
+    margin: 0px;
+    min-width: 150px;
+    list-style: none;
+  }
+
+  .context-menu ul li {
+    padding-bottom: 7px;
+    padding-top: 7px;
+    border: 1px solid black;
+  }
+
+
+  .context-menu ul li:hover {
+    background: darkgray;
+  }
+</style>
+
+<div id="Adminmenu" class="context-menu"
+     style="display: none">
+  <ul>
+    <li><p id="ban" class="button">Ban</p></li>
+    <li><p id="mute" class="button">Mute</p></li>
+  </ul>
+</div>
+
 <script lang="ts">
   import { io } from "socket.io-client";
   import { onMount } from "svelte";
   export let channel = "";
+
   let msg: string;
   let messagesList: Array<string> = [];
+  const hideMenu = () => {
+    document.getElementById("Adminmenu").style.display = "none"
+  }
+
+  const rightclick = (pos) => {
+    let str = document.getElementById('msg').textContent;
+    str = str.substring(str.search(" ") + 1)
+    console.log(str.substring(0,str.search(":")))
+    pos.preventDefault();
+
+    if (document.getElementById("Adminmenu").style.display == "block")
+      hideMenu();
+    else {
+      let menu = document.getElementById("Adminmenu")
+
+      menu.style.display = 'block';
+      menu.style.left = pos.pageX + "px";
+      menu.style.top = pos.pageY + "px";
+    }
+  }
+  document.oncontextmenu = hideMenu;
 
   const socket = io(import.meta.env.VITE_BACKEND_URI, {
     withCredentials: true,
@@ -22,16 +79,13 @@
     messagesList = messagesList;
     msg = "";
   };
-  const test = () => {
-    console.log("rightclick")
-  }
 </script>
 
 <h1>{channel}</h1>
 <br /><br />
 {#each messagesList as item, ina}
   <div class="myElement" oncontextmenu="return false;">
-  <li on:auxclick|preventDefault={test}>{ina + 1}: {item}</li>
+  <li id="msg" on:auxclick|preventDefault={rightclick}>{ina + 1}: {item}</li>
   </div>
 {/each}
 <form class="pt-40" on:submit|preventDefault={() => (msg = "")}>
