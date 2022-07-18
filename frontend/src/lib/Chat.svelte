@@ -10,9 +10,6 @@
   });
   onMount(() => socket.emit("joinRoom", { channel }));
 
-  socket.on("connect", () => {
-    console.log("connected");
-  });
 
   socket.on("newMessage", (event) => {
     messagesList.push(event);
@@ -25,12 +22,17 @@
     messagesList = messagesList;
     msg = "";
   };
+  const test = () => {
+    console.log("rightclick")
+  }
 </script>
 
 <h1>{channel}</h1>
 <br /><br />
 {#each messagesList as item, ina}
-  <li>{ina + 1}: {item}</li>
+  <div class="myElement" oncontextmenu="return false;">
+  <li on:auxclick|preventDefault={test}>{ina + 1}: {item}</li>
+  </div>
 {/each}
 <form class="pt-40" on:submit|preventDefault={() => (msg = "")}>
   <label for="send">
