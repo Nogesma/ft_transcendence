@@ -28,18 +28,40 @@
 <div id="Adminmenu" class="context-menu"
      style="display: none">
   <ul>
-    <li><p id="ban" class="button">Ban</p></li>
-    <li><p id="mute" class="button">Mute</p></li>
+    <li><p id="ban" class="button" on:click={banppl} >Ban</p></li>
+    <li><p id="mute" class="button" on:click={muteppl}>Mute</p></li>
   </ul>
 </div>
 
 <script lang="ts">
   import { io } from "socket.io-client";
   import { onMount } from "svelte";
+  import axios from "axios";
+
   export let channel = "";
 
   let msg: string;
   let messagesList: Array<string> = [];
+  let name: string;
+
+  const muteppl = () =>
+  {
+    if (name === localStorage.getItem('displayname'))
+      return ;
+  }
+
+  const banppl = () => {
+
+    // TODO prevent banning yourself
+    if (name === localStorage.getItem('displayname'))
+      return ;
+      axios.post(
+             `${import.meta.env.VITE_BACKEND_URI}/api/chat/ban/${channel}/${name}`,
+              {
+               withCredentials: true,
+              },
+      );
+  }
   const hideMenu = () => {
     document.getElementById("Adminmenu").style.display = "none"
   }
@@ -47,7 +69,8 @@
   const rightclick = (pos) => {
     let str = document.getElementById('msg').textContent;
     str = str.substring(str.search(" ") + 1)
-    console.log(str.substring(0,str.search(":")))
+    name = str.substring(0,str.search(":"));
+    console.log(name)
     pos.preventDefault();
 
     if (document.getElementById("Adminmenu").style.display == "block")

@@ -3,14 +3,12 @@
 
     //TODO Get the userID instead of its name:
     const banUser = (channelName, userName) =>
-    {
         axios.post(
             `${import.meta.env.VITE_BACKEND_URI}/api/chat/ban/${channelName}/${userName}`,
             {
                 withCredentials: true,
             },
         );
-    }
 
     let userName: string;
     let channelName: string;
@@ -54,7 +52,7 @@
                 <label
                         for="username"
                         class="btn btn-active btn-primary"
-                        on:click={banUser()}>Create
+                        on:click={banUser}>Create
             </div>
         </div>
     </label>
