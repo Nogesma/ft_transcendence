@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   HttpException,
@@ -68,5 +69,61 @@ export class ChatController {
   @Post("delete/:name")
   async deleteChannel(@Req() req: Request, @Param("name") name: string) {
     return this.chatService.deleteChannel(name, req.session.userId);
+  }
+
+  @Post("ban/:user")
+  async banUser(
+    @Req() req: Request,
+    @Param("user") user: string,
+    @Body("name") name: string,
+    @Body("expires") expires: Date
+  ) {
+    return this.chatService.banUser(req.session.userId, name, user, expires);
+  }
+
+  @Post("unban/:user")
+  async unbanUser(
+    @Req() req: Request,
+    @Param("user") user: string,
+    @Body("chan") chan: string
+  ) {
+    return this.chatService.unbanUser(req.session.userId, chan, user);
+  }
+
+  @Post("mute/:user")
+  async muteUser(
+    @Req() req: Request,
+    @Param("user") user: string,
+    @Body("name") name: string,
+    @Body("expires") expires: Date
+  ) {
+    return this.chatService.muteUser(req.session.userId, name, user, expires);
+  }
+
+  @Post("unmute/:user")
+  async unmuteUser(
+    @Req() req: Request,
+    @Param("user") user: string,
+    @Body("chan") chan: string
+  ) {
+    return this.chatService.unmuteUser(req.session.userId, chan, user);
+  }
+
+  @Post("add_admin/:user")
+  async addAdmin(
+    @Req() req: Request,
+    @Param("user") user: string,
+    @Body("chan") chan: string
+  ) {
+    return this.chatService.addAdmin(req.session.userId, chan, user);
+  }
+
+  @Post("remove_admin/:user")
+  async removeAdmin(
+    @Req() req: Request,
+    @Param("user") user: string,
+    @Body("chan") chan: string
+  ) {
+    return this.chatService.removeAdmin(req.session.userId, chan, user);
   }
 }

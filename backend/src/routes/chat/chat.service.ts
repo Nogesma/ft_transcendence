@@ -19,6 +19,7 @@ import { ChannelMemberService } from "../../models/channelMember/channelMember.s
 import { type User } from "../../models/user/user.model.js";
 import { ChannelAdminService } from "../../models/channelAdmin/channelAdmin.service.js";
 import { type Channel } from "../../models/channel/channel.model.js";
+import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
 
 @Injectable()
 export class ChatService {
@@ -27,7 +28,8 @@ export class ChatService {
     private readonly userService: UserService,
     private readonly channelService: ChannelService,
     private readonly channelMemberService: ChannelMemberService,
-    private readonly channelAdminService: ChannelAdminService
+    private readonly channelAdminService: ChannelAdminService,
+    private readonly channelBanService: ChannelBanService
   ) {}
 
   getJoinedChannels = async (user: User) => {
@@ -145,7 +147,161 @@ export class ChatService {
     else
       throw new HttpException(
         "Channel can only be deleted by it's owner",
+        HttpStatus.FORBIDDEN
+      );
+  };
+
+  /* Ban routes */
+  banUser = async (
+    oid: number,
+    chan: string,
+    userName: string,
+    expires: Date
+  ) => {
+    const channel = await this.channelService.getChannelByName(chan);
+    const user = await this.userService.getUserByName(userName);
+
+    if (!channel || !user)
+      throw new HttpException(
+        "Channel or user not found",
         HttpStatus.BAD_REQUEST
+      );
+
+    if (await this.channelBanService.isBanned(user.id))
+      throw new HttpException("User is already banned", HttpStatus.BAD_REQUEST);
+
+    if (
+      oid === channel.ownerId ||
+      (await this.channelAdminService.getAdmin(channel.id, oid))
+    ) {
+      await this.channelBanService.banUser(channel.id, user.id, true, expires);
+    } else
+      throw new HttpException(
+        "Member can only be banned by an admin",
+        HttpStatus.FORBIDDEN
+      );
+  };
+
+  unbanUser = async (oid: number, chan: string, userName: string) => {
+    const channel = await this.channelService.getChannelByName(chan);
+    const user = await this.userService.getUserByName(userName);
+
+    if (!channel || !user)
+      throw new HttpException(
+        "Channel or user not found",
+        HttpStatus.BAD_REQUEST
+      );
+    if (!(await this.channelBanService.isBanned(user.id)))
+      throw new HttpException("User is not banned", HttpStatus.BAD_REQUEST);
+    if (
+      oid === channel.ownerId ||
+      (await this.channelAdminService.getAdmin(channel.id, oid))
+    ) {
+      await this.channelBanService.unbanUser(channel.id, user.id, true);
+    } else
+      throw new HttpException(
+        "Member can only be banned by an admin",
+        HttpStatus.FORBIDDEN
+      );
+  };
+
+  muteUser = async (
+    oid: number,
+    chan: string,
+    userName: string,
+    expires: Date
+  ) => {
+    const channel = await this.channelService.getChannelByName(chan);
+    const user = await this.userService.getUserByName(userName);
+
+    if (!channel || !user)
+      throw new HttpException(
+        "Channel or user not found",
+        HttpStatus.BAD_REQUEST
+      );
+
+    if (await this.channelBanService.isMuted(user.id))
+      throw new HttpException("User is already muted", HttpStatus.BAD_REQUEST);
+
+    if (
+      oid === channel.ownerId ||
+      (await this.channelAdminService.getAdmin(channel.id, oid))
+    ) {
+      await this.channelBanService.banUser(channel.id, user.id, false, expires);
+    } else
+      throw new HttpException(
+        "Member can only be banned by an admin",
+        HttpStatus.FORBIDDEN
+      );
+  };
+
+  unmuteUser = async (oid: number, chan: string, userName: string) => {
+    const channel = await this.channelService.getChannelByName(chan);
+    const user = await this.userService.getUserByName(userName);
+
+    if (!channel || !user)
+      throw new HttpException(
+        "Channel or user not found",
+        HttpStatus.BAD_REQUEST
+      );
+    if (!(await this.channelBanService.isMuted(user.id)))
+      throw new HttpException("User is not muted", HttpStatus.BAD_REQUEST);
+    if (
+      oid === channel.ownerId ||
+      (await this.channelAdminService.getAdmin(channel.id, oid))
+    ) {
+      await this.channelBanService.unbanUser(channel.id, user.id, false);
+    } else
+      throw new HttpException(
+        "Member can only be banned by an admin",
+        HttpStatus.FORBIDDEN
+      );
+  };
+
+  isBanned = async (name: string, id: number) => {
+    const channel = await this.channelService.getChannelByName(name);
+
+    if (!channel)
+      throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
+    return this.channelBanService.isBanned(id);
+  };
+
+  /* Admin routes */
+  addAdmin = async (oid: number, chan: string, userName: string) => {
+    const channel = await this.channelService.getChannelByName(chan);
+    const user = await this.userService.getUserByName(userName);
+
+    if (!channel || !user)
+      throw new HttpException(
+        "Channel or user not found",
+        HttpStatus.BAD_REQUEST
+      );
+
+    if (oid === channel.ownerId) {
+      await this.channelAdminService.addAdmin(channel.id, user.id);
+    } else
+      throw new HttpException(
+        "Member can only be banned by an admin",
+        HttpStatus.FORBIDDEN
+      );
+  };
+
+  removeAdmin = async (oid: number, chan: string, userName: string) => {
+    const channel = await this.channelService.getChannelByName(chan);
+    const user = await this.userService.getUserByName(userName);
+
+    if (!channel || !user)
+      throw new HttpException(
+        "Channel or user not found",
+        HttpStatus.BAD_REQUEST
+      );
+
+    if (oid === channel.ownerId) {
+      await this.channelAdminService.removeAdmin(channel.id, user.id);
+    } else
+      throw new HttpException(
+        "Member can only be banned by an admin",
+        HttpStatus.FORBIDDEN
       );
   };
 }
