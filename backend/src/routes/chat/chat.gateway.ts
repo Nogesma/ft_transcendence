@@ -112,7 +112,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     if (!channel) return;
 
     const username = client.request.user.displayname;
-
-    client.to(channel.id).emit("newMessage", `${username}: ${message}`);
+    const login = client.request.user.login;
+    client.to(channel.id).emit("newMessage", `${login}: ${message}`);
   }
 }
