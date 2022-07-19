@@ -75,9 +75,10 @@ export class ChatController {
   async banUser(
     @Req() req: Request,
     @Param("user") user: string,
-    @Body("name") name: string,
-    @Body("expires") expires: Date
+    @Param("expires") expires: Date,
+    @Body("name") name: string
   ) {
+    expires = new Date();
     return this.chatService.banUser(req.session.userId, name, user, expires);
   }
 
@@ -85,8 +86,9 @@ export class ChatController {
   async unbanUser(
     @Req() req: Request,
     @Param("user") user: string,
-    @Body("chan") chan: string
+    @Body("name") chan: string
   ) {
+    console.log(chan);
     return this.chatService.unbanUser(req.session.userId, chan, user);
   }
 

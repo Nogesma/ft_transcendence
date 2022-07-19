@@ -29,6 +29,7 @@
      style="display: none">
   <ul>
     <li><p id="ban" class="button" on:click={banppl} >Ban</p></li>
+    <li><p id="unban" class="button" on:click={unbanppl} >UnBan</p></li>
     <li><p id="mute" class="button" on:click={muteppl}>Mute</p></li>
   </ul>
 </div>
@@ -49,14 +50,29 @@
     if (name === localStorage.getItem('displayname'))
       return ;
   }
-
+  const unbanppl = () => {
+    console.log(channel)
+    name = "lgyger"
+    axios.post(`${import.meta.env.VITE_BACKEND_URI}/api/chat/unban/${name}`,
+            {
+              name: channel,
+            },
+            {
+              withCredentials:  true,
+            },
+    );
+  }
   const banppl = () => {
-
     // TODO prevent banning yourself
+    name = "lgyger"
     if (name === localStorage.getItem('displayname'))
       return ;
       axios.post(
-             `${import.meta.env.VITE_BACKEND_URI}/api/chat/ban/${channel}/${name}`,
+             `${import.meta.env.VITE_BACKEND_URI}/api/chat/ban/${name}`,
+              {
+                name: channel,
+                expires: new Date(),
+              },
               {
                withCredentials: true,
               },

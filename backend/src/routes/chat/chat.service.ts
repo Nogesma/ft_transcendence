@@ -159,7 +159,7 @@ export class ChatService {
     expires: Date
   ) => {
     const channel = await this.channelService.getChannelByName(chan);
-    const user = await this.userService.getUserByName(userName);
+    const user = await this.userService.getUserByLogin(userName);
 
     if (!channel || !user)
       throw new HttpException(
@@ -167,8 +167,8 @@ export class ChatService {
         HttpStatus.BAD_REQUEST
       );
 
-    if (await this.channelBanService.isBanned(user.id))
-      throw new HttpException("User is already banned", HttpStatus.BAD_REQUEST);
+    //    if (await this.channelBanService.isBanned(user.id))
+    //      throw new HttpException("User is already banned", HttpStatus.BAD_REQUEST);
 
     if (
       oid === channel.ownerId ||
@@ -184,15 +184,15 @@ export class ChatService {
 
   unbanUser = async (oid: number, chan: string, userName: string) => {
     const channel = await this.channelService.getChannelByName(chan);
-    const user = await this.userService.getUserByName(userName);
+    const user = await this.userService.getUserByLogin(userName);
 
     if (!channel || !user)
       throw new HttpException(
         "Channel or user not found",
         HttpStatus.BAD_REQUEST
       );
-    if (!(await this.channelBanService.isBanned(user.id)))
-      throw new HttpException("User is not banned", HttpStatus.BAD_REQUEST);
+    //   if (!(await this.channelBanService.isBanned(user.id)))
+    //    throw new HttpException("User is not banned", HttpStatus.BAD_REQUEST);
     if (
       oid === channel.ownerId ||
       (await this.channelAdminService.getAdmin(channel.id, oid))
