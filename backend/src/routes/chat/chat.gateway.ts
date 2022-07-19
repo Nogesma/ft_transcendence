@@ -15,6 +15,7 @@ import { isExpired } from "../../utils/date.js";
 import { SessionService } from "../../models/session/session.service.js";
 import { type Session } from "../../models/session/session.model.js";
 import { UserService } from "../../models/user/user.service.js";
+import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
 import { type Channel } from "../../models/channel/channel.model.js";
 import type { User } from "../../models/user/user.model.js";
 
@@ -39,6 +40,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   server: Server;
 
   constructor(
+    private readonly ChannelBanService: ChannelBanService,
     private readonly configService: ConfigService<EnvironmentVariables, true>,
     private readonly sessionService: SessionService,
     private readonly userService: UserService
@@ -110,6 +112,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   ) {
     const channel = client.request.channels.find((x) => x.name == channelName);
     if (!channel) return;
+    if (await this.ChannelBanService.isBanned(client.request.user.id)) {
+      client.emit(
+        "newMessage",
+        "Server: You cannot talk because you are banned"
+      );
+      return;
+    }
 
     const username = client.request.user.displayname;
     const login = client.request.user.login;

@@ -17,9 +17,9 @@ export class ChannelBanService {
     this.channelBanModel.destroy({ where: { chan, user, type } });
 
   isBanned = (user: number) =>
-    this.channelBanModel.findOne({ where: { id: user, type: true } });
+    this.channelBanModel.findOne({ where: { user: user, type: true } });
   isMuted = (user: number) =>
-    this.channelBanModel.findOne({ where: { id: user, type: false } });
+    this.channelBanModel.findOne({ where: { user: user, type: false } });
 
   getAllBanned = (chan: number) =>
     this.channelBanModel.findAll({ where: { type: true, channel: chan } });

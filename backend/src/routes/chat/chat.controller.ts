@@ -88,7 +88,6 @@ export class ChatController {
     @Param("user") user: string,
     @Body("name") chan: string
   ) {
-    console.log(chan);
     return this.chatService.unbanUser(req.session.userId, chan, user);
   }
 

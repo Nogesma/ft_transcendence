@@ -167,8 +167,8 @@ export class ChatService {
         HttpStatus.BAD_REQUEST
       );
 
-    //    if (await this.channelBanService.isBanned(user.id))
-    //      throw new HttpException("User is already banned", HttpStatus.BAD_REQUEST);
+    if (await this.channelBanService.isBanned(user.id))
+      throw new HttpException("User is already banned", HttpStatus.BAD_REQUEST);
 
     if (
       oid === channel.ownerId ||
@@ -191,8 +191,8 @@ export class ChatService {
         "Channel or user not found",
         HttpStatus.BAD_REQUEST
       );
-    //   if (!(await this.channelBanService.isBanned(user.id)))
-    //    throw new HttpException("User is not banned", HttpStatus.BAD_REQUEST);
+    if (!(await this.channelBanService.isBanned(user.id)))
+      throw new HttpException("User is not banned", HttpStatus.BAD_REQUEST);
     if (
       oid === channel.ownerId ||
       (await this.channelAdminService.getAdmin(channel.id, oid))
