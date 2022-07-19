@@ -34,11 +34,15 @@ export class SettingsService {
   };
 
   generateNew2FA = async (user: User) => {
-    if (await user.tfa_secret)
-      throw new HttpException("2FA already enabled", HttpStatus.BAD_REQUEST);
+    const tfaSecret = await user.$get("tfa_secret");
+    if (tfaSecret) {
+      if (tfaSecret.temp) await tfaSecret.destroy();
+      else
+        throw new HttpException("2FA already enabled", HttpStatus.BAD_REQUEST);
+    }
 
     const secret = speakeasy.generateSecret().base32;
-    await this.tfaSecretService.createTFASecret(user, secret, true);
+    await this.tfaSecretService.createTFASecret(user.id, secret, true);
 
     const otpauthURL = speakeasy.otpauthURL({
       secret: secret,
@@ -52,7 +56,7 @@ export class SettingsService {
   };
 
   validate2FA = async (user: User, token: string) => {
-    const tfaSecret = user.tfa_secret;
+    const tfaSecret = await user.$get("tfa_secret");
     if (!tfaSecret)
       throw new HttpException(
         "Could not retrieve 2FA Secret",
@@ -150,6 +154,26 @@ export class SettingsService {
     ),
     andThen(Promise.all)
   );
+
+  deleteAvatar = (req: Request, login: string) => {
+    const imagePath = path.join(
+      this.configService.get("AVATAR_UPLOAD_PATH"),
+      login
+    );
+
+    // Checks for directory traversal
+    if (imagePath.indexOf(this.configService.get("AVATAR_UPLOAD_PATH")) !== 0)
+      throw new HttpException("Login is invalid", HttpStatus.FORBIDDEN);
+
+    try {
+      fs.unlinkSync(`${imagePath}.jpg`);
+    } catch (e) {
+      throw new HttpException(
+        "User does not have a custom PFP",
+        HttpStatus.BAD_REQUEST
+      );
+    }
+  };
 
   acceptFriendRequest = this.friendService.acceptFriendRequest;
 

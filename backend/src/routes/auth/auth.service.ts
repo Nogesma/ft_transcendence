@@ -61,9 +61,14 @@ export class AuthService {
         HttpStatus.UNAUTHORIZED
       );
 
-    const user = tfaSession.user;
+    const user = await tfaSession.$get("user");
+    if (!user)
+      throw new HttpException(
+        "Could not find user",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
 
-    const TFA = user.tfa_secret;
+    const TFA = await user.$get("tfa_secret");
     if (!TFA)
       throw new HttpException(
         "Could not find 2FA Secret",

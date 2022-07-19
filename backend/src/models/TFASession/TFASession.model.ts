@@ -13,6 +13,7 @@ import { User } from "../user/user.model.js";
 @Table({ timestamps: false })
 export class TFASession extends Model {
   @ForeignKey(() => User)
+  @AllowNull(false)
   @Column
   userId: number;
 

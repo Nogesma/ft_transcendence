@@ -9,8 +9,8 @@ export class TFASessionService {
     private tfaSessionModel: typeof TFASession
   ) {}
 
-  createTFASession = (user: number, token: string, expires: Date) =>
-    this.tfaSessionModel.create({ user, token, expires });
+  createTFASession = (userId: number, token: string, expires: Date) =>
+    this.tfaSessionModel.create({ userId, token, expires });
 
   getTFASession = (token: string) =>
     this.tfaSessionModel.findOne({ where: { token } });

@@ -1,5 +1,6 @@
 <script lang="ts">
   import axios from "axios";
+  import Modal from "./Modal.svelte";
 
   let channelPublic = true;
   let channelName: string;
@@ -25,13 +26,8 @@
 
 <label for="create-modal" class="modal-button btn">Create Channel</label>
 
-<input type="checkbox" id="create-modal" class="modal-toggle" />
-<label for="create-modal" class="modal cursor-pointer">
-  <label class="modal-box relative" for="create-modal">
-    <label
-      for="create-modal"
-      class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
-    >
+<Modal id="create-modal">
+  <svelte:fragment slot="content">
     <div class="flex flex-col space-y-4">
       <h3 class="text-lg font-bold">Create channel</h3>
       <div class="form-control">
@@ -76,5 +72,5 @@
         >
       </div>
     </div>
-  </label>
-</label>
+  </svelte:fragment>
+</Modal>

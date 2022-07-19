@@ -1,9 +1,10 @@
 <script lang="ts">
   import axios from "axios";
   import { replace } from "svelte-spa-router";
+  import { getUserData } from "../utils/auth";
 
   export let url: string;
-
+  export let modalId: string;
   let s: string;
   let error = "";
 
@@ -15,6 +16,7 @@
         { withCredentials: true }
       )
       .then(() => {
+        getUserData();
         window.history.replaceState({}, document.title, "/");
         replace("/");
       })
@@ -24,11 +26,9 @@
       });
 </script>
 
-<h1>2FA</h1>
+<label class="input-group">
+  <span>Code</span>
 
-<h3>{error}</h3>
-
-<form on:submit|preventDefault={post2FA} class="container">
   <input
     size="6"
     maxlength="6"
@@ -38,27 +38,13 @@
     on:keydown={() => (error = "")}
     inputmode="numeric"
     title="Only enter numbers"
+    class="input input-bordered flex-auto"
     bind:value={s}
   />
-  <br />
-  <input type="submit" value="Submit" />
-</form>
-
-<style>
-  h3 {
-    font-size: 60px;
-    text-align: center;
-    color: #ff3e00;
-  }
-
-  .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  input {
-    font-size: 60px;
-    text-align: center;
-  }
-</style>
+</label>
+<!-- todo: dont close the modal immediatly, display a success/error message -->
+<div class="modal-action">
+  <label for={modalId} class="btn btn-active btn-primary" on:click={post2FA}
+    >Send</label
+  >
+</div>

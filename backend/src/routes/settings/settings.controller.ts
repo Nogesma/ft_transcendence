@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -74,6 +75,17 @@ export class SettingsController {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     return this.userService.postAvatar(req, res, login);
+  }
+
+  @Delete("avatar")
+  async deleteAvatar(@Req() req: Request) {
+    const login = (await req.session.$get("user"))?.login;
+    if (!login)
+      throw new HttpException(
+        "Could not find user",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    return this.userService.deleteAvatar(req, login);
   }
 
   @Get("friend/requests")
