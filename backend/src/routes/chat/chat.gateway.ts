@@ -4,6 +4,8 @@ import {
   WebSocketGateway,
   WebSocketServer,
   ConnectedSocket,
+  OnGatewayInit,
+  OnGatewayConnection,
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 
@@ -13,6 +15,8 @@ import { isExpired } from "../../utils/date.js";
 import { SessionService } from "../../models/session/session.service.js";
 import { type Session } from "../../models/session/session.model.js";
 import { UserService } from "../../models/user/user.service.js";
+import { type Channel } from "../../models/channel/channel.model.js";
+import type { User } from "../../models/user/user.model.js";
 
 export interface ExtendedError extends Error {
   data?: never;
@@ -21,6 +25,8 @@ export interface ExtendedError extends Error {
 declare module "http" {
   export interface IncomingMessage {
     session: Session;
+    channels: Channel[];
+    user: User;
     signedCookies: { token: string };
   }
 }
@@ -28,7 +34,7 @@ declare module "http" {
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
 })
-export class ChatGateway {
+export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
@@ -52,51 +58,61 @@ export class ChatGateway {
       next();
     };
 
+  getChannels = async (socket: Socket, next: (err?: ExtendedError) => void) => {
+    const user = await socket.request.session.$get("user");
+
+    if (!user) return next(new Error("User not found"));
+
+    const channels = await user.$get("member");
+    if (!channels) return next(new Error("User not in any channels"));
+
+    socket.request.channels = channels;
+    socket.request.user = user;
+    next();
+  };
+
   afterInit() {
     this.server.use(cookieParser(this.configService.get("COOKIE_SECRET")));
     this.server.use(this.socketUse(this.sessionService));
+    this.server.use(this.getChannels);
+  }
+
+  handleConnection(@ConnectedSocket() client: Socket) {
+    client.on("disconnecting", async () => {
+      const username = client.request.user.displayname;
+      client.rooms.forEach((r) =>
+        client.to(r).emit("newMessage", `User : ${username} left the room`)
+      );
+    });
   }
 
   @SubscribeMessage("joinRoom")
   async handleRoomJoin(
     @ConnectedSocket() client: Socket,
-    @MessageBody("id") id: number
+    @MessageBody("channel") channelName: string
   ) {
-    const usr = await this.userService.getUserLogin(
-      client.request.session.userId
-    );
-    client.join(id.toString());
-    const it = client.rooms.values();
-    it.next();
-    client.broadcast
-      .to(it.next().value)
-      .emit("newMessage", `User: ${usr} joined the room`);
+    const channel = client.request.channels.find((x) => x.name == channelName);
+    if (!channel) return;
+
+    const username = client.request.user.displayname;
+
+    client.join(channel.id);
+    client
+      .to(channel.id)
+      .emit("newMessage", `User: ${username} joined the room`);
   }
 
-  @SubscribeMessage("leaveRoom")
-  async handleRoomLeave(@ConnectedSocket() client: Socket) {
-    console.log("left");
-    this.server.sockets.emit(
-      "newMessage",
-      `User : ${await this.userService.getUserLogin(
-        client.request.session.userId
-      )} left the room`
-    );
-  }
   @SubscribeMessage("sendMessage")
   async handleEvent(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: string
+    @MessageBody("channel") channelName: string,
+    @MessageBody("msg") message: string
   ) {
-    const it = client.rooms.values();
-    it.next();
-    this.server.sockets
-      .to(it.next().value)
-      .emit(
-        "newMessage",
-        `${await this.userService.getUserLogin(
-          client.request.session.userId
-        )}: ${data}`
-      );
+    const channel = client.request.channels.find((x) => x.name == channelName);
+    if (!channel) return;
+
+    const username = client.request.user.displayname;
+
+    client.to(channel.id).emit("newMessage", `${username}: ${message}`);
   }
 }
