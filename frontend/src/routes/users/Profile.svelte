@@ -7,17 +7,13 @@
   import QRCode from "qrcode";
   import TFAInput from "../../lib/2faInput.svelte";
   import Modal from "../../lib/Modal.svelte";
-  import { onMount } from "svelte";
 
-  export let params: { id: number };
-
-  let newDisplayName: string, file: FileList, tfa: Promise<Node>;
-
-  let elem: HTMLElement;
-
-  onMount(() => elem.appendChild(document.createElement("div")));
-
-  const uid: number = Number(params?.id) ?? $id;
+  const getTFAStatus = () =>
+    axios
+      .get(`${import.meta.env.VITE_BACKEND_URI}/api/user/2fa`, {
+        withCredentials: true,
+      })
+      .then(({ data }) => (tfa_enabled = data));
 
   const getUserStats = () =>
     axios
@@ -60,19 +56,35 @@
       })
       .then(() => $updatepfp++); // todo: find a way to update avatar in <Profile />
 
-  const request2FA = async () =>
-    axios
-      .get(`${import.meta.env.VITE_BACKEND_URI}/api/user/2fa`, {
-        withCredentials: true,
-      })
-      .then(async ({ data }) =>
-        elem.replaceChild(
-          await QRCode.toCanvas(data.otpauthURL),
-          elem.firstChild as Node
-        )
-      )
-      //todo: do case where user is not authenticated
-      .catch();
+  const request2FA = async () => {
+    if (!tfa_enabled)
+      return axios
+        .get(`${import.meta.env.VITE_BACKEND_URI}/api/user/2fa/enable`, {
+          withCredentials: true,
+        })
+        .then(async ({ data }) => {
+          if (!elem.hasChildNodes())
+            elem.appendChild(document.createElement("div"));
+          elem.replaceChild(
+            await QRCode.toCanvas(data.otpauthURL),
+            elem.firstChild as Node
+          );
+          return null;
+        });
+    return new Promise<null>(() => null);
+  };
+
+  export let params: { id: number };
+
+  let newDisplayName: string,
+    file: FileList,
+    tfa: Promise<null>,
+    elem: HTMLElement,
+    tfa_enabled = false;
+
+  const uid: number = Number(params?.id) ?? $id;
+
+  $: if (uid === $id) getTFAStatus();
 </script>
 
 {#await getUserStats()}
@@ -135,7 +147,8 @@
             <label
               for="toggle-2fa"
               class="btn btn-primary modal-button"
-              on:click={() => (tfa = request2FA())}>Enable 2FA</label
+              on:click={() => (tfa = request2FA())}
+              >{tfa_enabled ? "Disable" : "Enable"} 2FA</label
             >
           </div>
         {/if}
@@ -202,13 +215,39 @@
 <Modal id="toggle-2fa">
   <svelte:fragment slot="content">
     <div class="flex flex-col">
-      <h3 class="text-lg font-bold pb-4">Enable 2FA</h3>
+      {#if tfa_enabled}
+        <h3 class="text-lg font-bold pb-4">Disable 2FA</h3>
 
-      <div bind:this={elem} />
+        <TFAInput
+          modalId="toggle-2fa"
+          url="api/user/2fa/disable"
+          successMessage="TFA has been disabled"
+        />
+      {:else}
+        <h3 class="text-lg font-bold pb-4">Enable 2FA</h3>
 
-      {#await tfa then _}
-        <TFAInput modalId="toggle-2fa" url="api/user/2fa" />
-      {/await}
+        <div class="flex flex-auto justify-center mb-5" bind:this={elem} />
+
+        {#await tfa then _}
+          {#if elem && elem.hasChildNodes()}
+            <div
+              class="btn btn-active btn-primary"
+              on:click={() => {
+                elem.removeChild(elem.childNodes[0]);
+                elem = elem;
+              }}
+            >
+              ok
+            </div>
+          {:else}
+            <TFAInput
+              modalId="toggle-2fa"
+              url="api/user/2fa/validate"
+              successMessage="2FA has been enabled"
+            />
+          {/if}
+        {/await}
+      {/if}
     </div>
   </svelte:fragment>
 </Modal>

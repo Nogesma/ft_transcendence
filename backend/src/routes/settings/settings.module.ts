@@ -17,5 +17,6 @@ import { BlockModule } from "../../models/block/block.module.js";
   ],
   controllers: [SettingsController],
   providers: [SettingsService],
+  exports: [SettingsService],
 })
 export class SettingsModule {}

@@ -33,6 +33,12 @@ export class SettingsService {
     return pick(["login", "displayname", "id"], user);
   };
 
+  get2FAStatus = async (id: number) => {
+    const has2FA = await this.tfaSecretService.getTFASecret(id);
+
+    return Boolean(has2FA && !has2FA.temp);
+  };
+
   generateNew2FA = async (user: User) => {
     const tfaSecret = await user.$get("tfa_secret");
     if (tfaSecret) {
@@ -55,8 +61,32 @@ export class SettingsService {
     return { otpauthURL };
   };
 
-  validate2FA = async (user: User, token: string) => {
-    const tfaSecret = await user.$get("tfa_secret");
+  validate2FA = async (id: number, token: string) => {
+    const tfaSecret = await this.tfaSecretService.getTFASecret(id);
+    if (!tfaSecret)
+      throw new HttpException(
+        "User does not have 2FA enabled",
+        HttpStatus.BAD_REQUEST
+      );
+
+    const hasValidCode = speakeasy.totp.verify({
+      secret: tfaSecret.secret,
+      encoding: "base32",
+      token,
+      window: 1,
+      algorithm: "sha512",
+    });
+
+    if (!hasValidCode)
+      throw new HttpException("Invalid 2FA Code", HttpStatus.FORBIDDEN);
+
+    tfaSecret.temp = false;
+    await tfaSecret.save();
+  };
+
+  disable2FA = async (id: number, token: string) => {
+    const tfaSecret = await this.tfaSecretService.getTFASecret(id);
+
     if (!tfaSecret)
       throw new HttpException(
         "Could not retrieve 2FA Secret",
@@ -72,13 +102,9 @@ export class SettingsService {
     });
 
     if (!hasValidCode)
-      throw new HttpException("Invalid 2FA Code", HttpStatus.UNAUTHORIZED);
+      throw new HttpException("Invalid 2FA Code", HttpStatus.FORBIDDEN);
 
-    tfaSecret.temp = false;
-    await tfaSecret.save();
-
-    user.tfa = true;
-    await user.save();
+    await tfaSecret.destroy();
   };
 
   postDisplayName = (id: number, name: string) =>

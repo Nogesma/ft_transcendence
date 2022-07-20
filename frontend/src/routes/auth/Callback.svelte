@@ -4,11 +4,16 @@
   import { equals } from "ramda";
   import { onMount } from "svelte";
   import TFAInput from "../../lib/2faInput.svelte";
-  import Modal from "../../lib/Modal.svelte";
-  import { getUserData } from "../../utils/auth";
+  import { checkAuthentication } from "../../utils/auth";
 
   const urlParams = new URLSearchParams($querystring);
   const code = urlParams.get("code");
+
+  const redirect = () => {
+    checkAuthentication();
+    window.history.replaceState({}, document.title, "/");
+    replace("/");
+  };
 
   if (code) {
     const localState = localStorage.getItem("state");
@@ -18,7 +23,8 @@
 
     if (state && state === localState)
       onMount(() => postOauth(code, localState));
-  }
+    else redirect();
+  } else redirect();
 
   const teapot = axios.create({
     validateStatus: equals(418),
@@ -32,24 +38,17 @@
         { withCredentials: true }
       )
       .then(() => {
-        const modal: HTMLInputElement = <HTMLInputElement>(
-          document.getElementById("enter-2fa")
-        );
-
-        modal.checked = true;
+        (<HTMLInputElement>document.getElementById("enter-2fa")).checked = true;
       })
-      .catch(() => {
-        getUserData();
-        window.history.replaceState({}, document.title, "/");
-        replace("/");
-      });
+      .catch(redirect);
 </script>
 
-<Modal id="enter-2fa">
-  <svelte:fragment slot="content">
+<input type="checkbox" id="enter-2fa" class="modal-toggle" />
+<div class="modal">
+  <div class="modal-box">
     <div class="flex flex-col">
-      <h3 class="text-lg font-bold pb-4">Enable 2FA</h3>
+      <h3 class="text-lg font-bold pb-4">Enter 2FA Code</h3>
       <TFAInput modalId="enter-2fa" url="api/auth/2fa" />
     </div>
-  </svelte:fragment>
-</Modal>
+  </div>
+</div>
