@@ -1,5 +1,6 @@
 <script lang="ts">
   import axios from "axios";
+  import Modal from "./Modal.svelte";
 
   const getChannels = () =>
     axios.get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/channels`, {
@@ -21,13 +22,8 @@
 
 <label for="delete-modal" class="modal-button btn">Delete Channel</label>
 
-<input type="checkbox" id="delete-modal" class="modal-toggle" />
-<label for="delete-modal" class="modal cursor-pointer">
-  <label class="modal-box relative" for="delete-modal">
-    <label
-      for="delete-modal"
-      class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
-    >
+<Modal id="delete-modal">
+  <svelte:fragment slot="content">
     <div class="flex flex-col">
       <h3 class="text-lg font-bold pb-4">Delete channel</h3>
 
@@ -47,5 +43,5 @@
         {err}
       {/await}
     </div>
-  </label>
-</label>
+  </svelte:fragment>
+</Modal>

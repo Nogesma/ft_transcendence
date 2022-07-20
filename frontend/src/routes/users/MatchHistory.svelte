@@ -5,6 +5,7 @@
 
   dayjs.extend(relativeTime);
   import ProfilePic from "../../lib/ProfilePic.svelte";
+  import { displayname, login } from "../../stores/settings.js";
 
   export let params: { id: number };
 
@@ -38,11 +39,11 @@
             <div class="flex content-center">
               <div class="avatar px-5">
                 <div class="w-10 h-10">
-                  <ProfilePic attributes="rounded-full" />
+                  <ProfilePic attributes="rounded-full" user={$login} />
                 </div>
               </div>
               <div class="flex place-items-center">
-                {localStorage.displayname}
+                {$displayname}
               </div>
             </div>
           </td>

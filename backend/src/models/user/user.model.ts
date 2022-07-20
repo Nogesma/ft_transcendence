@@ -2,7 +2,6 @@ import {
   AllowNull,
   BelongsToMany,
   Column,
-  Default,
   HasMany,
   HasOne,
   Model,
@@ -37,11 +36,6 @@ export class User extends Model {
   @AllowNull(false)
   @Column
   displayname: string;
-
-  @AllowNull(false)
-  @Default(false)
-  @Column
-  tfa: boolean;
 
   @HasMany(() => Session)
   session: Session[];

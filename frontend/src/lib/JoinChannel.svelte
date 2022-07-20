@@ -1,5 +1,6 @@
 <script lang="ts">
   import axios from "axios";
+  import Modal from "./Modal.svelte";
 
   const getPublicChannels = () =>
     axios.get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/public`, {
@@ -33,12 +34,8 @@
 
 <label for="join-modal" class="modal-button btn">Join Channel</label>
 
-<input type="checkbox" id="join-modal" class="modal-toggle" />
-<label for="join-modal" class="modal cursor-pointer">
-  <label class="modal-box relative" for="join-modal">
-    <label for="join-modal" class="btn btn-sm btn-circle absolute right-2 top-2"
-      >✕</label
-    >
+<Modal id="join-modal">
+  <svelte:fragment slot="content">
     <div class="flex flex-col">
       <h3 class="text-lg font-bold pb-4">Join channel</h3>
       <select bind:value={channelType} class="select select-bordered">
@@ -100,5 +97,5 @@
         </div>
       {/if}
     </div>
-  </label>
-</label>
+  </svelte:fragment>
+</Modal>
