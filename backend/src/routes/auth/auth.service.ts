@@ -8,8 +8,8 @@ import { ConfigService } from "@nestjs/config";
 import { UserService } from "../../models/user/user.service.js";
 import { SessionService } from "../../models/session/session.service.js";
 import { TFASessionService } from "../../models/TFASession/TFASession.service.js";
-import { TFASecretService } from "../../models/TFASecret/TFASecret.service.js";
 import { type User } from "../../models/user/user.model.js";
+import { SettingsService } from "../settings/settings.service.js";
 
 @Injectable()
 export class AuthService {
@@ -18,7 +18,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly sessionService: SessionService,
     private readonly tfaSessionService: TFASessionService,
-    private readonly tfaSecretService: TFASecretService
+    private readonly settingsService: SettingsService
   ) {}
 
   oauth2Handshake = async (res: Response, code: string, state: string) => {
@@ -48,7 +48,8 @@ export class AuthService {
 
     const user = await this.userService.createUserIfNotExist(userData);
 
-    if (user.tfa) return this.createTFASession(res, user.id);
+    if (await this.settingsService.get2FAStatus(user.id))
+      return this.createTFASession(res, user.id);
 
     return this.createUserSession(res, user);
   };
@@ -61,9 +62,14 @@ export class AuthService {
         HttpStatus.UNAUTHORIZED
       );
 
-    const user = tfaSession.user;
+    const user = await tfaSession.$get("user");
+    if (!user)
+      throw new HttpException(
+        "Could not find user",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
 
-    const TFA = user.tfa_secret;
+    const TFA = await user.$get("tfa_secret");
     if (!TFA)
       throw new HttpException(
         "Could not find 2FA Secret",

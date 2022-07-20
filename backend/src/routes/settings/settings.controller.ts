@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -33,6 +34,11 @@ export class SettingsController {
   }
 
   @Get("2fa")
+  async get2FAStatus(@Req() req: Request) {
+    return this.userService.get2FAStatus(req.session.userId);
+  }
+
+  @Get("2fa/enable")
   async generateNew2FA(@Req() req: Request) {
     const user = await req.session.$get("user");
     if (!user)
@@ -43,15 +49,14 @@ export class SettingsController {
     return this.userService.generateNew2FA(user);
   }
 
-  @Post("2fa/:code")
+  @Post("2fa/validate/:code")
   async validate2FA(@Req() req: Request, @Param("code") code: string) {
-    const user = await req.session.$get("user");
-    if (!user)
-      throw new HttpException(
-        "Could not find user",
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    return this.userService.validate2FA(user, code);
+    return this.userService.validate2FA(req.session.userId, code);
+  }
+
+  @Post("2fa/disable/:code")
+  async disable2FA(@Req() req: Request, @Param("code") code: string) {
+    return this.userService.disable2FA(req.session.userId, code);
   }
 
   @Post("name")
@@ -74,6 +79,17 @@ export class SettingsController {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     return this.userService.postAvatar(req, res, login);
+  }
+
+  @Delete("avatar")
+  async deleteAvatar(@Req() req: Request) {
+    const login = (await req.session.$get("user"))?.login;
+    if (!login)
+      throw new HttpException(
+        "Could not find user",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    return this.userService.deleteAvatar(req, login);
   }
 
   @Get("friend/requests")

@@ -10,8 +10,10 @@ export class TFASecretService {
     private tfaSecretModel: typeof TFASecret
   ) {}
 
-  createTFASecret = (user: User, secret: string, temp: boolean) =>
-    this.tfaSecretModel.create({ user, secret, temp });
+  createTFASecret = (id: number, secret: string, temp: boolean) =>
+    this.tfaSecretModel.create({ id, secret, temp });
+
+  getTFASecret = (id: number) => this.tfaSecretModel.findOne({ where: { id } });
 
   setTFASecretTemp = (user: User, temp: boolean) =>
     this.tfaSecretModel.update({ temp }, { where: { user } });

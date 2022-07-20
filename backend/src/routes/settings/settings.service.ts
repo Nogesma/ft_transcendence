@@ -33,12 +33,22 @@ export class SettingsService {
     return pick(["login", "displayname", "id"], user);
   };
 
+  get2FAStatus = async (id: number) => {
+    const has2FA = await this.tfaSecretService.getTFASecret(id);
+
+    return Boolean(has2FA && !has2FA.temp);
+  };
+
   generateNew2FA = async (user: User) => {
-    if (await user.tfa_secret)
-      throw new HttpException("2FA already enabled", HttpStatus.BAD_REQUEST);
+    const tfaSecret = await user.$get("tfa_secret");
+    if (tfaSecret) {
+      if (tfaSecret.temp) await tfaSecret.destroy();
+      else
+        throw new HttpException("2FA already enabled", HttpStatus.BAD_REQUEST);
+    }
 
     const secret = speakeasy.generateSecret().base32;
-    await this.tfaSecretService.createTFASecret(user, secret, true);
+    await this.tfaSecretService.createTFASecret(user.id, secret, true);
 
     const otpauthURL = speakeasy.otpauthURL({
       secret: secret,
@@ -51,8 +61,32 @@ export class SettingsService {
     return { otpauthURL };
   };
 
-  validate2FA = async (user: User, token: string) => {
-    const tfaSecret = user.tfa_secret;
+  validate2FA = async (id: number, token: string) => {
+    const tfaSecret = await this.tfaSecretService.getTFASecret(id);
+    if (!tfaSecret)
+      throw new HttpException(
+        "User does not have 2FA enabled",
+        HttpStatus.BAD_REQUEST
+      );
+
+    const hasValidCode = speakeasy.totp.verify({
+      secret: tfaSecret.secret,
+      encoding: "base32",
+      token,
+      window: 1,
+      algorithm: "sha512",
+    });
+
+    if (!hasValidCode)
+      throw new HttpException("Invalid 2FA Code", HttpStatus.FORBIDDEN);
+
+    tfaSecret.temp = false;
+    await tfaSecret.save();
+  };
+
+  disable2FA = async (id: number, token: string) => {
+    const tfaSecret = await this.tfaSecretService.getTFASecret(id);
+
     if (!tfaSecret)
       throw new HttpException(
         "Could not retrieve 2FA Secret",
@@ -68,13 +102,9 @@ export class SettingsService {
     });
 
     if (!hasValidCode)
-      throw new HttpException("Invalid 2FA Code", HttpStatus.UNAUTHORIZED);
+      throw new HttpException("Invalid 2FA Code", HttpStatus.FORBIDDEN);
 
-    tfaSecret.temp = false;
-    await tfaSecret.save();
-
-    user.tfa = true;
-    await user.save();
+    await tfaSecret.destroy();
   };
 
   postDisplayName = (id: number, name: string) =>
@@ -150,6 +180,26 @@ export class SettingsService {
     ),
     andThen(Promise.all)
   );
+
+  deleteAvatar = (req: Request, login: string) => {
+    const imagePath = path.join(
+      this.configService.get("AVATAR_UPLOAD_PATH"),
+      login
+    );
+
+    // Checks for directory traversal
+    if (imagePath.indexOf(this.configService.get("AVATAR_UPLOAD_PATH")) !== 0)
+      throw new HttpException("Login is invalid", HttpStatus.FORBIDDEN);
+
+    try {
+      fs.unlinkSync(`${imagePath}.jpg`);
+    } catch (e) {
+      throw new HttpException(
+        "User does not have a custom PFP",
+        HttpStatus.BAD_REQUEST
+      );
+    }
+  };
 
   acceptFriendRequest = this.friendService.acceptFriendRequest;
 
