@@ -19,7 +19,10 @@
   const muteppl = () =>
   {
     if (name === localStorage.getItem('login'))
-      return ;
+    {
+      alert("You cannot mute yourself")
+      return;
+    }
     axios.post(`${import.meta.env.VITE_BACKEND_URI}/api/chat/mute/${name}`,
             {
               name: channel,
@@ -50,9 +53,11 @@
     );
   }
   const banppl = () => {
-    // TODO prevent banning yourself
     if (name === localStorage.getItem('login'))
-      return ;
+    {
+      alert("You cannot ban yourself")
+      return;
+    }
       axios.post(
              `${import.meta.env.VITE_BACKEND_URI}/api/chat/ban/${name}`,
               {

@@ -78,6 +78,7 @@ export class ChatController {
     @Param("expires") expires: Date,
     @Body("name") name: string
   ) {
+    if (req.user.login === user) return;
     expires = new Date();
     return this.chatService.banUser(req.session.userId, name, user, expires);
   }
@@ -98,6 +99,7 @@ export class ChatController {
     @Body("name") name: string,
     @Body("expires") expires: Date
   ) {
+    if (req.user.login === user) return;
     return this.chatService.muteUser(req.session.userId, name, user, expires);
   }
 
