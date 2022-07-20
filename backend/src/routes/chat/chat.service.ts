@@ -276,8 +276,10 @@ export class ChatService {
   /* Admin routes */
   addAdmin = async (oid: number, chan: string, userName: string) => {
     const channel = await this.channelService.getChannelByName(chan);
-    const user = await this.userService.getUserByName(userName);
-
+    const user = await this.userService.getUserByLogin(userName);
+    if (await this.channelAdminService.getAdmin(channel?.id, oid)) {
+      throw new HttpException("User is already admin", HttpStatus.BAD_REQUEST);
+    }
     if (!channel || !user)
       throw new HttpException(
         "Channel or user not found",

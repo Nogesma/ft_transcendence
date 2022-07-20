@@ -3,6 +3,7 @@
   <button class="btn btn-secondary" id="unban" on:click={unbanppl} >UnBan</button>
   <button class="btn btn-accent" id="mute" on:click={muteppl}>Mute</button>
   <button class="btn btn-accent" id="unmute" on:click={unmuteppl}>UnMute</button>
+  <button class="btn btn-accent" id="add_admin" on:click={add_admin}>Add Admin</button>
 </div>
 
 <script lang="ts">
@@ -69,6 +70,24 @@
               },
       );
   }
+
+  const add_admin = () => {
+    if (name === localStorage.getItem('login'))
+    {
+      alert("You cannot promote yourself as admin")
+      return;
+    }
+    axios.post(
+            `${import.meta.env.VITE_BACKEND_URI}/api/chat/add_admin/${name}`,
+            {
+              chan: channel,
+            },
+            {
+              withCredentials: true,
+            },
+    );
+  }
+
   const hideMenu = () => {
     document.getElementById("Adminmenu").style.display = "none"
   }
@@ -85,7 +104,7 @@
     else {
       let menu = document.getElementById("Adminmenu")
 
-      menu.style.display = 'flex';
+      menu.style.display = 'block';
       menu.style.left = pos.pageX + "px";
       menu.style.top = pos.pageY + "px";
     }
