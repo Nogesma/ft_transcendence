@@ -105,7 +105,7 @@ export class ChatController {
   async unmuteUser(
     @Req() req: Request,
     @Param("user") user: string,
-    @Body("chan") chan: string
+    @Body("name") chan: string
   ) {
     return this.chatService.unmuteUser(req.session.userId, chan, user);
   }

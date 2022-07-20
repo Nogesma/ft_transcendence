@@ -1,37 +1,8 @@
-<style type="text/css">
-  .context-menu {
-    position: absolute;
-    text-align: center;
-    background: lightgray;
-    border: 1px solid black;
-  }
-
-  .context-menu ul {
-    padding: 0px;
-    margin: 0px;
-    min-width: 150px;
-    list-style: none;
-  }
-
-  .context-menu ul li {
-    padding-bottom: 7px;
-    padding-top: 7px;
-    border: 1px solid black;
-  }
-
-
-  .context-menu ul li:hover {
-    background: darkgray;
-  }
-</style>
-
-<div id="Adminmenu" class="context-menu"
-     style="display: none">
-  <ul>
-    <li><p id="ban" class="button" on:click={banppl} >Ban</p></li>
-    <li><p id="unban" class="button" on:click={unbanppl} >UnBan</p></li>
-    <li><p id="mute" class="button" on:click={muteppl}>Mute</p></li>
-  </ul>
+<div class="btn-group btn-group-vertical context-menu max-w-xs" id="Adminmenu" style="display: none" >
+  <button class="btn btn-primary" id="ban" on:click={banppl} >Ban</button>
+  <button class="btn btn-secondary" id="unban" on:click={unbanppl} >UnBan</button>
+  <button class="btn btn-accent" id="mute" on:click={muteppl}>Mute</button>
+  <button class="btn btn-accent" id="unmute" on:click={unmuteppl}>UnMute</button>
 </div>
 
 <script lang="ts">
@@ -47,12 +18,28 @@
 
   const muteppl = () =>
   {
-    if (name === localStorage.getItem('displayname'))
+    if (name === localStorage.getItem('login'))
       return ;
+    axios.post(`${import.meta.env.VITE_BACKEND_URI}/api/chat/mute/${name}`,
+            {
+              name: channel,
+              expires: new Date(),
+            },
+            {
+              withCredentials: true,
+            });
+  }
+  const unmuteppl = () => {
+    axios.post(`${import.meta.env.VITE_BACKEND_URI}/api/chat/unmute/${name}`,
+            {
+              name: channel,
+            },
+            {
+              withCredentials: true,
+            },
+    );
   }
   const unbanppl = () => {
-    console.log(channel)
-    name = "lgyger"
     axios.post(`${import.meta.env.VITE_BACKEND_URI}/api/chat/unban/${name}`,
             {
               name: channel,
@@ -64,8 +51,7 @@
   }
   const banppl = () => {
     // TODO prevent banning yourself
-    name = "lgyger"
-    if (name === localStorage.getItem('displayname'))
+    if (name === localStorage.getItem('login'))
       return ;
       axios.post(
              `${import.meta.env.VITE_BACKEND_URI}/api/chat/ban/${name}`,
@@ -82,11 +68,11 @@
     document.getElementById("Adminmenu").style.display = "none"
   }
 
-  const rightclick = (pos) => {
-    let str = document.getElementById('msg').textContent;
-    str = str.substring(str.search(" ") + 1)
+  const rightclick = (pos, idx) => {
+    let str = messagesList[idx];
     name = str.substring(0,str.search(":"));
-    console.log(name)
+    if (name === `Me`)
+        name = localStorage.getItem('login')
     pos.preventDefault();
 
     if (document.getElementById("Adminmenu").style.display == "block")
@@ -94,7 +80,7 @@
     else {
       let menu = document.getElementById("Adminmenu")
 
-      menu.style.display = 'block';
+      menu.style.display = 'flex';
       menu.style.left = pos.pageX + "px";
       menu.style.top = pos.pageY + "px";
     }
@@ -108,23 +94,25 @@
 
 
   socket.on("newMessage", (event) => {
+    event = event.substring(event.search(":") + 2);
     messagesList.push(event);
     messagesList = messagesList;
   });
 
   const sendmsg = () => {
     socket.emit("sendMessage", { channel, msg });
-    messagesList.push(`${localStorage.getItem("displayname")}: ${msg}`);
+    messagesList.push(`Me: ${msg}`);
     messagesList = messagesList;
     msg = "";
   };
 </script>
 
+<svelte:body on:click={hideMenu}/>
 <h1>{channel}</h1>
 <br /><br />
 {#each messagesList as item, ina}
   <div class="myElement" oncontextmenu="return false;">
-  <li id="msg" on:auxclick|preventDefault={rightclick}>{ina + 1}: {item}</li>
+  <li id="msg" on:auxclick|preventDefault={(e) => rightclick(e, ina)}>{ina + 1}: {item}</li>
   </div>
 {/each}
 <form class="pt-40" on:submit|preventDefault={() => (msg = "")}>

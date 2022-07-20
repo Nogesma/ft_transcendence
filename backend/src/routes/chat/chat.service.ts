@@ -50,7 +50,14 @@ export class ChatService {
     id: number
   ) => {
     const channel = await this.channelService.getChannelByName(name);
-
+    if (await this.channelBanService.isBanned(id)) {
+      console.log("banned");
+      throw new HttpException(
+        "You are banned so go away",
+        HttpStatus.UNAUTHORIZED
+      );
+      return;
+    }
     if (!channel)
       throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
 
@@ -212,7 +219,7 @@ export class ChatService {
     expires: Date
   ) => {
     const channel = await this.channelService.getChannelByName(chan);
-    const user = await this.userService.getUserByName(userName);
+    const user = await this.userService.getUserByLogin(userName);
 
     if (!channel || !user)
       throw new HttpException(
@@ -237,7 +244,7 @@ export class ChatService {
 
   unmuteUser = async (oid: number, chan: string, userName: string) => {
     const channel = await this.channelService.getChannelByName(chan);
-    const user = await this.userService.getUserByName(userName);
+    const user = await this.userService.getUserByLogin(userName);
 
     if (!channel || !user)
       throw new HttpException(

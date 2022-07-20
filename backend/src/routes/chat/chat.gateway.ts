@@ -115,13 +115,22 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     if (await this.ChannelBanService.isBanned(client.request.user.id)) {
       client.emit(
         "newMessage",
-        "Server: You cannot talk because you are banned"
+        "Admin: Server: You cannot talk because you are banned"
+      );
+      return;
+    }
+    if (await this.ChannelBanService.isMuted(client.request.user.id)) {
+      client.emit(
+        "newMessage",
+        "Admin: Server: You cannot talk because you are muted"
       );
       return;
     }
 
     const username = client.request.user.displayname;
     const login = client.request.user.login;
-    client.to(channel.id).emit("newMessage", `${login}: ${message}`);
+    client
+      .to(channel.id)
+      .emit("newMessage", `${login}: ${username}: ${message}`);
   }
 }
