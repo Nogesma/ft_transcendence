@@ -11,6 +11,10 @@ import {
 import { ChatService } from "./chat.service.js";
 import { MessageBody } from "@nestjs/websockets";
 import { Request } from "express";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat.js";
+
+dayjs.extend(customParseFormat);
 
 @Controller("chat")
 export class ChatController {
@@ -75,12 +79,11 @@ export class ChatController {
   async banUser(
     @Req() req: Request,
     @Param("user") user: string,
-    @Param("expires") expires: Date,
+    @Body("expires") expires: Date,
     @Body("name") name: string
   ) {
-    if (req.user.login === user) return;
-    expires = new Date();
-    return this.chatService.banUser(req.session.userId, name, user, expires);
+    const date = expires ? dayjs(expires, "'YYYY-MM-DD'") : dayjs(0);
+    return this.chatService.banUser(req.session.userId, name, user, date);
   }
 
   @Post("unban/:user")
@@ -97,10 +100,10 @@ export class ChatController {
     @Req() req: Request,
     @Param("user") user: string,
     @Body("name") name: string,
-    @Body("expires") expires: Date
+    @Body("expires") expires: string
   ) {
-    if (req.user.login === user) return;
-    return this.chatService.muteUser(req.session.userId, name, user, expires);
+    const date = expires ? dayjs(expires, "'YYYY-MM-DD'") : dayjs(0);
+    return this.chatService.muteUser(req.session.userId, name, user, date);
   }
 
   @Post("unmute/:user")

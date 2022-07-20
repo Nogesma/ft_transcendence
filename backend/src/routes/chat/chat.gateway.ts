@@ -83,7 +83,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     client.on("disconnecting", async () => {
       const username = client.request.user.displayname;
       client.rooms.forEach((r) =>
-        client.to(r).emit("newMessage", `User : ${username} left the room`)
+        client.to(r).emit("newMessage", {
+          message: `${username} left the room`,
+          login: "ADMIN",
+          displayname: "ADMIN",
+        })
       );
     });
   }
@@ -99,9 +103,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     const username = client.request.user.displayname;
 
     client.join(channel.id);
-    client
-      .to(channel.id)
-      .emit("newMessage", `User: ${username} joined the room`);
+    client.to(channel.id).emit("newMessage", {
+      message: `${username} joined the room`,
+      login: "ADMIN",
+      displayname: "ADMIN",
+    });
   }
 
   @SubscribeMessage("sendMessage")
@@ -112,25 +118,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   ) {
     const channel = client.request.channels.find((x) => x.name == channelName);
     if (!channel) return;
-    if (await this.ChannelBanService.isBanned(client.request.user.id)) {
-      client.emit(
-        "newMessage",
-        "Admin: Server: You cannot talk because you are banned"
-      );
-      return;
-    }
-    if (await this.ChannelBanService.isMuted(client.request.user.id)) {
-      client.emit(
-        "newMessage",
-        "Admin: Server: You cannot talk because you are muted"
-      );
-      return;
-    }
 
-    const username = client.request.user.displayname;
-    const login = client.request.user.login;
-    client
-      .to(channel.id)
-      .emit("newMessage", `${login}: ${username}: ${message}`);
+    if (await this.ChannelBanService.isMuted(client.request.user.id)) {
+      client.emit("newMessage", {
+        message: "You cannot talk because you are muted",
+        login: "ADMIN",
+        displayname: "ADMIN",
+      });
+      return;
+    }
+    const { displayname, login } = client.request.user;
+
+    client.to(channel.id).emit("newMessage", { message, login, displayname });
   }
 }

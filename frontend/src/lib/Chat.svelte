@@ -1,149 +1,188 @@
-<div class="btn-group btn-group-vertical context-menu max-w-xs" id="Adminmenu" style="display: none" >
-  <button class="btn btn-primary" id="ban" on:click={banppl} >Ban</button>
-  <button class="btn btn-secondary" id="unban" on:click={unbanppl} >UnBan</button>
-  <button class="btn btn-accent" id="mute" on:click={muteppl}>Mute</button>
-  <button class="btn btn-accent" id="unmute" on:click={unmuteppl}>UnMute</button>
-  <button class="btn btn-accent" id="add_admin" on:click={add_admin}>Add Admin</button>
-</div>
-
 <script lang="ts">
   import { io } from "socket.io-client";
   import { onMount } from "svelte";
   import axios from "axios";
+  import Modal from "./Modal.svelte";
+  import { displayname, login } from "../stores/settings";
 
   export let channel = "";
 
   let msg: string;
-  let messagesList: Array<string> = [];
-  let name: string;
-
-  const muteppl = () =>
-  {
-    if (name === localStorage.getItem('login'))
-    {
-      alert("You cannot mute yourself")
-      return;
-    }
-    axios.post(`${import.meta.env.VITE_BACKEND_URI}/api/chat/mute/${name}`,
-            {
-              name: channel,
-              expires: new Date(),
-            },
-            {
-              withCredentials: true,
-            });
-  }
-  const unmuteppl = () => {
-    axios.post(`${import.meta.env.VITE_BACKEND_URI}/api/chat/unmute/${name}`,
-            {
-              name: channel,
-            },
-            {
-              withCredentials: true,
-            },
-    );
-  }
-  const unbanppl = () => {
-    axios.post(`${import.meta.env.VITE_BACKEND_URI}/api/chat/unban/${name}`,
-            {
-              name: channel,
-            },
-            {
-              withCredentials:  true,
-            },
-    );
-  }
-  const banppl = () => {
-    if (name === localStorage.getItem('login'))
-    {
-      alert("You cannot ban yourself")
-      return;
-    }
-      axios.post(
-             `${import.meta.env.VITE_BACKEND_URI}/api/chat/ban/${name}`,
-              {
-                name: channel,
-                expires: new Date(),
-              },
-              {
-               withCredentials: true,
-              },
-      );
-  }
-
-  const add_admin = () => {
-    if (name === localStorage.getItem('login'))
-    {
-      alert("You cannot promote yourself as admin")
+  let messagesList: Array<{
+    message: string;
+    login: string;
+    displayname: string;
+  }> = [];
+  const muteppl = (name) => {
+    if (name === localStorage.getItem("login")) {
+      alert("You cannot mute yourself");
       return;
     }
     axios.post(
-            `${import.meta.env.VITE_BACKEND_URI}/api/chat/add_admin/${name}`,
-            {
-              chan: channel,
-            },
-            {
-              withCredentials: true,
-            },
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/mute/${name}`,
+      {
+        name: channel,
+        expires: new Date(),
+      },
+      {
+        withCredentials: true,
+      }
     );
-  }
-
-  const hideMenu = () => {
-    document.getElementById("Adminmenu").style.display = "none"
-  }
-
-  const rightclick = (pos, idx) => {
-    let str = messagesList[idx];
-    name = str.substring(0,str.search(":"));
-    if (name === `Me`)
-        name = localStorage.getItem('login')
-    pos.preventDefault();
-
-    if (document.getElementById("Adminmenu").style.display == "block")
-      hideMenu();
-    else {
-      let menu = document.getElementById("Adminmenu")
-
-      menu.style.display = 'block';
-      menu.style.left = pos.pageX + "px";
-      menu.style.top = pos.pageY + "px";
+  };
+  const unmuteppl = (name) => {
+    axios.post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/unmute/${name}`,
+      {
+        name: channel,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+  };
+  const unbanppl = (name) => {
+    axios.post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/unban/${name}`,
+      {
+        name: channel,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+  };
+  const banppl = (name) => {
+    if (name === localStorage.getItem("login")) {
+      alert("You cannot ban yourself");
+      return;
     }
-  }
-  document.oncontextmenu = hideMenu;
+    console.log(name);
+    axios.post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/ban/${name}`,
+      {
+        name: channel,
+        expires: new Date(),
+      },
+      {
+        withCredentials: true,
+      }
+    );
+  };
+
+  const add_admin = (name) => {
+    if (name === localStorage.getItem("login")) {
+      alert("You cannot promote yourself as admin");
+      return;
+    }
+    axios.post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/add_admin/${name}`,
+      {
+        chan: channel,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+  };
 
   const socket = io(import.meta.env.VITE_BACKEND_URI, {
     withCredentials: true,
   });
   onMount(() => socket.emit("joinRoom", { channel }));
 
-
   socket.on("newMessage", (event) => {
-    event = event.substring(event.search(":") + 2);
     messagesList.push(event);
     messagesList = messagesList;
   });
 
   const sendmsg = () => {
     socket.emit("sendMessage", { channel, msg });
-    messagesList.push(`Me: ${msg}`);
+    messagesList.push({
+      message: msg,
+      login: $login,
+      displayname: $displayname,
+    });
     messagesList = messagesList;
     msg = "";
   };
+
+  let currentUser = 0;
 </script>
 
-<svelte:body on:click={hideMenu}/>
 <h1>{channel}</h1>
 <br /><br />
-{#each messagesList as item, ina}
-  <div class="myElement" oncontextmenu="return false;">
-  <li id="msg" on:auxclick|preventDefault={(e) => rightclick(e, ina)}>{ina + 1}: {item}</li>
+{#each messagesList as { displayname, message, login: userLogin }, ina}
+  <div class="dropdown">
+    <label tabindex="0" class="" on:click={() => (currentUser = ina)}
+      >{ina + 1}: {displayname}</label
+    >: {message}
+    <div
+      tabindex="0"
+      class="dropdown-content card card-side bg-base-100 shadow-xl"
+    >
+      <figure>
+        <img src="https://placeimg.com/200/280/arch" alt="Movie" />
+      </figure>
+      <div class="card-body">
+        <div class="card-actions justify-end">
+          <div class="dropdown">
+            <label tabindex="0" class="btn m-1">Click</label>
+            <ul
+              tabindex="0"
+              class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
+            >
+              <li>
+                <button
+                  class="btn btn-primary"
+                  id="ban"
+                  on:click={() => banppl(userLogin)}>Ban</button
+                >
+              </li>
+              <li>
+                <button
+                  class="btn btn-secondary"
+                  id="unban"
+                  on:click={() => unbanppl(userLogin)}>UnBan</button
+                >
+              </li>
+              <li>
+                <button
+                  class="btn btn-accent"
+                  id="mute"
+                  on:click={() => muteppl(userLogin)}>Mute</button
+                >
+              </li>
+              <li>
+                <button
+                  class="btn btn-accent"
+                  id="unmute"
+                  on:click={() => unmuteppl(userLogin)}>UnMute</button
+                >
+              </li>
+              <li>
+                <button
+                  class="btn btn-accent"
+                  id="add_admin"
+                  on:click={() => add_admin(userLogin)}>Add Admin</button
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <h2 class="card-title">New movie is released!</h2>
+        <p>Click the button to watch on Jetflix app.</p>
+
+        <div class="card-actions justify-end">
+          <button class="btn btn-primary">Watch</button>
+        </div>
+      </div>
+    </div>
   </div>
 {/each}
 <form class="pt-40" on:submit|preventDefault={() => (msg = "")}>
-  <label for="send">
-    <p>
-      <input bind:value={msg} />
-    </p>
+  <label class="input-group">
+    <span>Code</span>
+    <input class="input input-bordered" bind:value={msg} />
   </label>
-  <button id="send" on:click={sendmsg}> send message </button>
+  <button on:click={sendmsg}> send message </button>
 </form>

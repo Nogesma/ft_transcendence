@@ -20,6 +20,7 @@ import { type User } from "../../models/user/user.model.js";
 import { ChannelAdminService } from "../../models/channelAdmin/channelAdmin.service.js";
 import { type Channel } from "../../models/channel/channel.model.js";
 import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
+import { type Dayjs } from "dayjs";
 
 @Injectable()
 export class ChatService {
@@ -163,7 +164,7 @@ export class ChatService {
     oid: number,
     chan: string,
     userName: string,
-    expires: Date
+    expires: Dayjs
   ) => {
     const channel = await this.channelService.getChannelByName(chan);
     const user = await this.userService.getUserByLogin(userName);
@@ -177,11 +178,22 @@ export class ChatService {
     if (await this.channelBanService.isBanned(user.id))
       throw new HttpException("User is already banned", HttpStatus.BAD_REQUEST);
 
+    const muted = await this.channelBanService.isMuted(user.id);
+    if (muted) {
+      muted.type = true;
+      await muted.save();
+      return;
+    }
+
     if (
       oid === channel.ownerId ||
       (await this.channelAdminService.getAdmin(channel.id, oid))
     ) {
-      await this.channelBanService.banUser(channel.id, user.id, true, expires);
+      await this.channelBanService.banUser(
+        channel.id,
+        user.id,
+        expires.toDate()
+      );
     } else
       throw new HttpException(
         "Member can only be banned by an admin",
@@ -204,7 +216,7 @@ export class ChatService {
       oid === channel.ownerId ||
       (await this.channelAdminService.getAdmin(channel.id, oid))
     ) {
-      await this.channelBanService.unbanUser(channel.id, user.id, true);
+      await this.channelBanService.unbanUser(channel.id, user.id);
     } else
       throw new HttpException(
         "Member can only be banned by an admin",
@@ -216,7 +228,7 @@ export class ChatService {
     oid: number,
     chan: string,
     userName: string,
-    expires: Date
+    expires: Dayjs
   ) => {
     const channel = await this.channelService.getChannelByName(chan);
     const user = await this.userService.getUserByLogin(userName);
@@ -227,14 +239,18 @@ export class ChatService {
         HttpStatus.BAD_REQUEST
       );
 
-    if (await this.channelBanService.isMuted(user.id))
+    if (await this.channelBanService.isInTable(user.id))
       throw new HttpException("User is already muted", HttpStatus.BAD_REQUEST);
 
     if (
       oid === channel.ownerId ||
       (await this.channelAdminService.getAdmin(channel.id, oid))
     ) {
-      await this.channelBanService.banUser(channel.id, user.id, false, expires);
+      await this.channelBanService.muteUser(
+        channel.id,
+        user.id,
+        expires.toDate()
+      );
     } else
       throw new HttpException(
         "Member can only be banned by an admin",
@@ -257,7 +273,7 @@ export class ChatService {
       oid === channel.ownerId ||
       (await this.channelAdminService.getAdmin(channel.id, oid))
     ) {
-      await this.channelBanService.unbanUser(channel.id, user.id, false);
+      await this.channelBanService.unmuteUser(channel.id, user.id);
     } else
       throw new HttpException(
         "Member can only be banned by an admin",
