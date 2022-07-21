@@ -55,7 +55,7 @@ export class ChatService {
       console.log("banned");
       throw new HttpException(
         "You are banned so go away",
-        HttpStatus.UNAUTHORIZED
+        HttpStatus.FORBIDDEN
       );
       return;
     }
