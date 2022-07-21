@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { default as axios } from "axios";
-import { Response } from "express";
+import type { Response } from "express";
 import { nanoid } from "nanoid";
 import dayjs from "dayjs";
 import speakeasy from "speakeasy";
@@ -8,7 +8,7 @@ import { ConfigService } from "@nestjs/config";
 import { UserService } from "../../models/user/user.service.js";
 import { SessionService } from "../../models/session/session.service.js";
 import { TFASessionService } from "../../models/TFASession/TFASession.service.js";
-import { type User } from "../../models/user/user.model.js";
+import type { User } from "../../models/user/user.model.js";
 import { SettingsService } from "../settings/settings.service.js";
 
 @Injectable()

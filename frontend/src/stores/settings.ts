@@ -20,4 +20,6 @@ const pfp = derived([login, updatepfp], ([$login, $updatepfp], set) => {
       .catch(() => set(`https://cdn.intra.42.fr/users/${$login}.jpg`));
 });
 
-export { isLoggedIn, displayname, id, login, pfp, updatepfp };
+const status = writable(1);
+
+export { isLoggedIn, displayname, id, login, pfp, updatepfp, status };

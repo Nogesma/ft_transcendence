@@ -19,6 +19,6 @@ import { ChannelAdminModule } from "../../models/channelAdmin/channelAdmin.modul
     ChannelAdminModule,
   ],
   controllers: [ChatController],
-  providers: [ChatService, ChatGateway, UserModule],
+  providers: [ChatService, ChatGateway],
 })
 export class ChatModule {}

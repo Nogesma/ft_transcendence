@@ -16,9 +16,9 @@ import {
 } from "ramda";
 import { ChannelService } from "../../models/channel/channel.service.js";
 import { ChannelMemberService } from "../../models/channelMember/channelMember.service.js";
-import { type User } from "../../models/user/user.model.js";
+import type { User } from "../../models/user/user.model.js";
 import { ChannelAdminService } from "../../models/channelAdmin/channelAdmin.service.js";
-import { type Channel } from "../../models/channel/channel.model.js";
+import type { Channel } from "../../models/channel/channel.model.js";
 
 @Injectable()
 export class ChatService {

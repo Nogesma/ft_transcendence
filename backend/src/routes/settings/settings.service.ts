@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { Response, Request } from "express";
+import type { Response, Request } from "express";
 import { andThen, map, pick, pipe, prop } from "ramda";
 import busboy from "busboy";
 import { fileTypeFromBuffer } from "file-type";
@@ -9,7 +9,7 @@ import speakeasy from "speakeasy";
 import { ConfigService } from "@nestjs/config";
 import { UserService } from "../../models/user/user.service.js";
 import { TFASecretService } from "../../models/TFASecret/TFASecret.service.js";
-import { type User } from "../../models/user/user.model.js";
+import type { User } from "../../models/user/user.model.js";
 import { FriendService } from "../../models/friend/friend.service.js";
 import { BlockService } from "../../models/block/block.service.js";
 

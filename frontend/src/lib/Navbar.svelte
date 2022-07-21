@@ -22,9 +22,7 @@
     <div class="flex-none">
       <div class="dropdown dropdown-end">
         <div tabindex="0" class="btn btn-ghost btn-circle avatar">
-          <div class="w-10 rounded-full">
-            <ProfilePic user={$login} attributes="h-10 w-10 rounded-full" />
-          </div>
+          <ProfilePic user={$login} attributes="h-10 w-10 rounded-full" />
         </div>
         <ul
           tabindex="0"

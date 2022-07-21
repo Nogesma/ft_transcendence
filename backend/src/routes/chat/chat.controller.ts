@@ -9,7 +9,7 @@ import {
 } from "@nestjs/common";
 import { ChatService } from "./chat.service.js";
 import { MessageBody } from "@nestjs/websockets";
-import { Request } from "express";
+import type { Request } from "express";
 
 @Controller("chat")
 export class ChatController {

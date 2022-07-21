@@ -1,13 +1,12 @@
 <script lang="ts">
-  import { io } from "socket.io-client";
   import { onMount } from "svelte";
+  import { chatSocket } from "../utils/socket";
   export let channel = "";
   let msg: string;
   let messagesList: Array<string> = [];
 
-  const socket = io(import.meta.env.VITE_BACKEND_URI, {
-    withCredentials: true,
-  });
+  const socket = chatSocket();
+
   onMount(() => socket.emit("joinRoom", { channel }));
 
   socket.on("connect", () => {
