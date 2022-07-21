@@ -3,8 +3,9 @@
   import { onMount } from "svelte";
   import axios from "axios";
   import Modal from "./Modal.svelte";
-  import { displayname, login } from "../stores/settings";
+  import { displayname, login, id } from "../stores/settings";
   import ProfilePic from "./ProfilePic.svelte";
+  import { push } from "svelte-spa-router";
 
   export let channel = "";
 
@@ -94,13 +95,13 @@
     messagesList.push(event);
     messagesList = messagesList;
   });
-
   const sendmsg = () => {
     socket.emit("sendMessage", { channel, msg });
     messagesList.push({
       message: msg,
       login: $login,
       displayname: $displayname,
+      id: $id,
     });
     messagesList = messagesList;
     msg = "";
@@ -111,7 +112,7 @@
 
 <h1>{channel}</h1>
 <br /><br />
-{#each messagesList as { displayname, message, login: userLogin }, ina}
+{#each messagesList as { displayname, message, login: userLogin, id }, ina}
   <div class="dropdown">
     <label tabindex="0" class="" on:click={() => (currentUser = ina)}
       >{ina + 1}: {displayname}</label
@@ -121,7 +122,7 @@
       class="dropdown-content card card-side bg-base-100 shadow-xl"
     >
       <figure>
-        <ProfilePic user={userLogin} attributes="h-12 w-12" />
+        <ProfilePic user={userLogin} attributes="max-h-20" />
       </figure>
       <div class="card-body">
         <div class="card-actions justify-end">
@@ -167,14 +168,18 @@
                 >
               </li>
             </ul>
+            ß
           </div>
         </div>
-        <h2 class="card-title">{displayname}</h2>
-        <p>Click the button to watch on Jetflix app.</p>
-
-        <div class="card-actions justify-end">
-          <button class="btn btn-primary">Watch</button>
-        </div>
+        <h2 class="card-title">
+          <a href="#/users/{id}">{displayname}</a>
+        </h2>
+        <h2 class="card-title">
+          <p>Click the button to watch on Jetflix app.</p>
+          <div class="card-actions justify-end">
+            <button class="btn btn-primary">Watch</button>
+          </div>
+        </h2>
       </div>
     </div>
   </div>

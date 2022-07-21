@@ -87,6 +87,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
           message: `${username} left the room`,
           login: "ADMIN",
           displayname: "ADMIN",
+          id: 0,
         })
       );
     });
@@ -107,6 +108,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
       message: `${username} joined the room`,
       login: "ADMIN",
       displayname: "ADMIN",
+      id: 0,
     });
   }
 
@@ -124,11 +126,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
         message: "You cannot talk because you are muted",
         login: "ADMIN",
         displayname: "ADMIN",
+        id: 0,
       });
       return;
     }
-    const { displayname, login } = client.request.user;
+    const { displayname, login, id } = client.request.user;
 
-    client.to(channel.id).emit("newMessage", { message, login, displayname });
+    client
+      .to(channel.id)
+      .emit("newMessage", { message, login, displayname, id });
   }
 }

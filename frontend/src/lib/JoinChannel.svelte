@@ -10,21 +10,20 @@
 
   const joinChannel = () => {
     try {
-
-    axios.post(
-            `${import.meta.env.VITE_BACKEND_URI}/api/chat/join/${channelName}`,
-            {
-              password: channelPassword,
-              public: channelType == "Public",
-            },
-            {
-              withCredentials: true,
-            }
-    ); }
-    catch (e) {
-      alert(e)
+      axios.post(
+        `${import.meta.env.VITE_BACKEND_URI}/api/chat/join/${channelName}`,
+        {
+          password: channelPassword,
+          public: channelType == "Public",
+        },
+        {
+          withCredentials: true,
+        }
+      );
+    } catch (e) {
+      alert(e);
     }
-  }
+  };
   let channelType: string;
   let channelName: string;
 
