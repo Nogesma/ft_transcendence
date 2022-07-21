@@ -313,7 +313,7 @@ export class ChatService {
 
   removeAdmin = async (oid: number, chan: string, userName: string) => {
     const channel = await this.channelService.getChannelByName(chan);
-    const user = await this.userService.getUserByName(userName);
+    const user = await this.userService.getUserByLogin(userName);
 
     if (!channel || !user)
       throw new HttpException(
