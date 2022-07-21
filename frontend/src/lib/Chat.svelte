@@ -2,10 +2,8 @@
   import { io } from "socket.io-client";
   import { onMount } from "svelte";
   import axios from "axios";
-  import Modal from "./Modal.svelte";
   import { displayname, login, id } from "../stores/settings";
   import ProfilePic from "./ProfilePic.svelte";
-  import { push } from "svelte-spa-router";
 
   export let channel = "";
 
@@ -113,28 +111,29 @@
 <h1>{channel}</h1>
 <br /><br />
 {#each messagesList as { displayname, message, login: userLogin, id }, ina}
-  <div class="dropdown">
+  <div class="dropdown w-96">
     <label tabindex="0" class="" on:click={() => (currentUser = ina)}
       >{ina + 1}: {displayname}</label
     >: {message}
     <div
       tabindex="0"
-      class="dropdown-content card card-side bg-base-100 shadow-xl"
+      class="dropdown-content card card-side bg-base-100 shadow-xl max-h-fit max-w-fit"
     >
       <figure>
         <ProfilePic user={userLogin} attributes="max-h-20" />
       </figure>
-      <div class="card-body">
+      <div class="card-body max-h-fit">
         <div class="card-actions justify-end">
-          <div class="dropdown">
-            <label tabindex="0" class="btn m-1">Click</label>
+          <div class="dropdown max-h-full">
+            <label tabindex="0" class="btn m-1 max-h-full">Click</label>
             <ul
               tabindex="0"
-              class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
+              class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 max-h-full"
             >
               <li>
                 <button
-                  class="btn btn-primary"
+                  class="btn btn-primary max-h-fit
+"
                   id="ban"
                   on:click={() => banppl(userLogin)}>Ban</button
                 >
@@ -148,7 +147,7 @@
               </li>
               <li>
                 <button
-                  class="btn btn-accent"
+                  class="btn btn-accent max-h-fit"
                   id="mute"
                   on:click={() => muteppl(userLogin)}>Mute</button
                 >
