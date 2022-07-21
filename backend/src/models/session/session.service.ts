@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Session } from "./session.model.js";
-import { User } from "../user/user.model.js";
+import type { User } from "../user/user.model.js";
 
 @Injectable()
 export class SessionService {

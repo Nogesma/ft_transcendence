@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { io } from "socket.io-client";
   import { onMount } from "svelte";
+  import { chatSocket } from "../utils/socket";
   import axios from "axios";
   import { displayname, login, id } from "../stores/settings";
   import ProfilePic from "./ProfilePic.svelte";
@@ -85,9 +85,8 @@
     );
   };
 
-  const socket = io(import.meta.env.VITE_BACKEND_URI, {
-    withCredentials: true,
-  });
+  const socket = chatSocket();
+
   onMount(() => socket.emit("joinRoom", { channel }));
 
   socket.on("newMessage", (event) => {

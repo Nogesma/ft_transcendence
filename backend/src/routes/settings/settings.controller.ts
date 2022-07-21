@@ -10,8 +10,7 @@ import {
   Req,
   Res,
 } from "@nestjs/common";
-import { Request, Response } from "express";
-
+import type { Request, Response } from "express";
 import { SettingsService } from "./settings.service.js";
 import { ChannelService } from "../../models/channel/channel.service.js";
 

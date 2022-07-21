@@ -10,13 +10,11 @@ import {
 import { Server, Socket } from "socket.io";
 
 import { ConfigService } from "@nestjs/config";
-import cookieParser from "../../utils/socket-cookie-parser.js";
-import { isExpired } from "../../utils/date.js";
+import { socketAuth, socketCookieParser } from "../../utils/socket.js";
 import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
 import { SessionService } from "../../models/session/session.service.js";
-import { type Session } from "../../models/session/session.model.js";
-import { UserService } from "../../models/user/user.service.js";
-import { type Channel } from "../../models/channel/channel.model.js";
+import type { Session } from "../../models/session/session.model.js";
+import type { Channel } from "../../models/channel/channel.model.js";
 import type { User } from "../../models/user/user.model.js";
 
 export interface ExtendedError extends Error {
@@ -34,6 +32,7 @@ declare module "http" {
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
+  namespace: "chat",
 })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   @WebSocketServer()
@@ -42,40 +41,24 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   constructor(
     private readonly channelBanService: ChannelBanService,
     private readonly configService: ConfigService<EnvironmentVariables, true>,
-    private readonly sessionService: SessionService,
-    private readonly userService: UserService
+    private readonly sessionService: SessionService
   ) {}
 
-  socketUse =
-    (sessionService: SessionService) =>
-    async (socket: Socket, next: (err?: ExtendedError) => void) => {
-      const token = socket.request.signedCookies?.token;
-      if (!token) return next(new Error("Token not found"));
-
-      const session = await sessionService.getSession(token);
-      if (!session || isExpired(session.expires))
-        return next(new Error("Invalid token"));
-
-      socket.request.session = session;
-      next();
-    };
-
   getChannels = async (socket: Socket, next: (err?: ExtendedError) => void) => {
-    const user = await socket.request.session.$get("user");
-
-    if (!user) return next(new Error("User not found"));
+    const user = socket.request.user;
 
     const channels = await user.$get("member");
     if (!channels) return next(new Error("User not in any channels"));
 
     socket.request.channels = channels;
-    socket.request.user = user;
     next();
   };
 
   afterInit() {
-    this.server.use(cookieParser(this.configService.get("COOKIE_SECRET")));
-    this.server.use(this.socketUse(this.sessionService));
+    this.server.use(
+      socketCookieParser(this.configService.get("COOKIE_SECRET"))
+    );
+    this.server.use(socketAuth(this.sessionService));
     this.server.use(this.getChannels);
   }
 

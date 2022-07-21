@@ -2,6 +2,7 @@ import {
   AllowNull,
   BelongsToMany,
   Column,
+  Default,
   HasMany,
   HasOne,
   Model,
@@ -36,6 +37,12 @@ export class User extends Model {
   @AllowNull(false)
   @Column
   displayname: string;
+
+  // 0 => offline, 1 => online, 2 => in-game
+  @AllowNull(false)
+  @Default(0)
+  @Column
+  status: number;
 
   @HasMany(() => Session)
   session: Session[];

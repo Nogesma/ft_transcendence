@@ -6,7 +6,7 @@ import {
   Injectable,
   SetMetadata,
 } from "@nestjs/common";
-import { type Session } from "./models/session/session.model.js";
+import type { Session } from "./models/session/session.model.js";
 import { isExpired } from "./utils/date.js";
 import { SessionService } from "./models/session/session.service.js";
 import { Reflector } from "@nestjs/core";
