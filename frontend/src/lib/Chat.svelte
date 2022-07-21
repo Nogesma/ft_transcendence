@@ -12,8 +12,9 @@
     message: string;
     login: string;
     displayname: string;
+    id: number;
   }> = [];
-  const muteppl = (name) => {
+  const muteppl = (name: string) => {
     if (name === $login) {
       alert("You cannot mute yourself");
       return;
@@ -29,7 +30,7 @@
       }
     );
   };
-  const unmuteppl = (name) => {
+  const unmuteppl = (name: string) => {
     axios.post(
       `${import.meta.env.VITE_BACKEND_URI}/api/chat/unmute/${name}`,
       {
@@ -40,7 +41,7 @@
       }
     );
   };
-  const unbanppl = (name) => {
+  const unbanppl = (name: string) => {
     axios.post(
       `${import.meta.env.VITE_BACKEND_URI}/api/chat/unban/${name}`,
       {
@@ -51,7 +52,7 @@
       }
     );
   };
-  const banppl = (name) => {
+  const banppl = (name: string) => {
     if (name === $login) {
       alert("You cannot ban yourself");
       return;
@@ -68,7 +69,7 @@
     );
   };
 
-  const add_admin = (name) => {
+  const add_admin = (name: string) => {
     if (name === $login) {
       alert("You cannot promote yourself as admin");
       return;
@@ -104,17 +105,13 @@
     messagesList = messagesList;
     msg = "";
   };
-
-  let currentUser = 0;
 </script>
 
 <h1>{channel}</h1>
 <br /><br />
 {#each messagesList as { displayname, message, login: userLogin, id }, ina}
   <div class="dropdown w-96">
-    <label tabindex="0" class="" on:click={() => (currentUser = ina)}
-      >{ina + 1}: {displayname}</label
-    >: {message}
+    <label tabindex="0" class="" for="unused">{ina + 1}: {displayname}</label>: {message}
     <div
       tabindex="0"
       class="dropdown-content card card-side bg-base-100 shadow-xl max-h-fit max-w-fit"
@@ -125,7 +122,9 @@
       <div class="card-body max-h-fit">
         <div class="card-actions justify-end">
           <div class="dropdown max-h-full">
-            <label tabindex="0" class="btn m-1 max-h-full">Click</label>
+            <label for="unused" tabindex="0" class="btn m-1 max-h-full"
+              >Click</label
+            >
             <ul
               tabindex="0"
               class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 max-h-full"
