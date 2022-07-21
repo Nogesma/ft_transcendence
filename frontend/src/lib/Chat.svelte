@@ -4,6 +4,7 @@
   import axios from "axios";
   import Modal from "./Modal.svelte";
   import { displayname, login } from "../stores/settings";
+  import ProfilePic from "./ProfilePic.svelte";
 
   export let channel = "";
 
@@ -14,7 +15,7 @@
     displayname: string;
   }> = [];
   const muteppl = (name) => {
-    if (name === localStorage.getItem("login")) {
+    if (name === $login) {
       alert("You cannot mute yourself");
       return;
     }
@@ -52,11 +53,10 @@
     );
   };
   const banppl = (name) => {
-    if (name === localStorage.getItem("login")) {
+    if (name === $login) {
       alert("You cannot ban yourself");
       return;
     }
-    console.log(name);
     axios.post(
       `${import.meta.env.VITE_BACKEND_URI}/api/chat/ban/${name}`,
       {
@@ -70,7 +70,7 @@
   };
 
   const add_admin = (name) => {
-    if (name === localStorage.getItem("login")) {
+    if (name === $login) {
       alert("You cannot promote yourself as admin");
       return;
     }
@@ -121,7 +121,7 @@
       class="dropdown-content card card-side bg-base-100 shadow-xl"
     >
       <figure>
-        <img src="https://placeimg.com/200/280/arch" alt="Movie" />
+        <ProfilePic user={userLogin} attributes="h-12 w-12" />
       </figure>
       <div class="card-body">
         <div class="card-actions justify-end">
@@ -169,7 +169,7 @@
             </ul>
           </div>
         </div>
-        <h2 class="card-title">New movie is released!</h2>
+        <h2 class="card-title">{displayname}</h2>
         <p>Click the button to watch on Jetflix app.</p>
 
         <div class="card-actions justify-end">
