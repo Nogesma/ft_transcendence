@@ -12,8 +12,13 @@ export class ChannelAdminService {
   addAdmin = (chan: number, user: number) =>
     this.channelAdminModel.create({ chan, user });
 
-  getAdmin = (user: number) =>
-    this.channelAdminModel.findOne({ where: { id: user } });
+  removeAdmin = (chan: number, user: number) =>
+    this.channelAdminModel
+      .destroy({ where: { chan, user } })
+      .catch(console.error);
+
+  getAdmin = (chan: number, user: number) =>
+    this.channelAdminModel.findOne({ where: { chan, user } });
 
   getAllAdmin = (chan: number) =>
     this.channelAdminModel.findAll({ where: { channel: chan } });

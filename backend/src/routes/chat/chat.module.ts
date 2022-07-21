@@ -8,6 +8,7 @@ import { UserModule } from "../../models/user/user.module.js";
 import { ChannelModule } from "../../models/channel/channel.module.js";
 import { ChannelMemberModule } from "../../models/channelMember/channelMember.module.js";
 import { ChannelAdminModule } from "../../models/channelAdmin/channelAdmin.module.js";
+import { ChannelBanModule } from "../../models/channelBan/channelBan.module.js";
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ChannelAdminModule } from "../../models/channelAdmin/channelAdmin.modul
     ChannelModule,
     ChannelMemberModule,
     ChannelAdminModule,
+    ChannelBanModule,
   ],
   controllers: [ChatController],
   providers: [ChatService, ChatGateway],

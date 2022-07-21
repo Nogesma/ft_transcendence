@@ -11,6 +11,7 @@ import { Server, Socket } from "socket.io";
 
 import { ConfigService } from "@nestjs/config";
 import { socketAuth, socketCookieParser } from "../../utils/socket.js";
+import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
 import { SessionService } from "../../models/session/session.service.js";
 import type { Session } from "../../models/session/session.model.js";
 import type { Channel } from "../../models/channel/channel.model.js";
@@ -38,6 +39,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   server: Server;
 
   constructor(
+    private readonly channelBanService: ChannelBanService,
     private readonly configService: ConfigService<EnvironmentVariables, true>,
     private readonly sessionService: SessionService
   ) {}
@@ -62,9 +64,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
 
   handleConnection(@ConnectedSocket() client: Socket) {
     client.on("disconnecting", async () => {
-      const username = client.request.user.login;
+      const username = client.request.user.displayname;
       client.rooms.forEach((r) =>
-        client.to(r).emit("newMessage", `User : ${username} left the room`)
+        client.to(r).emit("newMessage", {
+          message: `${username} left the room`,
+          login: "ADMIN",
+          displayname: "ADMIN",
+          id: 0,
+        })
       );
     });
   }
@@ -77,12 +84,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     const channel = client.request.channels.find((x) => x.name == channelName);
     if (!channel) return;
 
-    const username = client.request.user.login;
+    const username = client.request.user.displayname;
 
     client.join(channel.id);
-    client
-      .to(channel.id)
-      .emit("newMessage", `User: ${username} joined the room`);
+    client.to(channel.id).emit("newMessage", {
+      message: `${username} joined the room`,
+      login: "ADMIN",
+      displayname: "ADMIN",
+      id: 0,
+    });
   }
 
   @SubscribeMessage("sendMessage")
@@ -94,8 +104,19 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     const channel = client.request.channels.find((x) => x.name == channelName);
     if (!channel) return;
 
-    const username = client.request.user.login;
+    if (await this.channelBanService.isMuted(client.request.user.id)) {
+      client.emit("newMessage", {
+        message: "You cannot talk because you are muted",
+        login: "ADMIN",
+        displayname: "ADMIN",
+        id: 0,
+      });
+      return;
+    }
+    const { displayname, login, id } = client.request.user;
 
-    client.to(channel.id).emit("newMessage", `${username}: ${message}`);
+    client
+      .to(channel.id)
+      .emit("newMessage", { message, login, displayname, id });
   }
 }
