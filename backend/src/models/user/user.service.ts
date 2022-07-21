@@ -41,7 +41,8 @@ export class UserService {
   };
 
   getUser = (id: number) => this.userModel.findByPk(id);
-
+  getUserByLogin = (login: string) =>
+    this.userModel.findOne({ where: { login } });
   getUserLogin = async (id: number) =>
     (await this.userModel.findByPk(id, { attributes: { include: ["login"] } }))
       ?.login;
