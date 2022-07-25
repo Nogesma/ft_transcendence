@@ -1,7 +1,5 @@
-import { nanoid } from "nanoid";
-
 export class Game {
-  game_id: string;
+  gameId: string;
   private readonly box: {
     width: number;
     length: number;
@@ -11,9 +9,15 @@ export class Game {
   private readonly speed: number = 0.2;
   private readonly tick_speed: number = 33;
 
-  constructor(width: number, length: number, height: number, thick: number) {
+  constructor(
+    gameId: string,
+    width: number,
+    length: number,
+    height: number,
+    thick: number
+  ) {
     this.box = { width, length, height, thick };
-    this.game_id = nanoid();
+    this.gameId = gameId;
   }
 
   get_params = () => {

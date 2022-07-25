@@ -1,10 +1,10 @@
 import { Module } from "@nestjs/common";
-import { PongController } from "./pong.controller.js";
 import { PongService } from "./pong.service.js";
+import { PongGateway } from "./pong.gateway.js";
+import { SessionModule } from "../../models/session/session.module.js";
 
 @Module({
-  imports: [],
-  controllers: [PongController],
-  providers: [PongService],
+  imports: [SessionModule],
+  providers: [PongService, PongGateway],
 })
 export class PongModule {}

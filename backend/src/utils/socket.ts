@@ -18,23 +18,50 @@ const socketAuth =
     if (!session || isExpired(session.expires))
       return next(new Error("Invalid token"));
 
-    const user = await session.$get("user");
-
-    if (!user) return next(new Error("User not found"));
-
     socket.request.session = session;
-    socket.request.user = user;
     next();
   };
 
+const addUser = async (socket: Socket, next: (err?: ExtendedError) => void) => {
+  const user = await socket.client.request.session?.$get("user");
+
+  if (!user) return next(new Error("User not found"));
+
+  socket.request.user = user;
+  next();
+};
+
+const addChannels = async (
+  socket: Socket,
+  next: (err?: ExtendedError) => void
+) => {
+  const channels = await socket.request.user?.$get("member");
+
+  if (!channels) return next(new Error("User not in any channels"));
+
+  socket.request.channels = channels;
+  next();
+};
+
+const addStats = async (
+  socket: Socket,
+  next: (err?: ExtendedError) => void
+) => {
+  const stats = await socket.request.user?.$get("stats");
+
+  if (!stats) return next(new Error("User does not have stats"));
+
+  socket.request.stats = stats;
+  next();
+};
+
 const socketCookieParser =
   (cookieSecret: string) =>
-  (socket: Socket, next: (err?: ExtendedError) => void) => {
+  (socket: Socket, next: (err?: ExtendedError) => void) =>
     cookieParser(cookieSecret)(
       socket.request as never,
       null as never,
       next as NextFunction
     );
-  };
 
-export { socketAuth, socketCookieParser };
+export { socketAuth, socketCookieParser, addUser, addChannels, addStats };

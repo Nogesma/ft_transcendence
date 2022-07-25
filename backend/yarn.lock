@@ -1591,6 +1591,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/socket.io@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "@types/socket.io@npm:3.0.2"
+  dependencies:
+    socket.io: "*"
+  checksum: 168cf77e48b466582bd69d1c25930bb657225e742288d658a03a1e8af254350daa61f9441ec2be0d8354f1dcc747966e4342000bce875549fe54ec03e2fafec3
+  languageName: node
+  linkType: hard
+
 "@types/speakeasy@npm:^2.0.7":
   version: 2.0.7
   resolution: "@types/speakeasy@npm:2.0.7"
@@ -2319,6 +2328,7 @@ __metadata:
     "@types/node": ^18.0.6
     "@types/ramda": ^0.28.15
     "@types/sequelize": ^4.28.14
+    "@types/socket.io": ^3.0.2
     "@types/speakeasy": ^2.0.7
     "@types/supertest": ^2.0.12
     "@typescript-eslint/eslint-plugin": ^5.30.7
@@ -6976,7 +6986,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"socket.io@npm:4.5.1, socket.io@npm:^4.5.1":
+"socket.io@npm:*, socket.io@npm:4.5.1, socket.io@npm:^4.5.1":
   version: 4.5.1
   resolution: "socket.io@npm:4.5.1"
   dependencies:

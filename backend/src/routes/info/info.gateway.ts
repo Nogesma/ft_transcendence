@@ -9,24 +9,9 @@ import {
   OnGatewayDisconnect,
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-
 import { ConfigService } from "@nestjs/config";
-import { socketAuth, socketCookieParser } from "../../utils/socket.js";
+import { addUser, socketAuth, socketCookieParser } from "../../utils/socket.js";
 import { SessionService } from "../../models/session/session.service.js";
-import type { Session } from "../../models/session/session.model.js";
-import type { User } from "../../models/user/user.model.js";
-
-export interface ExtendedError extends Error {
-  data?: never;
-}
-
-declare module "http" {
-  export interface IncomingMessage {
-    session: Session;
-    user: User;
-    signedCookies: { token: string };
-  }
-}
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
@@ -48,6 +33,7 @@ export class InfoGateway
       socketCookieParser(this.configService.get("COOKIE_SECRET"))
     );
     this.server.use(socketAuth(this.sessionService));
+    this.server.use(addUser);
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {

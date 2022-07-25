@@ -7,7 +7,7 @@ export class PongService {
 
   //todo change into get game data (pos etc)
   getGame = async (game_id: string) => {
-    const game = this.games.find((game) => game.game_id === game_id);
+    const game = this.games.find((game) => game.gameId === game_id);
     if (!game)
       throw new HttpException(
         "Could not find game",
@@ -16,9 +16,10 @@ export class PongService {
     return game.get_params();
   };
 
-  newGame = async () => {
-    const game = new Game(15, 30, 4, 2);
+  newGame = async (gameId: string, player1: number, player2: number) => {
+    console.log({ player1, player2, gameId });
+    const game = new Game(gameId, 15, 30, 4, 2);
     this.games.push(game);
-    return { game_id: game.game_id, params: game.get_params() };
+    return { game_id: game, params: game.get_params() };
   };
 }

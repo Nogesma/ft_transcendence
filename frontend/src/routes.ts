@@ -15,6 +15,9 @@ export default {
   "/auth/oauth2callback": wrap({
     asyncComponent: () => import("./routes/auth/Callback.svelte"),
   }),
+  "/game": wrap({
+    asyncComponent: () => import("./routes/Game.svelte"),
+  }),
   "*": wrap({
     asyncComponent: () => import("./routes/404.svelte"),
   }),
