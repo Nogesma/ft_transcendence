@@ -5,6 +5,7 @@ import {
   ConnectedSocket,
   OnGatewayInit,
   OnGatewayDisconnect,
+  MessageBody,
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 
@@ -16,7 +17,6 @@ import {
   socketCookieParser,
 } from "../../utils/socket.js";
 import { SessionService } from "../../models/session/session.service.js";
-import { equals, includes, reject } from "ramda";
 import { PongService } from "./pong.service.js";
 import { nanoid } from "nanoid";
 
@@ -27,7 +27,9 @@ import { nanoid } from "nanoid";
 export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
-  queue: Array<{ userId: number; socketId: string }> = [];
+  // we might want to user <elo, {uid, sid}> to do elo based matchmaking?
+  // userId, socketId
+  queue = new Map<number, string>();
 
   constructor(
     private readonly configService: ConfigService<EnvironmentVariables, true>,
@@ -45,49 +47,64 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    const id = { userId: client.request.user.id, socketId: client.id };
-
-    this.queue = reject(equals(id), this.queue);
+    this.queue.delete(client.request.user.id);
+    // todo: remove from all games if spectating;
   }
 
   @SubscribeMessage("joinQueue")
   async joinQueue(@ConnectedSocket() client: Socket) {
-    const id = { userId: client.request.user.id, socketId: client.id };
-    if (!includes(id, this.queue)) this.queue.push(id);
+    this.queue.set(client.request.user.id, client.id);
 
     client.emit("inQueue", null);
 
-    if (this.queue.length >= 2) {
-      console.log(this.queue);
+    if (this.queue.size >= 2) {
       const gameId = nanoid();
 
-      const p1 = this.queue.shift();
-      const p2 = this.queue.shift();
+      const [p1, p2] = Array.from(this.queue.keys());
 
       if (!p1 || !p2) throw new Error("ID is null when starting game");
 
-      this.server.to(p1.socketId).to(p2.socketId).socketsJoin(gameId);
+      const s1 = this.queue.get(p1);
+      this.queue.delete(p1);
+      const s2 = this.queue.get(p2);
+      this.queue.delete(p2);
 
-      this.pongService.newGame(gameId, p1.userId, p2.userId);
+      if (!s1 || !s2) throw new Error("Socket is null when starting game");
 
-      this.server
-        .to(gameId)
-        .emit("matchFound", { p1: p1.userId, p2: p2.userId });
+      this.server.to(s1).to(s2).socketsJoin(gameId);
+
+      this.pongService.newGame(gameId, p1, p2);
+
+      this.server.to(gameId).emit("matchFound", gameId);
     }
   }
 
   @SubscribeMessage("leaveQueue")
   async leaveQueue(@ConnectedSocket() client: Socket) {
-    const id = { userId: client.request.user.id, socketId: client.id };
-    if (!includes(id, this.queue)) this.queue.push(id);
-
-    this.queue = reject(equals(id), this.queue);
-
+    this.queue.delete(client.request.user.id);
     client.emit("notQueue", null);
   }
 
-  @SubscribeMessage("playerReady")
-  async handleGameStart(@ConnectedSocket() client: Socket) {
-    // todo
+  @SubscribeMessage("joinGame")
+  async handleGameStart(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() gameId: string
+  ) {
+    //todo: we need to make sure the user is not in another game, or at least
+    // that he isn't using the same socket (this applies for playing and spectating)
+    const id = client.request.user.id;
+
+    const game = this.pongService.getGame(gameId);
+    // we emit an object without any attributes if a game doesn't exist
+    if (!game) return client.emit("gameInfo", {});
+
+    client.join(gameId);
+
+    if (game.isSpectator(id)) {
+      game.newSpectator(id);
+      client.to(gameId).emit("newSpectator", id);
+    }
+
+    client.emit("gameInfo", game.getInfo());
   }
 }

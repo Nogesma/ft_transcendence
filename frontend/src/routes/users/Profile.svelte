@@ -7,6 +7,7 @@
   import TFAInput from "../../lib/2faInput.svelte";
   import Modal from "../../lib/Modal.svelte";
   import { getUserData } from "../../utils/auth";
+  import { getUserInfo, getUserStats } from "../../utils/info.js";
 
   const getTFAStatus = () =>
     axios
@@ -14,22 +15,6 @@
         withCredentials: true,
       })
       .then(({ data }) => (tfa_enabled = data));
-
-  const getUserInfo = () =>
-    axios
-      .get(`${import.meta.env.VITE_BACKEND_URI}/api/info/${uid}`, {
-        withCredentials: true,
-      })
-      .then(({ data }) => data)
-      .catch(console.error);
-
-  const getUserStats = () =>
-    axios
-      .get(`${import.meta.env.VITE_BACKEND_URI}/api/info/stats/${uid}`, {
-        withCredentials: true,
-      })
-      .then(({ data }) => data)
-      .catch(console.error);
 
   const updateUserName = async () =>
     axios
@@ -54,7 +39,7 @@
           "Content-Type": "multipart/form-data",
         },
       })
-      .then(() => $updatepfp++); // todo: find a way to update avatar in <Profile />
+      .then(() => $updatepfp++);
   };
 
   const resetAvatar = () =>
@@ -62,7 +47,7 @@
       .delete(`${import.meta.env.VITE_BACKEND_URI}/api/user/avatar`, {
         withCredentials: true,
       })
-      .then(() => $updatepfp++); // todo: find a way to update avatar in <Profile />
+      .then(() => $updatepfp++);
 
   const request2FA = async () => {
     if (!tfa_enabled)
@@ -95,7 +80,7 @@
   $: if (uid === $id) getTFAStatus();
 </script>
 
-{#await getUserInfo() then { login, displayname: name, status }}
+{#await getUserInfo(uid) then { login, displayname: name, status }}
   <div class="hero min-h-screen bg-base-200">
     <div class="hero-content flex-col lg:flex-row justify-start w-full">
       <ProfilePic
@@ -108,7 +93,7 @@
           {uid === $id ? $displayname : name}
         </h1>
 
-        {#await getUserStats() then { wins, losses, elo, highestElo }}
+        {#await getUserStats(uid) then { wins, losses, elo, highestElo }}
           <div class="flex flex-row space-x-4">
             <table class="table table-zebra w-full flex-auto">
               <thead>

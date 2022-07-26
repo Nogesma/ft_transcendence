@@ -1,97 +1,143 @@
 <script lang="ts">
   import { gameSocket } from "../utils/socket";
-  import { Socket } from "socket.io-client";
+  import type { Socket } from "socket.io-client";
   import { id } from "../stores/settings";
-  import dayjs, { Dayjs } from "dayjs";
-  import { divide } from "ramda";
+  import { getUserInfo, getUserStats } from "../utils/info.js";
+  import ProfilePic from "../lib/ProfilePic.svelte";
+  import Matchmaking from "../lib/Pong/Matchmaking.svelte";
+  import { isNil } from "ramda";
+  import { params } from "svelte-spa-router";
 
-  let socket: Socket | null;
+  const initCanvas = (width: number, height: number) => {
+    const cv = <HTMLCanvasElement>document.getElementById("game");
 
-  // 0 => before matchmaking, 1 => matchmaking, 2 => in game
-  let state = 0;
-  let timeout;
+    if (!cv) throw new Error("Canvas does not exist.");
 
-  let p1: number, p2: number;
+    cv.height = height;
+    cv.width = width;
 
-  const registerHandlers = (s) => {
-    s.on("inQueue", () => {
-      start = dayjs();
-      state = 1;
-      time = "00:00";
-      timeout = setInterval(
-        () => (time = secondsToTime(divide(dayjs().diff(start), 1000))),
-        1000
-      );
-    });
+    ctx = cv.getContext("2d");
 
-    s.on("notQueue", () => {
-      state = 0;
-      clearTimeout(timeout);
-    });
+    if (!ctx) throw new Error("Context does not exist.");
 
-    s.on("matchFound", (p) => {
-      state = 2;
-      p1 = p.p1;
-      p2 = p.p2;
-    });
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, width, height);
   };
 
-  const initSocket = () => {
-    const s = gameSocket();
-    registerHandlers(s);
+  const registerListenners = (s: Socket) => {
+    s.on(
+      "gameInfo",
+      // i fucking love typescript
+      ({
+        width,
+        height,
+        p1,
+        p2,
+      }: {
+        width: number;
+        height: number;
+        p1: number;
+        p2: number;
+      }) => {
+        if (!width) return alert(`No game with id: ${gameId} found.`);
 
-    return s;
+        console.log("received game info");
+        initCanvas(width, height);
+
+        player1 = p1;
+        player2 = p2;
+
+        isSpectating = $id === p1 || $id === p2;
+
+        console.log(player1, player2);
+        // only register frame handler after canvas is init
+        // todo: frame handler
+        // s.on("frame", (data) => {
+        // drawFrame(data);
+        // window.requestAnimationFrame(() => {
+        // we dont need a callback for now;
+        // });
+        // });
+      }
+    );
   };
 
-  $: if ($id !== 0) socket = initSocket();
-
-  const joinQueue = () => {
-    if (socket) socket.emit("joinQueue", null);
-  };
-
-  const leaveQueue = () => {
-    if (socket) socket.emit("leaveQueue", null);
-  };
-
-  let start: Dayjs, time: string;
-
-  const secondsToTime = (time: number): string => {
-    if (time === Infinity || time == -Infinity) {
-      return "DNF";
+  // todo:
+  // we need to decide how we send events
+  // either send one event on each keydown and allow repeated events
+  // or send a event on keydown and one on keyup, <== this one is probably better but a bit harder to implement
+  const handleKeydown = (event: KeyboardEvent) => {
+    if (isSpectating || event.repeat) return;
+    if (event.key === "up") {
+      //todo: send event;
     }
-
-    let min = String(Math.floor(time / 60));
-    let s = (time - min * 60).toFixed(0);
-    if (s.length === 1) {
-      s = "0" + s;
+    if (event.key === "down") {
+      // todo: send event;
     }
-
-    if (min.length === 1) {
-      min = "0" + min;
-    }
-
-    return `${min + ":"}${s}`;
   };
+
+  const handleKeyup = (event: KeyboardEvent) => {
+    if (isSpectating || event.repeat) return;
+    if (event.key === "up") {
+      //todo: send event;
+    }
+    if (event.key === "down") {
+      // todo: send event;
+    }
+  };
+
+  let socket: Socket | undefined;
+  let isSpectating = true;
+
+  let ctx: CanvasRenderingContext2D | null;
+  let player1: number, player2: number;
+
+  $: if ($id !== 0) {
+    socket = gameSocket();
+    console.log(socket);
+  }
+
+  $: gameId = $params?.id;
+
+  $: if (gameId && socket) {
+    console.log("registering", gameId, socket);
+    registerListenners(socket);
+    socket.emit("joinGame", gameId);
+  }
 </script>
 
-{#if state !== 2}
-  <div class="hero min-h-screen">
-    <div class="hero-content text-center">
-      <div>
-        <h1 class="text-5xl font-bold pb-40">Start game !</h1>
-        {#if state === 0}
-          <button class="btn btn-active btn-primary btn-lg" on:click={joinQueue}
-            >Ready</button
-          >
-        {:else}
-          <button
-            class="btn btn-active btn-primary btn-lg"
-            on:click={leaveQueue}>{time}</button
-          >
-        {/if}
-      </div>
-    </div>
-  </div>
+<svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
+
+{#if isNil(gameId)}
+  {#if socket}
+    <Matchmaking {socket} />
+  {/if}
 {:else}
-  Game;
+  <div class="flex flex-auto justify-around flex-nowrap">
+    {#if player1}
+      <div class="flex-col">
+        {#await getUserInfo(player1) then { login, displayname: name }}
+          <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
+          {name}
+          {#await getUserStats(player1) then { elo }}
+            {elo}
+          {/await}
+        {/await}
+      </div>
+    {/if}
+
+    <canvas id="game" />
+
+    {#if player2}
+      <div class="flex-col">
+        {#await getUserInfo(player2) then { login, displayname: name }}
+          <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
+          {name}
+          {#await getUserStats(player2) then { elo }}
+            {elo}
+          {/await}
+        {/await}
+      </div>
+    {/if}
+  </div>
 {/if}
