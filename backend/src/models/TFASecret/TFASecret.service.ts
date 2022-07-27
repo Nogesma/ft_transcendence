@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { TFASecret } from "./TFASecret.model.js";
-import type { User } from "../user/user.model.js";
 
 @Injectable()
 export class TFASecretService {
@@ -10,11 +9,9 @@ export class TFASecretService {
     private tfaSecretModel: typeof TFASecret
   ) {}
 
-  createTFASecret = (id: number, secret: string, temp: boolean) =>
-    this.tfaSecretModel.create({ id, secret, temp });
+  createTFASecret = (userId: number, secret: string, temp: boolean) =>
+    this.tfaSecretModel.create({ userId, secret, temp });
 
-  getTFASecret = (id: number) => this.tfaSecretModel.findOne({ where: { id } });
-
-  setTFASecretTemp = (user: User, temp: boolean) =>
-    this.tfaSecretModel.update({ temp }, { where: { user } });
+  getTFASecret = (userId: number) =>
+    this.tfaSecretModel.findOne({ where: { userId } });
 }

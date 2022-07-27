@@ -28,7 +28,7 @@ export class User extends Model {
   @Unique
   @AllowNull(false)
   @Column
-  id: number;
+  declare id: number;
 
   @AllowNull(false)
   @Column

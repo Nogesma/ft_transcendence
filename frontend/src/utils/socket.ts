@@ -1,13 +1,20 @@
 import { io } from "socket.io-client";
 
+const backendUri = import.meta.env.VITE_BACKEND_URI;
+
 const chatSocket = () =>
-  io(`${import.meta.env.VITE_BACKEND_URI}/chat`, {
+  io(`${backendUri}/chat`, {
     withCredentials: true,
   });
 
 const statusSocket = () =>
-  io(`${import.meta.env.VITE_BACKEND_URI}/status`, {
+  io(`${backendUri}/status`, {
     withCredentials: true,
   });
 
-export { chatSocket, statusSocket };
+const gameSocket = () =>
+  io(`${backendUri}/pong`, {
+    withCredentials: true,
+  });
+
+export { chatSocket, statusSocket, gameSocket };

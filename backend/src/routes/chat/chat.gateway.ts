@@ -10,25 +10,14 @@ import {
 import { Server, Socket } from "socket.io";
 
 import { ConfigService } from "@nestjs/config";
-import { socketAuth, socketCookieParser } from "../../utils/socket.js";
+import {
+  addChannels,
+  addUser,
+  socketAuth,
+  socketCookieParser,
+} from "../../utils/socket.js";
 import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
 import { SessionService } from "../../models/session/session.service.js";
-import type { Session } from "../../models/session/session.model.js";
-import type { Channel } from "../../models/channel/channel.model.js";
-import type { User } from "../../models/user/user.model.js";
-
-export interface ExtendedError extends Error {
-  data?: never;
-}
-
-declare module "http" {
-  export interface IncomingMessage {
-    session: Session;
-    channels: Channel[];
-    user: User;
-    signedCookies: { token: string };
-  }
-}
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
@@ -44,22 +33,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     private readonly sessionService: SessionService
   ) {}
 
-  getChannels = async (socket: Socket, next: (err?: ExtendedError) => void) => {
-    const user = socket.request.user;
-
-    const channels = await user.$get("member");
-    if (!channels) return next(new Error("User not in any channels"));
-
-    socket.request.channels = channels;
-    next();
-  };
-
   afterInit() {
     this.server.use(
       socketCookieParser(this.configService.get("COOKIE_SECRET"))
     );
     this.server.use(socketAuth(this.sessionService));
-    this.server.use(this.getChannels);
+    this.server.use(addUser);
+    this.server.use(addChannels);
   }
 
   handleConnection(@ConnectedSocket() client: Socket) {
