@@ -45,5 +45,12 @@ export class Game {
     spectators: this.spectatorList,
   });
 
+  isPlayer = (id: number) => id === this.player1 || id === this.player2;
+
   isSpectator = (id: number) => id !== this.player1 && id !== this.player2;
+
+  playerDisconnect = (id: number) => {
+    //todo: handle player disconnection, maybe allow him 10s to reconnect?
+    console.log("player disconnected: ", id);
+  };
 }

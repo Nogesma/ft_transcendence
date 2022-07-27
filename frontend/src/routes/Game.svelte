@@ -33,23 +33,24 @@
         height,
         p1,
         p2,
+        spectators,
       }: {
         width: number;
         height: number;
         p1: number;
         p2: number;
+        spectators: Set<number>;
       }) => {
         if (!width) return alert(`No game with id: ${gameId} found.`);
 
-        console.log("received game info");
         initCanvas(width, height);
 
         player1 = p1;
         player2 = p2;
+        spectatorList = spectators;
 
         isSpectating = $id === p1 || $id === p2;
 
-        console.log(player1, player2);
         // only register frame handler after canvas is init
         // todo: frame handler
         // s.on("frame", (data) => {
@@ -58,6 +59,9 @@
         // we dont need a callback for now;
         // });
         // });
+
+        s.on("newSpectator", (id) => spectatorList.add(id));
+        s.on("delSpectator", (id) => spectatorList.delete(id));
       }
     );
   };
@@ -88,6 +92,7 @@
 
   let socket: Socket | undefined;
   let isSpectating = true;
+  let spectatorList: Set<number>;
 
   let ctx: CanvasRenderingContext2D | null;
   let player1: number, player2: number;
@@ -139,5 +144,13 @@
         {/await}
       </div>
     {/if}
+  </div>
+  <div class="flex flex-auto justify-center">
+    {#each [...spectatorList] as spec}
+      {#await getUserInfo(spec) then { login, displayname: name }}
+        <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
+        {name}
+      {/await}
+    {/each}
   </div>
 {/if}

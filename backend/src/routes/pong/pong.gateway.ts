@@ -47,8 +47,10 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    this.queue.delete(client.request.user.id);
-    // todo: remove from all games if spectating;
+    const id = client.request.user.id;
+
+    this.queue.delete(id);
+    this.pongService.disconnectClient(id);
   }
 
   @SubscribeMessage("joinQueue")
@@ -106,5 +108,27 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
     }
 
     client.emit("gameInfo", game.getInfo());
+  }
+
+  @SubscribeMessage("leaveGame")
+  async handleGameLeave(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() gameId: string
+  ) {
+    const id = client.request.user.id;
+
+    const game = this.pongService.getGame(gameId);
+    if (!game) return;
+
+    client.leave(gameId);
+
+    if (game.isSpectator(id)) {
+      game.newSpectator(id);
+      client.to(gameId).emit("delSpectator", id);
+    } else {
+      //todo: player chose to leave the game, forfeit immediatly.
+      // unwanted disconnections where the player will have a chance to join again
+      // will be handled in the handleDisconnection function
+    }
   }
 }
