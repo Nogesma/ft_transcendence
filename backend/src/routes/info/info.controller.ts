@@ -7,8 +7,13 @@ export class InfoController {
   constructor(private readonly infoService: InfoService) {}
 
   @Get(":id")
-  async getUserData(@Param("id") id: number) {
-    return this.infoService.getUserStats(id);
+  async getUserInfo(@Param("id") id: number) {
+    return this.infoService.getUserInfo(id);
+  }
+
+  @Get("stats/:id")
+  async getUserStats(@Param("id") id: number) {
+    return (await this.infoService.getUserStats(id)).toJSON();
   }
 
   @Get("/game/history/:id")

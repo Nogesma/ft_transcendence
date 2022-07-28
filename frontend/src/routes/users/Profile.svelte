@@ -2,11 +2,12 @@
   import ProfilePic from "../../lib/ProfilePic.svelte";
   import axios from "axios";
   import { push } from "svelte-spa-router";
-  import { getUserData } from "../../utils/auth";
   import { displayname, id, updatepfp } from "../../stores/settings.js";
   import QRCode from "qrcode";
   import TFAInput from "../../lib/2faInput.svelte";
   import Modal from "../../lib/Modal.svelte";
+  import { getUserData } from "../../utils/auth";
+  import { getUserInfo, getUserStats } from "../../utils/info.js";
 
   const getTFAStatus = () =>
     axios
@@ -14,14 +15,6 @@
         withCredentials: true,
       })
       .then(({ data }) => (tfa_enabled = data));
-
-  const getUserStats = () =>
-    axios
-      .get(`${import.meta.env.VITE_BACKEND_URI}/api/info/${uid}`, {
-        withCredentials: true,
-      })
-      .then(({ data }) => data)
-      .catch(console.error);
 
   const updateUserName = async () =>
     axios
@@ -46,7 +39,7 @@
           "Content-Type": "multipart/form-data",
         },
       })
-      .then(() => $updatepfp++); // todo: find a way to update avatar in <Profile />
+      .then(() => $updatepfp++);
   };
 
   const resetAvatar = () =>
@@ -54,7 +47,7 @@
       .delete(`${import.meta.env.VITE_BACKEND_URI}/api/user/avatar`, {
         withCredentials: true,
       })
-      .then(() => $updatepfp++); // todo: find a way to update avatar in <Profile />
+      .then(() => $updatepfp++);
 
   const request2FA = async () => {
     if (!tfa_enabled)
@@ -87,52 +80,56 @@
   $: if (uid === $id) getTFAStatus();
 </script>
 
-{#await getUserStats()}
-  ...
-{:then { login, displayname: name, win, losses, elo, highestElo }}
+{#await getUserInfo(uid) then { login, displayname: name, status }}
   <div class="hero min-h-screen bg-base-200">
     <div class="hero-content flex-col lg:flex-row justify-start w-full">
-      <ProfilePic attributes="max-w-sm rounded-lg shadow-2xl" user={login} />
+      <ProfilePic
+        attributes="max-w-sm rounded-lg shadow-2xl"
+        user={login}
+        {status}
+      />
       <div class="flex flex-col ml-6 space-y-6 content-start">
         <h1 class="text-5xl font-bold">
           {uid === $id ? $displayname : name}
         </h1>
-        <div class="flex flex-row space-x-4">
-          <table class="table table-zebra w-full flex-auto">
-            <thead>
-              <tr>
-                <th>Win</th>
-                <th>Loss</th>
-                <th>Ratio (%)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{win}</td>
-                <td>{losses}</td>
-                <td>{losses !== 0 ? (win / losses) * 100 : 100}%</td>
-              </tr>
-            </tbody>
-          </table>
-          <table class="table table-zebra w-full flex-auto">
-            <thead>
-              <tr>
-                <th>Current Elo</th>
-                <th>Highest Elo</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{elo}</td>
-                <td>{highestElo}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
 
+        {#await getUserStats(uid) then { wins, losses, elo, highestElo }}
+          <div class="flex flex-row space-x-4">
+            <table class="table table-zebra w-full flex-auto">
+              <thead>
+                <tr>
+                  <th>Win</th>
+                  <th>Loss</th>
+                  <th>Ratio (%)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{wins}</td>
+                  <td>{losses}</td>
+                  <td>{losses !== 0 ? (wins / losses) * 100 : 100}%</td>
+                </tr>
+              </tbody>
+            </table>
+            <table class="table table-zebra w-full flex-auto">
+              <thead>
+                <tr>
+                  <th>Current Elo</th>
+                  <th>Highest Elo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{elo}</td>
+                  <td>{highestElo}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        {/await}
         <button
           class="btn btn-primary"
-          on:click={() => push(`/users/history/${id}`)}
+          on:click={() => push(`/users/history/${uid}`)}
           >Match History
         </button>
         {#if uid === $id}

@@ -16,11 +16,11 @@ import {
 } from "ramda";
 import { ChannelService } from "../../models/channel/channel.service.js";
 import { ChannelMemberService } from "../../models/channelMember/channelMember.service.js";
-import { type User } from "../../models/user/user.model.js";
+import type { User } from "../../models/user/user.model.js";
 import { ChannelAdminService } from "../../models/channelAdmin/channelAdmin.service.js";
-import { type Channel } from "../../models/channel/channel.model.js";
+import type { Channel } from "../../models/channel/channel.model.js";
 import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
-import { type Dayjs } from "dayjs";
+import type { Dayjs } from "dayjs";
 
 @Injectable()
 export class ChatService {
@@ -57,7 +57,6 @@ export class ChatService {
         "You are banned so go away",
         HttpStatus.FORBIDDEN
       );
-      return;
     }
     if (!channel)
       throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);

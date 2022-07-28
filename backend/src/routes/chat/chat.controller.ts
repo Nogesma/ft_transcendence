@@ -10,7 +10,7 @@ import {
 } from "@nestjs/common";
 import { ChatService } from "./chat.service.js";
 import { MessageBody } from "@nestjs/websockets";
-import { Request } from "express";
+import type { Request } from "express";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat.js";
 

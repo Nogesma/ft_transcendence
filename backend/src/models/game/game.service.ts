@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Game } from "./game.model.js";
-import { type User } from "../user/user.model.js";
+import type { User } from "../user/user.model.js";
 import { StatsService } from "../stats/stats.service.js";
 import dayjs from "dayjs";
 import { getElo } from "../../utils/elo.js";
@@ -24,7 +24,7 @@ export class GameService {
     if (!p2Stats) p2Stats = await this.statsService.initStats(p2.id);
 
     const scoreP1 = getElo(
-      p1Stats.win + p1Stats.losses,
+      p1Stats.wins + p1Stats.losses,
       p1Stats.highestElo,
       p1Stats.elo,
       p2Stats.elo,
@@ -32,7 +32,7 @@ export class GameService {
     );
 
     const scoreP2 = getElo(
-      p2Stats.win + p2Stats.losses,
+      p2Stats.wins + p2Stats.losses,
       p2Stats.highestElo,
       p2Stats.elo,
       p1Stats.elo,

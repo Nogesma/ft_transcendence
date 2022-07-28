@@ -21,6 +21,6 @@ import { ChannelBanModule } from "../../models/channelBan/channelBan.module.js";
     ChannelBanModule,
   ],
   controllers: [ChatController],
-  providers: [ChatService, ChatGateway, UserModule],
+  providers: [ChatService, ChatGateway],
 })
 export class ChatModule {}

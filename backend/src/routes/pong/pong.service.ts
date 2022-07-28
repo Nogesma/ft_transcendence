@@ -1,24 +1,21 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { Game } from "../../game/game.js";
 
 @Injectable()
 export class PongService {
-  private games: Array<Game> = [];
+  private games = new Map<string, Game>();
 
   //todo change into get game data (pos etc)
-  getGame = async (game_id: string) => {
-    const game = this.games.find((game) => game.game_id === game_id);
-    if (!game)
-      throw new HttpException(
-        "Could not find game",
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    return game.get_params();
-  };
+  getGame = (id: string) => this.games.get(id);
 
-  newGame = async () => {
-    const game = new Game(15, 30, 4, 2);
-    this.games.push(game);
-    return { game_id: game.game_id, params: game.get_params() };
+  disconnectClient = (id: number) =>
+    this.games.forEach((x) =>
+      x.isPlayer(id) ? x.playerDisconnect(id) : x.removeSpectator(id)
+    );
+
+  newGame = async (gameId: string, player1: number, player2: number) => {
+    const game = new Game(gameId, player1, player2, 1600, 30, 900, 2);
+    this.games.set(gameId, game);
+    return { game_id: game, params: game.get_params() };
   };
 }

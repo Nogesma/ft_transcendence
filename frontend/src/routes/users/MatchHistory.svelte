@@ -5,18 +5,35 @@
 
   dayjs.extend(relativeTime);
   import ProfilePic from "../../lib/ProfilePic.svelte";
-  import { displayname, login } from "../../stores/settings.js";
+  import { displayname, id, login } from "../../stores/settings.js";
 
   export let params: { id: number };
 
-  const id = params.id;
+  const uid: number = params?.id ?? $id;
+
+  const getUserInfo = () =>
+    axios
+      .get(`${import.meta.env.VITE_BACKEND_URI}/api/info/${uid}`, {
+        withCredentials: true,
+      })
+      .then(({ data }) => data)
+      .catch(console.error);
 
   const getUserMatchHistory = () =>
     axios
-      .get(`${import.meta.env.VITE_BACKEND_URI}/api/info/game/history/${id}`, {
+      .get(`${import.meta.env.VITE_BACKEND_URI}/api/info/game/history/${uid}`, {
         withCredentials: true,
       })
       .then(({ data }) => data);
+
+  let ulogin: string, udisplayname: string;
+
+  if (uid == $id) [ulogin, udisplayname] = [$login, $displayname];
+  else
+    getUserInfo().then(
+      ({ login, displayname }) =>
+        ([ulogin, udisplayname] = [login, displayname])
+    );
 </script>
 
 {#await getUserMatchHistory()}
@@ -39,11 +56,11 @@
             <div class="flex content-center">
               <div class="avatar px-5">
                 <div class="w-10 h-10">
-                  <ProfilePic attributes="rounded-full" user={$login} />
+                  <ProfilePic attributes="rounded-full" user={ulogin} />
                 </div>
               </div>
               <div class="flex place-items-center">
-                {$displayname}
+                {udisplayname}
               </div>
             </div>
           </td>

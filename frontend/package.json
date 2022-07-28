@@ -17,11 +17,11 @@
     "@types/qrcode": "^1.4.2",
     "@types/ramda": "^0.28.15",
     "@types/three": "^0.142.0",
-    "@typescript-eslint/eslint-plugin": "^5.30.7",
-    "@typescript-eslint/parser": "^5.30.7",
+    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/parser": "^5.31.0",
     "autoprefixer": "^10.4.7",
     "axios": "^0.27.2",
-    "daisyui": "^2.19.1",
+    "daisyui": "^2.20.0",
     "dayjs": "^1.11.4",
     "eslint": "^8.20.0",
     "eslint-config-prettier": "^8.5.0",
@@ -42,7 +42,7 @@
     "three": "^0.142.0",
     "tslib": "^2.4.0",
     "typescript": "^4.7.4",
-    "vite": "^3.0.2",
+    "vite": "^3.0.3",
     "vite-plugin-compression": "^0.5.1"
   }
 }

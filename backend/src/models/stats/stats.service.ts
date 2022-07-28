@@ -11,7 +11,7 @@ export class StatsService {
 
   initStats = async (userId: number) =>
     this.statsModel.create({
-      win: 0,
+      wins: 0,
       losses: 0,
       elo: 1000,
       highestElo: 1000,
@@ -24,7 +24,7 @@ export class StatsService {
     win: boolean,
     score: number
   ) => {
-    if (win) player.win++;
+    if (win) player.wins++;
     else player.losses++;
 
     player.elo += score;
@@ -35,5 +35,8 @@ export class StatsService {
   };
 
   getStats = async (userId: number) =>
-    this.statsModel.findOne({ where: { userId } });
+    this.statsModel.findOne({
+      where: { userId },
+      attributes: { include: ["wins", "losses", "elo", "highestElo"] },
+    });
 }

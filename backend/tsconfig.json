@@ -20,6 +20,7 @@
     "noFallthroughCasesInSwitch": true,
     "strict": true,
     "alwaysStrict": true,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "importsNotUsedAsValues": "error"
   }
 }

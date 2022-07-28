@@ -17,7 +17,7 @@ export class TFASecret extends Model {
   @ForeignKey(() => User)
   @PrimaryKey
   @Column
-  id: number;
+  userId: number;
 
   @BelongsTo(() => User)
   user: ReturnType<() => User>;

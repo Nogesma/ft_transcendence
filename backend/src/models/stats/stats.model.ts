@@ -13,7 +13,7 @@ import { User } from "../user/user.model.js";
 export class Stats extends Model {
   @AllowNull(false)
   @Column
-  win: number;
+  wins: number;
 
   @AllowNull(false)
   @Column
