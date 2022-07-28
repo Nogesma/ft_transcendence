@@ -30,6 +30,10 @@
       }
     );
   };
+  const sendpm = (name: string) => {
+    let str = $login;
+    socket.emit("sendpm", { name, str });
+  };
   const unmuteppl = (name: string) => {
     axios.post(
       `${import.meta.env.VITE_BACKEND_URI}/api/chat/unmute/${name}`,
@@ -92,6 +96,10 @@
   socket.on("newMessage", (event) => {
     messagesList.push(event);
     messagesList = messagesList;
+  });
+  socket.on("receivepm", (event) => {
+    console.log("test");
+    alert(event);
   });
   const sendmsg = () => {
     socket.emit("sendMessage", { channel, msg });
@@ -174,7 +182,9 @@
         <h2 class="card-title">
           <p>Click the button to watch on Jetflix app.</p>
           <div class="card-actions justify-end">
-            <button class="btn btn-primary">Watch</button>
+            <button on:click={() => sendpm(userLogin)} class="btn btn-primary"
+              >send pm to {displayname}</button
+            >
           </div>
         </h2>
       </div>

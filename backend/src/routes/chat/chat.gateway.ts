@@ -18,6 +18,7 @@ import {
 } from "../../utils/socket.js";
 import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
 import { SessionService } from "../../models/session/session.service.js";
+import { UserService } from "../../models/user/user.service.js";
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
@@ -29,6 +30,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
 
   constructor(
     private readonly channelBanService: ChannelBanService,
+    private readonly userService: UserService,
     private readonly configService: ConfigService<EnvironmentVariables, true>,
     private readonly sessionService: SessionService
   ) {}
@@ -74,7 +76,26 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
       id: 0,
     });
   }
-
+  @SubscribeMessage("sendpm")
+  async handlepm(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("name") receiverName: string,
+    @MessageBody("str") senderlogin: string
+  ) {
+    const channel = client.request.channels.find((x) => x.name);
+    if (!channel) {
+      console.log("test");
+      return;
+    }
+    const receiver = await this.userService.getUserByLogin(receiverName);
+    if (!receiver) {
+      console.log("test");
+      return;
+    } // todo proper error msg
+    const { displayname, login, id } = receiver;
+    console.log(channel.name);
+    client.to(channel.id).emit("receivepm", { displayname, login, id });
+  }
   @SubscribeMessage("sendMessage")
   async handleEvent(
     @ConnectedSocket() client: Socket,
