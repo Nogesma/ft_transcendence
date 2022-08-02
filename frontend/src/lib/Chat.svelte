@@ -14,7 +14,7 @@
     displayname: string;
     id: number;
   }> = [];
-  const muteppl = (name: string) => {
+  const muteUser = (name: string) => {
     if (name === $login) {
       alert("You cannot mute yourself");
       return;
@@ -32,9 +32,13 @@
   };
   const sendpm = (name: string) => {
     let str = $login;
+    if (str === name) {
+      alert("you cannot send a pm to yourself");
+      return;
+    }
     socket.emit("sendpm", { name, str });
   };
-  const unmuteppl = (name: string) => {
+  const unmuteUser = (name: string) => {
     axios.post(
       `${import.meta.env.VITE_BACKEND_URI}/api/chat/unmute/${name}`,
       {
@@ -45,9 +49,9 @@
       }
     );
   };
-  const unbanppl = (name: string) => {
+  const unbanUser = (name: string) => {
     axios.post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/chat/unban/${name}`,
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/UnBan/${name}`,
       {
         name: channel,
       },
@@ -56,7 +60,7 @@
       }
     );
   };
-  const banppl = (name: string) => {
+  const banUser = (name: string) => {
     if (name === $login) {
       alert("You cannot ban yourself");
       return;
@@ -73,7 +77,7 @@
     );
   };
 
-  const add_admin = (name: string) => {
+  const addAdmin = (name: string) => {
     if (name === $login) {
       alert("You cannot promote yourself as admin");
       return;
@@ -97,7 +101,7 @@
     messagesList.push(event);
     messagesList = messagesList;
   });
-  socket.on("receivepm", (event) => {
+  socket.on("pm", (event) => {
     console.log("test");
     alert(event);
   });
@@ -114,8 +118,9 @@
   };
 </script>
 
-<h1>{channel}</h1>
+<!--<h1>{channel}</h1>-->
 <br /><br />
+
 <!--{#each messagesList as { displayname, message, login: userLogin, id }, ina}-->
 <!--  <div class="dropdown p-2 bg-base-100 rounded-box">-->
 <!--    <label tabindex="0" class="" for="unused">{ina + 1}: {displayname}</label>: {message}-->
@@ -254,9 +259,9 @@
                         <ProfilePic user={userLogin} attributes="h-8 w-8 rounded-full" />
                       </div>
                       <ul tabindex="0"
-                          class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+                          class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-green-400 rounded-box w-52"
                       >
-                          <li>list</li>
+                          <li class="text-gray-50">list</li>
 <!--                          <li><button on:click={sendmsg}>Logout</button></li>-->
                       </ul>
                   </div>
