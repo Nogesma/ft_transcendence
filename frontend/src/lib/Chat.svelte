@@ -177,7 +177,6 @@
                 >
               </li>
             </ul>
-            ß
           </div>
         </div>
         <h2 class="card-title">
