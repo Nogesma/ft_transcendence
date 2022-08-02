@@ -32,6 +32,10 @@
   };
   const sendpm = (name: string) => {
     let str = $login;
+    if (str === name) {
+      alert("you cannot send a pm to yourself");
+      return;
+    }
     socket.emit("sendpm", { name, str });
   };
   const unmuteppl = (name: string) => {
