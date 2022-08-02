@@ -97,7 +97,7 @@
     messagesList.push(event);
     messagesList = messagesList;
   });
-  socket.on("receivepm", (event) => {
+  socket.on("pm", (event) => {
     console.log("test");
     alert(event);
   });
