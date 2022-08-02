@@ -14,7 +14,7 @@
     displayname: string;
     id: number;
   }> = [];
-  const muteppl = (name: string) => {
+  const MutePPL = (name: string) => {
     if (name === $login) {
       alert("You cannot mute yourself");
       return;
@@ -38,7 +38,7 @@
     }
     socket.emit("sendpm", { name, str });
   };
-  const unmuteppl = (name: string) => {
+  const UnMutePPL = (name: string) => {
     axios.post(
       `${import.meta.env.VITE_BACKEND_URI}/api/chat/unmute/${name}`,
       {
@@ -49,9 +49,9 @@
       }
     );
   };
-  const unbanppl = (name: string) => {
+  const UnBanPPL = (name: string) => {
     axios.post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/chat/unban/${name}`,
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/UnBan/${name}`,
       {
         name: channel,
       },
@@ -60,7 +60,7 @@
       }
     );
   };
-  const banppl = (name: string) => {
+  const BanPPL = (name: string) => {
     if (name === $login) {
       alert("You cannot ban yourself");
       return;
@@ -145,28 +145,28 @@
                   class="btn btn-primary max-h-fit
 "
                   id="ban"
-                  on:click={() => banppl(userLogin)}>Ban</button
+                  on:click={() => BanPPL(userLogin)}>Ban</button
                 >
               </li>
               <li>
                 <button
                   class="btn btn-secondary"
-                  id="unban"
-                  on:click={() => unbanppl(userLogin)}>UnBan</button
+                  id="UnBan"
+                  on:click={() => UnBanPPL(userLogin)}>UnBan</button
                 >
               </li>
               <li>
                 <button
                   class="btn btn-accent max-h-fit"
                   id="mute"
-                  on:click={() => muteppl(userLogin)}>Mute</button
+                  on:click={() => MutePPL(userLogin)}>Mute</button
                 >
               </li>
               <li>
                 <button
                   class="btn btn-accent"
                   id="unmute"
-                  on:click={() => unmuteppl(userLogin)}>UnMute</button
+                  on:click={() => UnMutePPL(userLogin)}>UnMute</button
                 >
               </li>
               <li>
