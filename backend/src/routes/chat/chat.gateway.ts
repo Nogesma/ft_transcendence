@@ -82,9 +82,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     @MessageBody("name") receiverName: string,
     @MessageBody("str") senderlogin: string
   ) {
-    const channel = client.request.channels.find((x) => x.name);
-    if (!channel) return;
     const receiver = await this.userService.getUserByLogin(senderlogin);
+    if (!receiver) return;
     client.join(String(receiver?.id));
     client.to(String(receiver?.id)).emit("pm", { test: String, test2: String });
   }
