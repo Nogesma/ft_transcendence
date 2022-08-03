@@ -5,7 +5,9 @@
   import { displayname, login, id } from "../stores/settings";
   import ProfilePic from "./ProfilePic.svelte";
   import { isEmpty } from "ramda";
+  import joinchannel from "./JoinChannel.svelte";
   import Chat from "./Chat.svelte";
+  import { push } from "svelte-spa-router";
 
   export let channel = "";
 
@@ -249,6 +251,9 @@
                                             border-gray-300 cursor-pointer hover:bg-gray-100 focus:outline-none"
                     on:click={() => {
                       channel = name;
+                      socket.close();
+                      socket.open();
+                      socket.emit("joinRoom", { channel });
                     }}
                   >
                     <img
