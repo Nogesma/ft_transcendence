@@ -4,8 +4,19 @@
   import axios from "axios";
   import { displayname, login, id } from "../stores/settings";
   import ProfilePic from "./ProfilePic.svelte";
+  import {isEmpty} from "ramda";
+  import Chat from "./Chat.svelte";
 
   export let channel = "";
+
+  // List chat
+  let channelListName ="";
+  let hasChat = false;
+  if (!isEmpty(channel)) hasChat = true;
+  const getChannels = () =>
+      axios.get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/channels`, {
+          withCredentials: true,
+      });
 
   let msg: string;
   let messagesList: Array<{
@@ -214,35 +225,46 @@
           </div>
         </div>
         <ul class="overflow-auto h-[32rem]">
-          <h2 class="my-2 mb-2 ml-2 text-lg text-gray-600">Chats</h2>
-          <li>
-            <a href="#" class="flex items-center px-3 py-2 text-sm transition duration-150 ease-in-out border-b
-            border-gray-300 cursor-pointer hover:bg-gray-100 focus:outline-none">
-              <img class="object-cover w-10 h-10 rounded-full"
-                   src="https://spaces-cdn.clipsafari.com/c7q6wksk9ojlezcan9cymncfoe70" alt="username" />
-              <div class="w-full pb-2">
-                <div class="flex justify-between">
-                  <span class="block ml-2 font-semibold text-gray-600">{channel}</span>
-                <span class="block ml-2 text-sm text-gray-600"></span> <!--  TODO -> last activity?-->
-                </div>
-                <span class="block ml-2 text-sm text-gray-600"></span> <!--  TODO -> last message -->
-              </div>
-            </a>
-          </li>
+            <li>
+            <h2 class="my-2 mb-2 ml-2 text-lg text-gray-600">Chats</h2>
+            {#await getChannels()}
+                <p>waiting...</p>
+            {:then { data }}
+                {#each data as { name }}
+                    <div class="flex">
+                        <a href="#" class="flex items-center px-3 py-2 text-sm transition duration-150 ease-in-out border-b
+                                            border-gray-300 cursor-pointer hover:bg-gray-100 focus:outline-none"
+                        on:click={() => {
+                            channel = name;
+                        }}>
+                          <img class="object-cover w-10 h-10 rounded-full"
+                               src="https://spaces-cdn.clipsafari.com/c7q6wksk9ojlezcan9cymncfoe70" alt="username" />
+                            <div class="w-full pb-2">
+                              <div class="flex justify-between">
+                                <span class="block ml-2 font-semibold text-gray-600">{name}</span>
+                                  <span class="block ml-2 text-sm text-gray-600"></span> <!--  TODO -> last activity?-->
+                              </div>
+                                <span class="block ml-2 text-sm text-gray-600"></span> <!--  TODO -> last message -->
+                            </div>
+                        </a>
+                    </div>
+                {/each}
+            {:catch  err}
+                <p>{err}</p>
+            {/await}
+            </li>
         </ul>
       </div>
-      <div class="hidden lg:col-span-2 lg:block">
-        <div class="w-full">
-          <div class="relative flex items-center p-3 border-b border-gray-300">
-            <img class="object-cover w-10 h-10 rounded-full"
-                 src="https://spaces-cdn.clipsafari.com/c7q6wksk9ojlezcan9cymncfoe70" alt="username" />
-            <span class="block ml-2 font-bold text-gray-600">{channel}</span>
-            <span class="absolute w-3 h-3 bg-green-600 rounded-full left-10 top-3">
-              </span>
-          </div>
-          <div class="relative w-full p-6 overflow-y-auto h-[40rem]">
+        <div class="hidden lg:col-span-2 lg:block">
+            <div class="w-full">
+                <div class="relative flex items-center p-3 border-b border-gray-300">
+                    <img class="object-cover w-10 h-10 rounded-full"
+                         src="https://spaces-cdn.clipsafari.com/c7q6wksk9ojlezcan9cymncfoe70" alt="username" />
+                    <span class="block ml-2 font-bold text-gray-600">{channel}</span>
+                    <span class="absolute w-3 h-3 bg-green-600 rounded-full left-10 top-3"></span>
+                </div>
+                <div class="relative w-full p-6 overflow-y-auto h-[40rem]">
             {#each messagesList as { displayname, message, login: userLogin, id }, ina}
-<!--            <label tabindex="0" class="" for="unused">{ina + 1}: {displayname}</label>: {message}-->
             <ul class="space-y-2">
 <!--              TODO -> when others send message justify start-->
 <!--              <li class="flex justify-start">-->
