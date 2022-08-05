@@ -6,7 +6,7 @@
   import ProfilePic from "../lib/ProfilePic.svelte";
   import Matchmaking from "../lib/Pong/Matchmaking.svelte";
   import { isNil } from "ramda";
-  import { params } from "svelte-spa-router";
+  import { params, replace } from "svelte-spa-router";
 
   const initCanvas = (width: number, height: number) => {
     const cv = <HTMLCanvasElement>document.getElementById("game");
@@ -41,13 +41,18 @@
         p2: number;
         spectators: Set<number>;
       }) => {
-        if (!width) return alert(`No game with id: ${gameId} found.`);
+        if (!width) replace("/game");
 
-        initCanvas(width, height);
+        const checkExist = setInterval(() => {
+          if (<HTMLCanvasElement>document.getElementById("game")) {
+            clearInterval(checkExist);
+            initCanvas(width, height);
+          }
+        }, 100);
 
         player1 = p1;
         player2 = p2;
-        spectatorList = spectators;
+        spectatorList = new Set(spectators);
 
         isSpectating = $id === p1 || $id === p2;
 
@@ -92,15 +97,12 @@
 
   let socket: Socket | undefined;
   let isSpectating = true;
-  let spectatorList: Set<number>;
+  let spectatorList = new Set<number>();
 
   let ctx: CanvasRenderingContext2D | null;
   let player1: number, player2: number;
 
-  $: if ($id !== 0) {
-    socket = gameSocket();
-    console.log(socket);
-  }
+  $: if ($id !== 0) socket = gameSocket();
 
   $: gameId = $params?.id;
 
