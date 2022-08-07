@@ -81,7 +81,7 @@
 </script>
 
 {#await getUserInfo(uid) then { login, displayname: name, status }}
-  <div class="hero min-h-screen bg-base-200">
+  <div class="hero h-full">
     <div class="hero-content flex-col lg:flex-row justify-start w-full">
       <ProfilePic
         attributes="max-w-sm rounded-lg shadow-2xl"

@@ -42,7 +42,7 @@ export class Game {
     height: this.box.height,
     p1: this.player1,
     p2: this.player2,
-    spectators: this.spectatorList,
+    spectators: Array.from(this.spectatorList),
   });
 
   isPlayer = (id: number) => id === this.player1 || id === this.player2;

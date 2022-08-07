@@ -14,7 +14,7 @@ export class PongService {
     );
 
   newGame = async (gameId: string, player1: number, player2: number) => {
-    const game = new Game(gameId, player1, player2, 1600, 30, 900, 2);
+    const game = new Game(gameId, player1, player2, 400, 30, 300, 2);
     this.games.set(gameId, game);
     return { game_id: game, params: game.get_params() };
   };
