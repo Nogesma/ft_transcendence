@@ -20,7 +20,7 @@
   $: socket && socket.emit("status", { status: $status });
 </script>
 
-<div>
+<div class="h-screen flex flex-col">
   <Navbar />
   <Router {routes} />
 </div>

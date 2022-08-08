@@ -123,7 +123,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
     client.leave(gameId);
 
     if (game.isSpectator(id)) {
-      game.newSpectator(id);
+      game.removeSpectator(id);
       client.to(gameId).emit("delSpectator", id);
     } else {
       //todo: player chose to leave the game, forfeit immediatly.
