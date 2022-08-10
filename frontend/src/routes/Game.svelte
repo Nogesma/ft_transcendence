@@ -1,7 +1,7 @@
 <script lang="ts">
   import { gameSocket } from "../utils/socket";
   import type { Socket } from "socket.io-client";
-  import { id } from "../stores/settings";
+  import { id, status, gameId } from "../stores/settings";
   import { getUserInfo, getUserStats } from "../utils/info.js";
   import ProfilePic from "../lib/ProfilePic.svelte";
   import Matchmaking from "../lib/Pong/Matchmaking.svelte";
@@ -56,6 +56,9 @@
 
         isSpectating = $id === p1 || $id === p2;
 
+        if (isSpectating) $status = 3;
+        else $status = 2;
+
         // only register frame handler after canvas is init
         // todo: frame handler
         // s.on("frame", (data) => {
@@ -104,10 +107,9 @@
 
   $: if ($id !== 0) socket = gameSocket();
 
-  $: gameId = $params?.id;
+  $: $gameId = $params?.id ?? "";
 
   $: if (gameId && socket) {
-    console.log("registering", gameId, socket);
     registerListenners(socket);
     socket.emit("joinGame", gameId);
   }

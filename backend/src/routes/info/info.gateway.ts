@@ -49,9 +49,12 @@ export class InfoGateway
   @SubscribeMessage("status")
   async handleStatusUpdate(
     @ConnectedSocket() client: Socket,
-    @MessageBody("status") status: number
+    @MessageBody("status") status: number,
+    @MessageBody("gameId") gameId: string
   ) {
     client.request.user.status = status;
+    if (status === 2 || status === 3) client.request.user.currentGame = gameId;
+    else client.request.user.currentGame = "";
     await client.request.user.save();
   }
 }
