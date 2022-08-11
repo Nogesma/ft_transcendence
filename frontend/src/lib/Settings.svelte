@@ -109,7 +109,8 @@
               <div
                 class="btn btn-active btn-primary"
                 on:click={() => {
-                  if (elem.firstChild) elem.removeChild(elem.firstChild);
+                  //if (elem.firstChild) elem.removeChild(elem.firstChild);
+                  elem.appendChild(new HTMLElement());
                   // todo: find why modal closes when updating elem
                   elem = elem;
                 }}

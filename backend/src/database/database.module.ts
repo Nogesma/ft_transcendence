@@ -22,7 +22,7 @@ import { Block } from "../models/block/block.model.js";
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         dialect: "postgres",
-        host: "localhost",
+        host: configService.get("DB_HOST"),
         port: 5432,
         username: configService.get("DB_USER"),
         password: configService.get("DB_PASSWORD"),

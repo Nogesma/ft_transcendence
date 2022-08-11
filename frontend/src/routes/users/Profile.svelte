@@ -5,6 +5,7 @@
 
   import { getUserInfo, getUserStats } from "../../utils/info.js";
   import Settings from "../../lib/Settings.svelte";
+  import { isEmpty } from "ramda";
 
   export let params: { id: number };
 
@@ -58,7 +59,7 @@
             </table>
           </div>
         {/await}
-        {#if status === 2 || status === 3}
+        {#if (status === 2 || status === 3) && gameId && !isEmpty(gameId)}
           <button
             class="btn btn-secondary"
             on:click={() => push(`/game/${gameId}`)}

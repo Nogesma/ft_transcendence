@@ -15,15 +15,19 @@ services:
       - avatars:/files
       - caddy_data:/data
       - caddy_config:/config
+    env_file:
+      - .env.frontend
 
   db:
     container_name: postgresql
     restart: always
-    image: postgres:14.3-alpine
+    image: postgres:14.4-alpine
     networks:
       back:
     volumes:
       - db:/var/lib/postgresql/data
+    env_file:
+      - .env.postgres
 
   nestjs:
     depends_on:
@@ -35,6 +39,8 @@ services:
       back:
     volumes:
       - avatars:/files
+    env_file:
+      - .env.backend
 
 volumes:
   db: { }
