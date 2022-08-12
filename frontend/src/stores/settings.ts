@@ -10,6 +10,8 @@ const login = writable("");
 
 const id = writable(0);
 
+const gameId = writable("");
+
 const updatepfp = writable(0);
 
 const pfp = derived([login, updatepfp], ([$login, $updatepfp], set) => {
@@ -22,4 +24,4 @@ const pfp = derived([login, updatepfp], ([$login, $updatepfp], set) => {
 
 const status = writable(1);
 
-export { isLoggedIn, displayname, id, login, pfp, updatepfp, status };
+export { isLoggedIn, displayname, id, login, pfp, updatepfp, status, gameId };

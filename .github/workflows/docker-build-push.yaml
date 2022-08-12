@@ -42,6 +42,11 @@ jobs:
           cache-dependency-path: 'backend/yarn.lock'
       - run: yarn install --immutable
       - run: yarn run build
+        env:
+          VITE_REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
+          VITE_CLIENT_ID: ${{ secrets.CIENT_ID }}
+          VITE_BACKEND_URI: ${{ secrets.BACKEND_URI }}
+
       - uses: actions/upload-artifact@v3
         with:
           name: frontend-dist
