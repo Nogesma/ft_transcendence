@@ -15,8 +15,6 @@ services:
       - avatars:/files
       - caddy_data:/data
       - caddy_config:/config
-    env_file:
-      - .env.frontend
 
   db:
     container_name: postgresql
