@@ -67,8 +67,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     if (!channel) return;
 
     const username = client.request.user.displayname;
-
+    client.join(client.request.user.id.toString());
     client.join(channel.id);
+    console.log(client.request.user.id.toString());
     client.to(channel.id).emit("newMessage", {
       message: `${username} joined the room`,
       login: "ADMIN",
@@ -80,12 +81,18 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   async handlepm(
     @ConnectedSocket() client: Socket,
     @MessageBody("name") receiverName: string,
-    @MessageBody("str") senderlogin: string
+    @MessageBody("str") senderlogin: string,
+    @MessageBody("msg") msg: string
   ) {
-    if (receiverName === senderlogin) return;
-    const receiver = await this.userService.getUserByLogin(senderlogin);
-    if (!receiver) return;
-    client.to(String(receiver?.id)).emit("pm", { test: String, test2: String });
+    const receiver = await this.userService.getUserByLogin(receiverName);
+    const sender = await this.userService.getUserByLogin(senderlogin);
+    if (!receiver || !sender) return;
+    console.log(receiver.id);
+    this.server.to(String(receiver?.id)).emit("pm", {
+      msg,
+      login: senderlogin,
+      displayname: sender?.displayname,
+    });
   }
   @SubscribeMessage("sendMessage")
   async handleEvent(

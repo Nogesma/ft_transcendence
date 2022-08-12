@@ -42,13 +42,9 @@
     nbr: number,
     displayname: string
   ) => {
-    console.log(uid, nbr, displayname); // simply justifying use of this variable for the check, might be or not be used for pms
+    console.log(uid, nbr, displayname, msg); // simply justifying use of this variable for the check, might be or not be used for pms
     let str = $login;
-    if (str === name) {
-      alert("you cannot send a pm to yourself");
-      return;
-    }
-    socket.emit("sendpm", { name, str });
+    socket.emit("sendpm", { name, str, msg });
   };
   const unmuteUser = (name: string) => {
     axios.post(
@@ -114,8 +110,13 @@
     messagesList = messagesList;
   });
   socket.on("pm", (event) => {
-    console.log("test");
-    alert(event);
+    let pm: {
+      msg: string;
+      login: string;
+      displayname: string;
+    };
+    pm = event;
+    alert(`${pm.displayname} has sent you a message: ${pm.msg}`);
   });
   const sendmsg = () => {
     socket.emit("sendMessage", { channel, msg });
