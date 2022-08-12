@@ -4,17 +4,10 @@
   import axios from "axios";
   import { displayname, login, id } from "../stores/settings";
   import ProfilePic from "./ProfilePic.svelte";
-  import { isEmpty } from "ramda";
-  import joinchannel from "./JoinChannel.svelte";
-  import Chat from "./Chat.svelte";
-  import { push } from "svelte-spa-router";
 
   export let channel = "";
 
   // List chat
-  let channelListName = "";
-  let hasChat = false;
-  if (!isEmpty(channel)) hasChat = true;
   const getChannels = () =>
     axios.get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/channels`, {
       withCredentials: true,
@@ -43,7 +36,13 @@
       }
     );
   };
-  const sendpm = (name: string) => {
+  const sendpm = (
+    name: string,
+    uid: number,
+    nbr: number,
+    displayname: string
+  ) => {
+    console.log(uid, nbr, displayname); // simply justifying use of this variable for the check, might be or not be used for pms
     let str = $login;
     if (str === name) {
       alert("you cannot send a pm to yourself");
@@ -90,7 +89,7 @@
     );
   };
 
-  const addAdmin = (name: string) => {
+  /* const addAdmin = (name: string) => {
     if (name === $login) {
       alert("You cannot promote yourself as admin");
       return;
@@ -104,7 +103,7 @@
         withCredentials: true,
       }
     );
-  };
+  }; */
 
   const socket = chatSocket();
 
@@ -246,7 +245,7 @@
               {#each data as { name }}
                 <div class="flex">
                   <a
-                    href="#"
+                    href="/"
                     class="flex items-center px-3 py-2 text-sm transition duration-150 ease-in-out border-b
                                             border-gray-300 cursor-pointer hover:bg-gray-100 focus:outline-none"
                     on:click={() => {
@@ -348,6 +347,12 @@
                         on:click={() => unmuteUser(userLogin)}
                       >
                         Unmute {userLogin}
+                      </li>
+                      <li
+                        class="text-gray-50"
+                        on:click={() => sendpm(userLogin, id, ina, displayname)}
+                      >
+                        Sendpm {userLogin}
                       </li>
                       <!--                          <li><button on:click={sendmsg}>Logout</button></li>-->
                     </ul>
