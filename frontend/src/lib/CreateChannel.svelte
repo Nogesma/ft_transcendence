@@ -5,8 +5,8 @@
   let channelPublic = true;
   let channelName: string;
 
-  const createChannel = () => {
-    axios
+  const createChannel = async () => {
+    await axios
       .post(
         `${import.meta.env.VITE_BACKEND_URI}/api/chat/create/${channelName}`,
         {
@@ -19,6 +19,7 @@
       )
       .then(({ data }) => console.log(data))
       .catch();
+    window.location.reload();
   };
 
   // Clear password when type changes

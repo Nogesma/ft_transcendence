@@ -8,7 +8,7 @@
     });
   // .catch(() => push("/auth/login"))
 
-  const joinChannel = () => {
+  export const joinChannel = () => {
     try {
       axios.post(
         `${import.meta.env.VITE_BACKEND_URI}/api/chat/join/${channelName}`,
