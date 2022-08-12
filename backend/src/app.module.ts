@@ -10,6 +10,7 @@ import { PongModule } from "./routes/pong/pong.module.js";
 import { APP_GUARD } from "@nestjs/core";
 import { AuthGuard } from "./authenticate.guard.js";
 import { InfoModule } from "./routes/info/info.module.js";
+import { PrivatemessagesModule } from "./routes/PrivateMessages/privatemessages.module.js";
 
 @Module({
   providers: [
@@ -34,6 +35,7 @@ import { InfoModule } from "./routes/info/info.module.js";
       }),
     }),
     DatabaseModule,
+    PrivatemessagesModule,
     AuthModule,
     SettingsModule,
     SessionModule,

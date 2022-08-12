@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { chatSocket } from "../utils/socket";
+  import { pmSocket } from "../utils/socket";
   import axios from "axios";
   import { displayname, login, id } from "../stores/settings";
   import ProfilePic from "./ProfilePic.svelte";
@@ -44,7 +45,7 @@
   ) => {
     console.log(uid, nbr, displayname, msg); // simply justifying use of this variable for the check, might be or not be used for pms
     let str = $login;
-    socket.emit("sendpm", { name, str, msg });
+    pmsocket.emit("sendpm", { name, str, msg });
   };
   const unmuteUser = (name: string) => {
     axios.post(
@@ -101,15 +102,15 @@
     );
   }; */
 
+  const pmsocket = pmSocket();
   const socket = chatSocket();
-
   onMount(() => socket.emit("joinRoom", { channel }));
 
   socket.on("newMessage", (event) => {
     messagesList.push(event);
     messagesList = messagesList;
   });
-  socket.on("pm", (event) => {
+  pmsocket.on("pm", (event) => {
     let pm: {
       msg: string;
       login: string;
@@ -131,84 +132,7 @@
   };
 </script>
 
-<!--<h1>{channel}</h1>-->
 <br /><br />
-
-<!--{#each messagesList as { displayname, message, login: userLogin, id }, ina}-->
-<!--  <div class="dropdown p-2 bg-base-100 rounded-box">-->
-<!--    <label tabindex="0" class="" for="unused">{ina + 1}: {displayname}</label>: {message}-->
-<!--    <div-->
-<!--      tabindex="0"-->
-<!--      class="dropdown-content card card-side bg-base-100 shadow-xl max-h-fit max-w-fit"-->
-<!--    >-->
-<!--      <div class="dropdown">-->
-<!--      <div class="card-body max-h-fit bg-neutral-focus">-->
-<!--        <label for="unused" tabindex="0" class="btn m-1">-->
-<!--          <div tabindex="0" class="btn btn-ghost btn-circle avatar">-->
-<!--              <ProfilePic user={userLogin} attributes="h-12 w-12 rounded-full" />-->
-<!--          </div>-->
-<!--        </label>-->
-<!--        <div class="card-actions justify-end">-->
-<!--&lt;!&ndash;          <div class="dropdown">&ndash;&gt;-->
-<!--            <ul-->
-<!--              tabindex="0"-->
-<!--              class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 max-h-full"-->
-<!--            >-->
-<!--              <li>-->
-<!--                <button-->
-<!--                  class="btn btn-primary max-h-fit"-->
-<!--                  id="ban"-->
-<!--                  on:click={() => banppl(userLogin)}>Ban</button-->
-<!--                >-->
-<!--              </li>-->
-<!--              <li>-->
-<!--                <button-->
-<!--                  class="btn btn-secondary"-->
-<!--                  id="unban"-->
-<!--                  on:click={() => unbanppl(userLogin)}>UnBan</button-->
-<!--                >-->
-<!--              </li>-->
-<!--              <li>-->
-<!--                <button-->
-<!--                  class="btn btn-accent max-h-fit"-->
-<!--                  id="mute"-->
-<!--                  on:click={() => muteppl(userLogin)}>Mute</button-->
-<!--                >-->
-<!--              </li>-->
-<!--              <li>-->
-<!--                <button-->
-<!--                  class="btn btn-accent"-->
-<!--                  id="unmute"-->
-<!--                  on:click={() => unmuteppl(userLogin)}>UnMute</button-->
-<!--                >-->
-<!--              </li>-->
-<!--              <li>-->
-<!--                <button-->
-<!--                  class="btn btn-accent"-->
-<!--                  id="add_admin"-->
-<!--                  on:click={() => add_admin(userLogin)}>Add Admin</button-->
-<!--                >-->
-<!--              </li>-->
-<!--            </ul>-->
-<!--            ß-->
-<!--          </div>-->
-<!--        </div>-->
-<!--&lt;!&ndash;        <h2 class="card-title">&ndash;&gt;-->
-<!--&lt;!&ndash;          <a href="#/users/{id}">{displayname}</a>&ndash;&gt;-->
-<!--&lt;!&ndash;        </h2>&ndash;&gt;-->
-<!--        <h2 class="card-title">-->
-<!--          <p>Click the button to watch on Jetflix app.</p>-->
-<!--          <div class="card-actions justify-end">-->
-<!--            <button on:click={() => sendpm(userLogin)} class="btn btn-primary"-->
-<!--              >send pm to {displayname}</button-->
-<!--            >-->
-<!--          </div>-->
-<!--        </h2>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--{/each}-->
-
 <body>
   <div class="container mx-auto">
     <div class="min-w-full border rounded lg:grid lg:grid-cols-3">
@@ -297,12 +221,6 @@
           <div class="relative w-full p-6 overflow-y-auto h-[40rem]">
             {#each messagesList as { displayname, message, login: userLogin, id }, ina}
               <ul class="space-y-2">
-                <!--              TODO -> when others send message justify start-->
-                <!--              <li class="flex justify-start">-->
-                <!--                <div class="relative max-w-xl px-4 py-2 text-gray-700 rounded shadow">-->
-                <!--                  <span class="block">{message}</span>-->
-                <!--                </div>-->
-                <!--              </li>-->
                 <li class="flex justify-end space-x-3 h-fit p-1 static">
                   <div
                     class="max-w-xl px-4 py-1 text-gray-700 bg-gray-100 rounded shadow static"
@@ -355,7 +273,6 @@
                       >
                         Sendpm {userLogin}
                       </li>
-                      <!--                          <li><button on:click={sendmsg}>Logout</button></li>-->
                     </ul>
                   </div>
                 </li>
