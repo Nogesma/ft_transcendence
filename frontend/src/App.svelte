@@ -6,7 +6,7 @@
   import { onMount } from "svelte";
   import { statusSocket } from "./utils/socket";
   import { checkAuthentication } from "./utils/auth";
-  import { id, status } from "./stores/settings";
+  import { gameId, id, status } from "./stores/settings";
   import type { Socket } from "socket.io-client";
 
   if (new URLSearchParams(window.location.search).has("code"))
@@ -17,7 +17,7 @@
 
   $: if ($id !== 0) socket = statusSocket();
 
-  $: socket && socket.emit("status", { status: $status });
+  $: socket && socket.emit("status", { status: $status, gameId: $gameId });
 </script>
 
 <div class="h-screen flex flex-col">

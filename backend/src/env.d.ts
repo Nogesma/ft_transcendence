@@ -4,6 +4,7 @@ declare global {
     CLIENT_SECRET: string;
     REDIRECT_URI: string;
     COOKIE_SECRET: string;
+    DB_HOST: string;
     DB_USER: string;
     DB_NAME: string;
     DB_PASSWORD: string;

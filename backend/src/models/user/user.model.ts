@@ -38,11 +38,15 @@ export class User extends Model {
   @Column
   displayname: string;
 
-  // 0 => offline, 1 => online, 2 => in-game
+  // 0 => offline, 1 => online, 2 => in-game, 3 => spectating
   @AllowNull(false)
   @Default(0)
   @Column
   status: number;
+
+  // Current game id used is in-game or spectating
+  @Column
+  currentGame: string;
 
   @HasMany(() => Session)
   session: Session[];
