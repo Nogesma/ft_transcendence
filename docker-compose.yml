@@ -1,8 +1,8 @@
 version: '3.9'
 
 services:
-  webserv:
-    container_name: webserv
+  transcendence:
+    container_name: transcendence
     build: frontend
     restart: always
     networks:

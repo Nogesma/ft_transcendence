@@ -4,4 +4,5 @@ http://transcendence.manosgr.me {
 		precompressed br gzip
 	}
 	reverse_proxy /api/* nestjs:3000
+	reverse_proxy /socket.io/* nestjs:3000
 }

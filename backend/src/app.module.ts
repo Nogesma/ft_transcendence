@@ -27,6 +27,7 @@ import { InfoModule } from "./routes/info/info.module.js";
         REDIRECT_URI: Joi.string().required(),
         COOKIE_SECRET: Joi.string().required(),
         DB_USER: Joi.string().required(),
+        DB_HOST: Joi.string().required(),
         DB_NAME: Joi.string().required(),
         DB_PASSWORD: Joi.string().required(),
         AVATAR_UPLOAD_PATH: Joi.string().required(),
