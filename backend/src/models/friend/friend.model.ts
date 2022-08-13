@@ -1,14 +1,20 @@
 import {
+  AutoIncrement,
   Column,
-  Default,
   ForeignKey,
   Model,
+  PrimaryKey,
   Table,
 } from "sequelize-typescript";
 import { User } from "../user/user.model.js";
 
 @Table({ timestamps: false })
 export class Friend extends Model {
+  @PrimaryKey
+  @AutoIncrement
+  @Column
+  id: number;
+
   @ForeignKey(() => User)
   @Column
   user: number;
@@ -17,7 +23,7 @@ export class Friend extends Model {
   @Column
   friend: number;
 
-  @Default(false)
+  // 0 => friend not accepted, null => friend request sent, not accepted, 1 => friends
   @Column
   isFriend: boolean;
 }

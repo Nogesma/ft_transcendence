@@ -28,8 +28,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
   // we might want to user <elo, {uid, sid}> to do elo based matchmaking?
-  // userId, socketId
-  queue = new Map<number, string>();
+  // userId, socketId.
+  classicQueue = new Map<number, string>();
+  modifiedQueue = new Map<number, string>();
 
   constructor(
     private readonly configService: ConfigService<EnvironmentVariables, true>,
@@ -49,33 +50,42 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
   async handleDisconnect(@ConnectedSocket() client: Socket) {
     const id = client.request.user.id;
 
-    this.queue.delete(id);
-    this.pongService.disconnectClient(id);
+    this.classicQueue.delete(id);
+    this.modifiedQueue.delete(id);
+    console.log(id);
+    this.pongService.disconnectClient(client, id);
   }
 
   @SubscribeMessage("joinQueue")
-  async joinQueue(@ConnectedSocket() client: Socket) {
-    this.queue.set(client.request.user.id, client.id);
+  async joinQueue(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() type: number
+  ) {
+    if (type !== 0 && type !== 1) return;
+
+    const queue = type ? this.modifiedQueue : this.classicQueue;
+
+    queue.set(client.request.user.id, client.id);
 
     client.emit("inQueue", null);
 
-    if (this.queue.size >= 2) {
+    if (queue.size >= 2) {
       const gameId = nanoid();
 
-      const [p1, p2] = Array.from(this.queue.keys());
+      const [p1, p2] = Array.from(queue.keys());
 
       if (!p1 || !p2) throw new Error("ID is null when starting game");
 
-      const s1 = this.queue.get(p1);
-      this.queue.delete(p1);
-      const s2 = this.queue.get(p2);
-      this.queue.delete(p2);
+      const s1 = queue.get(p1);
+      queue.delete(p1);
+      const s2 = queue.get(p2);
+      queue.delete(p2);
 
       if (!s1 || !s2) throw new Error("Socket is null when starting game");
 
       this.server.to(s1).to(s2).socketsJoin(gameId);
 
-      this.pongService.newGame(gameId, p1, p2);
+      await this.pongService.newGame(gameId, p1, p2, type);
 
       this.server.to(gameId).emit("matchFound", gameId);
     }
@@ -83,7 +93,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
 
   @SubscribeMessage("leaveQueue")
   async leaveQueue(@ConnectedSocket() client: Socket) {
-    this.queue.delete(client.request.user.id);
+    this.classicQueue.delete(client.request.user.id);
+    this.modifiedQueue.delete(client.request.user.id);
     client.emit("notQueue", null);
   }
 
@@ -123,8 +134,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
     client.leave(gameId);
 
     if (game.isSpectator(id)) {
-      game.removeSpectator(id);
-      client.to(gameId).emit("delSpectator", id);
+      game.removeSpectator(client, id);
     } else {
       //todo: player chose to leave the game, forfeit immediatly.
       // unwanted disconnections where the player will have a chance to join again

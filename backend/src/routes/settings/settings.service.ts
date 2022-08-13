@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import type { Response, Request } from "express";
-import { andThen, map, pick, pipe, prop } from "ramda";
+import { pick } from "ramda";
 import busboy from "busboy";
 import { fileTypeFromBuffer } from "file-type";
 import path from "path";
@@ -167,19 +167,9 @@ export class SettingsService {
     req.pipe(bb);
   };
 
-  getPendingFriendRequests = pipe(
-    this.friendService.getPendingFriendRequest,
-    andThen(
-      map(
-        pipe(
-          prop("friend"),
-          this.userService.getUser,
-          andThen(pick(["id", "displayname"]))
-        )
-      )
-    ),
-    andThen(Promise.all)
-  );
+  getFriendList = this.friendService.getAllFriends;
+
+  getPendingFriendRequests = this.friendService.getPendingFriendRequest;
 
   deleteAvatar = (req: Request, login: string) => {
     const imagePath = path.join(
@@ -205,7 +195,17 @@ export class SettingsService {
 
   denyFriendRequest = this.friendService.delFriend;
 
-  addFriend = this.friendService.addFriend;
+  addFriend = async (uid: number, fid: number) => {
+    const isFriend = Boolean(await this.friendService.isFriend(uid, fid));
+
+    if (isFriend)
+      throw new HttpException(
+        "Friend request already sent",
+        HttpStatus.BAD_REQUEST
+      );
+
+    await this.friendService.addFriend(uid, fid).catch(console.error);
+  };
 
   block = this.blockService.blockUser;
   unblock = this.blockService.unblockUser;

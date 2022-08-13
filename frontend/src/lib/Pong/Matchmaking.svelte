@@ -40,8 +40,8 @@
     });
   };
 
-  const joinQueue = () => {
-    if (socket) socket.emit("joinQueue", null);
+  const joinQueue = (n: number) => {
+    if (socket) socket.emit("joinQueue", n);
   };
 
   const leaveQueue = () => {
@@ -74,8 +74,13 @@
     <div>
       <h1 class="text-5xl font-bold pb-40">Start game !</h1>
       {#if !inQueue}
-        <button class="btn btn-active btn-primary btn-lg" on:click={joinQueue}
-          >Ready</button
+        <button
+          class="btn btn-active btn-primary btn-lg"
+          on:click={() => joinQueue(0)}>Classic Pong</button
+        >
+        <button
+          class="btn btn-active btn-primary btn-lg"
+          on:click={() => joinQueue(1)}>Modified Pong</button
         >
       {:else}
         <button class="btn btn-active btn-primary btn-lg" on:click={leaveQueue}
