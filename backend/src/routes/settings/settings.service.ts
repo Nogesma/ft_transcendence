@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import type { Response, Request } from "express";
-import { pick } from "ramda";
+import { andThen, map, pick, pipe, prop } from "ramda";
 import busboy from "busboy";
 import { fileTypeFromBuffer } from "file-type";
 import path from "path";
@@ -169,7 +169,10 @@ export class SettingsService {
 
   getFriendList = this.friendService.getAllFriends;
 
-  getPendingFriendRequests = this.friendService.getPendingFriendRequest;
+  getPendingFriendRequests = pipe(
+    this.friendService.getPendingFriendRequest,
+    andThen(map(prop("friend")))
+  );
 
   deleteAvatar = (req: Request, login: string) => {
     const imagePath = path.join(

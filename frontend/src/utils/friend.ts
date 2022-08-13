@@ -26,7 +26,9 @@ const getPendingFriendRequests = (): Promise<number[]> =>
 const acceptFriendRequest = (friendId: number) =>
   axios
     .post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/user/friend/accept/${friendId}`,
+      `${
+        import.meta.env.VITE_BACKEND_URI
+      }/api/user/friend/requests/accept/${friendId}`,
       {},
       {
         withCredentials: true,
@@ -37,7 +39,9 @@ const acceptFriendRequest = (friendId: number) =>
 const denyFriendRequest = (friendId: number) =>
   axios
     .post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/user/friend/deny/${friendId}`,
+      `${
+        import.meta.env.VITE_BACKEND_URI
+      }/api/user/friend/requests/deny/${friendId}`,
       {},
       {
         withCredentials: true,
