@@ -82,7 +82,17 @@
       }
     );
   };
-
+  const removeAdmin = (name: string) => {
+    axios.post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/remove_admin/${name}`,
+      {
+        chan: channel,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+  };
   const addAdmin = (name: string) => {
     if (name === $login) {
       alert("You cannot promote yourself as admin");
@@ -217,7 +227,7 @@
             />
           </div>
           <div class="relative w-full p-6 overflow-y-auto h-[40rem]">
-            {#each messagesList as { displayname, message, login: userLogin, id }, ina}
+            {#each messagesList as { displayname, message, login: userLogin }}
               <ul class="space-y-2">
                 <li class="flex justify-end space-x-3 h-fit p-1 static">
                   <div
@@ -245,37 +255,43 @@
                         class="text-gray-50"
                         on:click={() => banUser(userLogin)}
                       >
-                        Ban {userLogin}
+                        Ban {displayname}
                       </li>
                       <li
                         class="text-gray-50"
                         on:click={() => muteUser(userLogin)}
                       >
-                        Mute {userLogin}
+                        Mute {displayname}
                       </li>
                       <li
                         class="text-gray-50"
                         on:click={() => unbanUser(userLogin)}
                       >
-                        Unban {userLogin}
+                        Unban {displayname}
                       </li>
                       <li
                         class="text-gray-50"
                         on:click={() => unmuteUser(userLogin)}
                       >
-                        Unmute {userLogin}
+                        Unmute {displayname}
                       </li>
                       <li
                         class="text-gray-50"
                         on:click={() => addAdmin(userLogin)}
                       >
-                        Add as Admin {userLogin}
+                        Add {displayname} as Admin
+                      </li>
+                      <li
+                        class="text-gray-50"
+                        on:click={() => removeAdmin(userLogin)}
+                      >
+                        Remove {displayname} as Admin
                       </li>
                       <li
                         class="text-gray-50"
                         on:click={() => sendpm(userLogin)}
                       >
-                        Sendpm {userLogin}
+                        Sendpm {displayname}
                       </li>
                       <input
                         type="text"

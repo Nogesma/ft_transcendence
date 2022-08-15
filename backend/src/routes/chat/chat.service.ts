@@ -319,7 +319,7 @@ export class ChatService {
         "Channel or user not found",
         HttpStatus.BAD_REQUEST
       );
-
+    if (oid === user.id) return;
     if (oid === channel.ownerId) {
       await this.channelAdminService.removeAdmin(channel.id, user.id);
     } else

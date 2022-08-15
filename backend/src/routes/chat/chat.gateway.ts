@@ -88,7 +88,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     if (!client || !channelName || !message) return;
     const channel = client.request.channels.find((x) => x.name == channelName);
     if (!channel) return;
-
+    if (await this.channelBanService.isBanned(client.request.user.id)) {
+      client.leave(channel.id);
+      return;
+    }
     if (await this.channelBanService.isMuted(client.request.user.id)) {
       client.emit("newMessage", {
         message: "You cannot talk because you are muted",
