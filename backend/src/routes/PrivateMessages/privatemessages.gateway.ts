@@ -55,12 +55,12 @@ export class PrivatemessagesGateway
     @ConnectedSocket() client: Socket,
     @MessageBody("name") receiverName: string,
     @MessageBody("str") senderlogin: string,
-    @MessageBody("msg") msg: string
+    @MessageBody("pmmsg") msg: string
   ) {
+    if (!receiverName || !senderlogin || !msg) return;
     const receiver = await this.userService.getUserByLogin(receiverName);
     const sender = await this.userService.getUserByLogin(senderlogin);
     if (!receiver || !sender) return;
-    console.log(receiver.id);
     this.server.to(String(receiver?.id)).emit("pm", {
       msg,
       login: senderlogin,

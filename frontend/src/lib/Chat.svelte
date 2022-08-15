@@ -15,6 +15,7 @@
     });
 
   let msg: string;
+  let pmmsg: string;
   let messagesList: Array<{
     message: string;
     login: string;
@@ -37,15 +38,11 @@
       }
     );
   };
-  const sendpm = (
-    name: string,
-    uid: number,
-    nbr: number,
-    displayname: string
-  ) => {
-    console.log(uid, nbr, displayname, msg); // simply justifying use of this variable for the check, might be or not be used for pms
+  const sendpm = (name: string) => {
+    if (!pmmsg || pmmsg.length === 0) return;
+    console.log(pmmsg);
     let str = $login;
-    pmsocket.emit("sendpm", { name, str, msg });
+    pmsocket.emit("sendpm", { name, str, pmmsg });
   };
   const unmuteUser = (name: string) => {
     axios.post(
@@ -86,7 +83,7 @@
     );
   };
 
-  /* const addAdmin = (name: string) => {
+  const addAdmin = (name: string) => {
     if (name === $login) {
       alert("You cannot promote yourself as admin");
       return;
@@ -100,7 +97,7 @@
         withCredentials: true,
       }
     );
-  }; */
+  };
 
   const pmsocket = pmSocket();
   const socket = chatSocket();
@@ -120,6 +117,7 @@
     alert(`${pm.displayname} has sent you a message: ${pm.msg}`);
   });
   const sendmsg = () => {
+    if (!msg || msg.length === 0) return;
     socket.emit("sendMessage", { channel, msg });
     messagesList.push({
       message: msg,
@@ -269,10 +267,24 @@
                       </li>
                       <li
                         class="text-gray-50"
-                        on:click={() => sendpm(userLogin, id, ina, displayname)}
+                        on:click={() => addAdmin(userLogin)}
+                      >
+                        Add as Admin {userLogin}
+                      </li>
+                      <li
+                        class="text-gray-50"
+                        on:click={() => sendpm(userLogin)}
                       >
                         Sendpm {userLogin}
                       </li>
+                      <input
+                        type="text"
+                        placeholder="PmMessage"
+                        class="block w-full py-2 pl-4 mx-3 bg-gray-100 rounded-full outline-none focus:text-gray-700"
+                        name="pmmessage"
+                        required
+                        bind:value={pmmsg}
+                      />
                     </ul>
                   </div>
                 </li>
