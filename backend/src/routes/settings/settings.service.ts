@@ -167,7 +167,10 @@ export class SettingsService {
     req.pipe(bb);
   };
 
-  getFriendList = this.friendService.getAllFriends;
+  getFriendList = pipe(
+    this.friendService.getAllFriends,
+    andThen(map(prop("friend")))
+  );
 
   getPendingFriendRequests = pipe(
     this.friendService.getPendingFriendRequest,

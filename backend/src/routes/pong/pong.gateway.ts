@@ -19,6 +19,7 @@ import {
 import { SessionService } from "../../models/session/session.service.js";
 import { PongService } from "./pong.service.js";
 import { nanoid } from "nanoid";
+import { isNil } from "ramda";
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
@@ -31,6 +32,10 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
   // userId, socketId.
   classicQueue = new Map<number, string>();
   modifiedQueue = new Map<number, string>();
+  customQueue = new Map<
+    number,
+    { socket: string; opponent: number; type: boolean }
+  >();
 
   constructor(
     private readonly configService: ConfigService<EnvironmentVariables, true>,
@@ -52,16 +57,16 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
 
     this.classicQueue.delete(id);
     this.modifiedQueue.delete(id);
-    console.log(id);
+    this.customQueue.delete(id);
     this.pongService.disconnectClient(client, id);
   }
 
   @SubscribeMessage("joinQueue")
   async joinQueue(
     @ConnectedSocket() client: Socket,
-    @MessageBody() type: number
+    @MessageBody() type: boolean
   ) {
-    if (type !== 0 && type !== 1) return;
+    if (isNil(type)) return;
 
     const queue = type ? this.modifiedQueue : this.classicQueue;
 
@@ -93,8 +98,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
 
   @SubscribeMessage("leaveQueue")
   async leaveQueue(@ConnectedSocket() client: Socket) {
-    this.classicQueue.delete(client.request.user.id);
-    this.modifiedQueue.delete(client.request.user.id);
+    const id = client.request.user.id;
+
+    this.classicQueue.delete(id);
+    this.modifiedQueue.delete(id);
+    this.customQueue.delete(id);
     client.emit("notQueue", null);
   }
 
@@ -119,6 +127,47 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
     }
 
     client.emit("gameInfo", game.getInfo());
+  }
+
+  @SubscribeMessage("customGame")
+  async handleCustomGame(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("id") opponentId: number,
+    @MessageBody("type") type: boolean
+  ) {
+    const id = client.request.user.id;
+
+    if (isNil(type) || isNaN(opponentId)) return;
+
+    client.emit("inQueue", null);
+
+    const queue = this.customQueue.get(opponentId);
+
+    if (queue) {
+      if (queue.opponent !== id || queue.type !== type) return;
+
+      const gameId = nanoid();
+
+      const p1 = opponentId;
+      const s1 = queue.socket;
+
+      const p2 = id;
+      const s2 = client.id;
+
+      this.customQueue.delete(opponentId);
+
+      this.server.to(s1).to(s2).socketsJoin(gameId);
+
+      await this.pongService.newGame(gameId, p1, p2, type);
+
+      this.server.to(gameId).emit("matchFound", gameId);
+    } else {
+      this.customQueue.set(client.request.user.id, {
+        socket: client.id,
+        opponent: opponentId,
+        type,
+      });
+    }
   }
 
   @SubscribeMessage("leaveGame")

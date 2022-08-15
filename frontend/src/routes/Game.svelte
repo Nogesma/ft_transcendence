@@ -5,7 +5,7 @@
   import { getUserInfo, getUserStats } from "../utils/info.js";
   import ProfilePic from "../lib/ProfilePic.svelte";
   import Matchmaking from "../lib/Pong/Matchmaking.svelte";
-  import { isEmpty } from "ramda";
+  import { isEmpty, split, startsWith } from "ramda";
   import { params, replace } from "svelte-spa-router";
 
   const initCanvas = (width: number, height: number) => {
@@ -108,8 +108,6 @@
   let isSpectating = true;
   let spectatorList = new Set<number>();
 
-  $: console.log(spectatorList);
-
   let ctx: CanvasRenderingContext2D | null;
   let player1: number, player2: number;
 
@@ -117,15 +115,16 @@
 
   $: $gameId = $params?.id ?? "";
 
-  $: if (!isEmpty($gameId) && socket) {
+  $: if (!isEmpty($gameId) && !startsWith("custom", $gameId) && socket) {
     registerListenners(socket);
+
     socket.emit("joinGame", $gameId);
   }
 </script>
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
-{#if isEmpty($gameId)}
+{#if isEmpty($gameId) || startsWith("custom", $gameId)}
   {#if socket}
     <Matchmaking {socket} />
   {/if}

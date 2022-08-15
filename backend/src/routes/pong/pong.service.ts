@@ -18,7 +18,7 @@ export class PongService {
     gameId: string,
     player1: number,
     player2: number,
-    type: number
+    type: boolean
   ) => {
     const game = new Game(gameId, player1, player2, type, 400, 30, 300, 2);
     this.games.set(gameId, game);

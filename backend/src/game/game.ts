@@ -4,7 +4,7 @@ export class Game {
   private spectatorList = new Set<number>();
 
   private readonly gameId: string;
-  private readonly type: number;
+  private readonly type: boolean;
   private readonly player1: number;
   private readonly player2: number;
 
@@ -21,7 +21,7 @@ export class Game {
     gameId: string,
     p1: number,
     p2: number,
-    type: number,
+    type: boolean,
     width: number,
     length: number,
     height: number,

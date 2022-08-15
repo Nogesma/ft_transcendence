@@ -1,9 +1,10 @@
 <script lang="ts">
   import type { Socket } from "socket.io-client";
   import dayjs, { Dayjs } from "dayjs";
-  import { divide } from "ramda";
+  import { divide, split, startsWith } from "ramda";
   import { replace } from "svelte-spa-router";
   import { onMount } from "svelte";
+  import { gameId } from "../../stores/settings";
 
   export let socket: Socket;
 
@@ -31,6 +32,7 @@
     s.on("notQueue", () => {
       clearInterval(timeout);
       inQueue = false;
+      replace(`/game`);
     });
 
     s.on("matchFound", (id) => {
@@ -40,7 +42,7 @@
     });
   };
 
-  const joinQueue = (n: number) => {
+  const joinQueue = (n: boolean) => {
     if (socket) socket.emit("joinQueue", n);
   };
 
@@ -67,6 +69,15 @@
   };
 
   onMount(() => registerListenners(socket));
+
+  $: if (socket && startsWith("custom", $gameId)) {
+    const [, type, opponentId] = split(".", $gameId);
+
+    socket.emit("customGame", {
+      id: Number(opponentId),
+      type: Boolean(Number(type)),
+    });
+  }
 </script>
 
 <div class="hero min-h-screen">
@@ -76,11 +87,11 @@
       {#if !inQueue}
         <button
           class="btn btn-active btn-primary btn-lg"
-          on:click={() => joinQueue(0)}>Classic Pong</button
+          on:click={() => joinQueue(false)}>Classic Pong</button
         >
         <button
           class="btn btn-active btn-primary btn-lg"
-          on:click={() => joinQueue(1)}>Modified Pong</button
+          on:click={() => joinQueue(true)}>Modified Pong</button
         >
       {:else}
         <button class="btn btn-active btn-primary btn-lg" on:click={leaveQueue}

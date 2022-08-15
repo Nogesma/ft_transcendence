@@ -6,6 +6,8 @@
     getFriendList,
   } from "../utils/friend.js";
   import { pendingFriends } from "../stores/settings.js";
+  import ProfilePic from "../lib/ProfilePic.svelte";
+  import { getUserInfo } from "../utils/info.js";
 
   let friendName = "";
   let status = -1;
@@ -70,20 +72,80 @@
   </div>
 </label>
 
-{#each $pendingFriends as id, i}
-  <div>
-    {i}: {id}
-    <button class="btn btn-accent" on:click={() => acceptFriendRequest(id)}
-      >accept</button
-    >
-    <button class="btn btn-error" on:click={() => denyFriendRequest(id)}
-      >deny</button
-    >
-  </div>
-{/each}
+<table class="table table-zebra w-full">
+  <thead>
+    <tr>
+      <th colspan="4" class="text-center">Pending friend requests</th>
+    </tr>
+  </thead>
+  <tbody>
+    {#each $pendingFriends as id}
+      {#await getUserInfo(id) then { login, displayname }}
+        <tr>
+          <td>
+            <div class="flex content-center place-items-center space-x-5">
+              <div class="avatar w-10 h-10">
+                <ProfilePic attributes="rounded-full" user={login} />
+              </div>
+              <div class="italic">
+                {login}
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="flex place-items-center">
+              {displayname}
+            </div>
+          </td>
+          <td>
+            <button
+              class="btn btn-accent"
+              on:click={() => acceptFriendRequest(id)}>accept</button
+            >
+          </td>
+          <td>
+            <button class="btn btn-error" on:click={() => denyFriendRequest(id)}
+              >deny</button
+            >
+          </td>
+        </tr>
+      {/await}
+    {/each}
+  </tbody>
+</table>
 
-{#await getFriendList() then friendList}
-  {#each friendList as id, i}
-    {i}: {id}
-  {/each}
-{/await}
+<table class="table table-zebra w-full">
+  <thead>
+    <tr>
+      <th colspan="2" class="text-center">Friends</th>
+    </tr>
+  </thead>
+  <tbody>
+    {#await getFriendList() then friendList}
+      {#each friendList as id}
+        {#await getUserInfo(id) then { login, displayname, status }}
+          <tr>
+            <td>
+              <div class="flex content-center place-items-center space-x-5">
+                <div class="avatar w-10 h-10">
+                  <ProfilePic attributes="rounded-full" user={login} {status} />
+                </div>
+                <div class="italic">
+                  {login}
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="flex place-items-center">
+                {displayname}
+              </div>
+            </td>
+            {#if status === 1}
+              <td> Challenge </td>
+            {/if}
+          </tr>
+        {/await}
+      {/each}
+    {/await}
+  </tbody>
+</table>
