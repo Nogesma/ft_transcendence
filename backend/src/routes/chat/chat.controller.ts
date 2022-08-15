@@ -22,6 +22,7 @@ export class ChatController {
 
   @Get("channels")
   async getUserChannels(@Req() req: Request) {
+    if (!req) return;
     const user = await req.session.$get("user");
     if (!user)
       throw new HttpException(
@@ -43,6 +44,7 @@ export class ChatController {
     @MessageBody("password") password: string,
     @MessageBody("public") pub: boolean
   ) {
+    if (!req || !name) return;
     return this.chatService.joinChannel(
       name,
       pub,
@@ -53,6 +55,7 @@ export class ChatController {
 
   @Post("leave/:name")
   async leaveChannel(@Req() req: Request, @Param("name") name: string) {
+    if (!req || !name) return;
     return this.chatService.leaveChannel(name, req.session.userId);
   }
 
@@ -63,6 +66,7 @@ export class ChatController {
     @MessageBody("password") password: string,
     @MessageBody("public") pub: boolean
   ) {
+    if (!req || !name) return;
     return this.chatService.createChannel(
       name,
       pub,
@@ -72,6 +76,7 @@ export class ChatController {
   }
   @Post("delete/:name")
   async deleteChannel(@Req() req: Request, @Param("name") name: string) {
+    if (!req || !name) return;
     return this.chatService.deleteChannel(name, req.session.userId);
   }
 
@@ -82,6 +87,7 @@ export class ChatController {
     @Body("expires") expires: Date,
     @Body("name") name: string
   ) {
+    if (!user || !name) return;
     const date = expires ? dayjs(expires, "'YYYY-MM-DD'") : dayjs(0);
     return this.chatService.banUser(req.session.userId, name, user, date);
   }
@@ -92,6 +98,7 @@ export class ChatController {
     @Param("user") user: string,
     @Body("name") chan: string
   ) {
+    if (!req || !user || !chan) return;
     return this.chatService.unbanUser(req.session.userId, chan, user);
   }
 
@@ -102,6 +109,7 @@ export class ChatController {
     @Body("name") name: string,
     @Body("expires") expires: string
   ) {
+    if (!req || !user || !name || !expires) return;
     const date = expires ? dayjs(expires, "'YYYY-MM-DD'") : dayjs(0);
     return this.chatService.muteUser(req.session.userId, name, user, date);
   }
@@ -112,6 +120,7 @@ export class ChatController {
     @Param("user") user: string,
     @Body("name") chan: string
   ) {
+    if (!req || !user || !chan) return;
     return this.chatService.unmuteUser(req.session.userId, chan, user);
   }
 
@@ -121,6 +130,7 @@ export class ChatController {
     @Param("user") user: string,
     @Body("chan") chan: string
   ) {
+    if (!req || !user || !chan) return;
     return this.chatService.addAdmin(req.session.userId, chan, user);
   }
 
@@ -130,6 +140,7 @@ export class ChatController {
     @Param("user") user: string,
     @Body("chan") chan: string
   ) {
+    if (!req || !user || !chan) return;
     return this.chatService.removeAdmin(req.session.userId, chan, user);
   }
 }

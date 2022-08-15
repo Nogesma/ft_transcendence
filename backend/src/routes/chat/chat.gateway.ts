@@ -45,6 +45,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   }
 
   handleConnection(@ConnectedSocket() client: Socket) {
+    if (!client) return;
     client.on("disconnecting", async () => {
       const username = client.request.user.displayname;
       client.rooms.forEach((r) =>
@@ -63,6 +64,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     @ConnectedSocket() client: Socket,
     @MessageBody("channel") channelName: string
   ) {
+    if (!client || !channelName) return;
     const channel = client.request.channels.find((x) => x.name == channelName);
     if (!channel) return;
 
@@ -77,29 +79,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
       id: 0,
     });
   }
-  @SubscribeMessage("sendpm")
-  async handlepm(
-    @ConnectedSocket() client: Socket,
-    @MessageBody("name") receiverName: string,
-    @MessageBody("str") senderlogin: string,
-    @MessageBody("msg") msg: string
-  ) {
-    const receiver = await this.userService.getUserByLogin(receiverName);
-    const sender = await this.userService.getUserByLogin(senderlogin);
-    if (!receiver || !sender) return;
-    console.log(receiver.id);
-    this.server.to(String(receiver?.id)).emit("pm", {
-      msg,
-      login: senderlogin,
-      displayname: sender?.displayname,
-    });
-  }
   @SubscribeMessage("sendMessage")
   async handleEvent(
     @ConnectedSocket() client: Socket,
     @MessageBody("channel") channelName: string,
     @MessageBody("msg") message: string
   ) {
+    if (!client || !channelName || !message) return;
     const channel = client.request.channels.find((x) => x.name == channelName);
     if (!channel) return;
 
