@@ -280,12 +280,29 @@ export class ChatService {
       );
   };
 
-  isBanned = async (name: string, id: number) => {
-    const channel = await this.channelService.getChannelByName(name);
-
+  is_admin = async (name: string, chan: string) => {
+    const channel = await this.channelService.getChannelByName(chan);
+    const user = await this.userService.getUserByLogin(name);
+    if (!user) return;
     if (!channel)
       throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
-    return this.channelBanService.isBanned(id);
+    return await this.channelAdminService.getAdmin(channel.id, user.id);
+  };
+  ismuted = async (name: string, chan: string) => {
+    const channel = await this.channelService.getChannelByName(chan);
+    const user = await this.userService.getUserByLogin(name);
+    if (!user) return;
+    if (!channel)
+      throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
+    return await this.channelBanService.isMuted(user.id);
+  };
+  isBanned = async (name: string, chan: string) => {
+    const channel = await this.channelService.getChannelByName(chan);
+    const user = await this.userService.getUserByLogin(name);
+    if (!user) return;
+    if (!channel)
+      throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
+    return await this.channelBanService.isBanned(user.id);
   };
 
   /* Admin routes */

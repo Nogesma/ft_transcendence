@@ -94,6 +94,39 @@
       }
     );
   };
+  const ismuted = (name: string) => {
+    return axios.post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/is_muted/${name}`,
+      {
+        chan: channel,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+  };
+  const is_admin = (name: string) => {
+    return axios.post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/is_admin/${name}`,
+      {
+        chan: channel,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+  };
+  const isbanned = (name: string) => {
+    return axios.post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/is_banned/${name}`,
+      {
+        chan: channel,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+  };
   const addAdmin = (name: string) => {
     if (name === $login) {
       alert("You cannot promote yourself as admin");
@@ -252,42 +285,51 @@
                       tabindex="0"
                       class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-green-400 rounded-box w-52"
                     >
-                      <li
-                        class="text-gray-50"
-                        on:click={() => banUser(userLogin)}
-                      >
-                        Ban {displayname}
-                      </li>
-                      <li
-                        class="text-gray-50"
-                        on:click={() => muteUser(userLogin)}
-                      >
-                        Mute {displayname}
-                      </li>
-                      <li
-                        class="text-gray-50"
-                        on:click={() => unbanUser(userLogin)}
-                      >
-                        Unban {displayname}
-                      </li>
-                      <li
-                        class="text-gray-50"
-                        on:click={() => unmuteUser(userLogin)}
-                      >
-                        Unmute {displayname}
-                      </li>
-                      <li
-                        class="text-gray-50"
-                        on:click={() => addAdmin(userLogin)}
-                      >
-                        Add {displayname} as Admin
-                      </li>
-                      <li
-                        class="text-gray-50"
-                        on:click={() => removeAdmin(userLogin)}
-                      >
-                        Remove {displayname} as Admin
-                      </li>
+                      {#if isbanned(userLogin)}
+                        <li
+                          class="text-gray-50"
+                          on:click={() => banUser(userLogin)}
+                        >
+                          Ban {displayname}
+                        </li>
+                      {:else}
+                        <li
+                          class="text-gray-50"
+                          on:click={() => unbanUser(userLogin)}
+                        >
+                          Unban {displayname}
+                        </li>
+                      {/if}
+                      {#if ismuted(userLogin)}
+                        <li
+                          class="text-gray-50"
+                          on:click={() => muteUser(userLogin)}
+                        >
+                          Mute {displayname}
+                        </li>
+                      {:else}
+                        <li
+                          class="text-gray-50"
+                          on:click={() => unmuteUser(userLogin)}
+                        >
+                          Unmute {displayname}
+                        </li>
+                      {/if}
+                      {#if is_admin(userLogin)}
+                        <li
+                          class="text-gray-50"
+                          on:click={() => addAdmin(userLogin)}
+                        >
+                          Add {displayname} as Admin
+                        </li>
+                      {:else}
+                        <li
+                          class="text-gray-50"
+                          on:click={() => removeAdmin(userLogin)}
+                        >
+                          Remove {displayname} as Admin
+                        </li>
+                      {/if}
                       <li
                         class="text-gray-50"
                         on:click={() => push(`/users/${$id}`)}

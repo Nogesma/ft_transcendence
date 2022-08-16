@@ -37,6 +37,30 @@ export class ChatController {
     return this.chatService.getPublicChannels();
   }
 
+  @Post("is_admin/:name")
+  async isadmin(
+    @Req() req: Request,
+    @Param("name") name: string,
+    @Body("chan") chan: string
+  ) {
+    return this.chatService.is_admin(name, chan);
+  }
+  @Post("is_muted/:name")
+  async ismuted(
+    @Req() req: Request,
+    @Param("name") name: string,
+    @Body("chan") chan: string
+  ) {
+    return this.chatService.ismuted(name, chan);
+  }
+  @Post("is_banned/:name")
+  async isbanned(
+    @Req() req: Request,
+    @Param("name") name: string,
+    @Body("chan") chan: string
+  ) {
+    return this.chatService.isBanned(name, chan);
+  }
   @Post("join/:name")
   async joinChannel(
     @Req() req: Request,
