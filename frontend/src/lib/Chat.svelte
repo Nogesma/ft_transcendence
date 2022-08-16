@@ -5,6 +5,7 @@
   import axios from "axios";
   import { displayname, login, id } from "../stores/settings";
   import ProfilePic from "./ProfilePic.svelte";
+  import { push } from "svelte-spa-router";
 
   export let channel = "";
 
@@ -286,6 +287,12 @@
                         on:click={() => removeAdmin(userLogin)}
                       >
                         Remove {displayname} as Admin
+                      </li>
+                      <li
+                        class="text-gray-50"
+                        on:click={() => push(`/users/${$id}`)}
+                      >
+                        View profile
                       </li>
                       <li
                         class="text-gray-50"
