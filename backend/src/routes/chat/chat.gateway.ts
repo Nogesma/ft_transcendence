@@ -85,9 +85,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   ) {
     const channel = client.request.channels.find((x) => x.name == channelName);
     if (!channel) return;
-    client.to(channel.id).emit("invite", {
+    this.server.to(channel.id).emit("invite", {
       message: `${client.request.user.displayname} has invited you for a game`,
-      game_id: randomInt(0, 100),
+      game_id: client.request.user.id,
+      type: true,
     });
   }
 

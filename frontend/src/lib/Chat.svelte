@@ -4,8 +4,15 @@
   import axios from "axios";
   import { displayname, login, id } from "../stores/settings";
   import ProfilePic from "./ProfilePic.svelte";
+  import { push } from "svelte-spa-router";
 
   export let channel = "";
+  let flag = undefined;
+  let invite: {
+    message: string;
+    game_id: number;
+    type: boolean;
+  };
 
   // List chat
   const getChannels = () =>
@@ -109,12 +116,8 @@
 
   onMount(() => socket.emit("joinRoom", { channel }));
   socket.on("invite", (event) => {
-    let invite: {
-      message: string;
-      game_id: number;
-    };
     invite = event;
-    alert(invite.message);
+    flag = 1;
   });
 
   const sendinvite = () => {
@@ -129,6 +132,11 @@
     console.log("test");
     alert(event);
   });
+  const accept_invite = () => {
+    console.log(`#/game/custom.${invite.type}.${invite.game_id}`);
+    flag = undefined;
+    push(`#/game/custom.${invite.type}.${invite.game_id}`);
+  };
   const sendmsg = () => {
     socket.emit("sendMessage", { channel, msg });
     messagesList.push({
@@ -373,6 +381,11 @@
               </ul>
             {/each}
           </div>
+          {#if flag}
+            <br />
+            <button on:click={() => accept_invite()}> {invite.message}</button>
+            <br />
+          {/if}
           <div
             class="flex items-center justify-between w-full p-3 border-t border-gray-300"
           >
