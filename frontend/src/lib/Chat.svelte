@@ -5,14 +5,17 @@
   import { displayname, login, id } from "../stores/settings";
   import ProfilePic from "./ProfilePic.svelte";
   import { push } from "svelte-spa-router";
+  import type { Socket } from "socket.io-client";
+  import { acceptInvite, sendInvite } from "../utils/gameInvite.js";
+  import {
+    banUser,
+    muteUser,
+    unbanUser,
+    unmuteUser,
+  } from "../utils/chatManagement.js";
 
   export let channel = "";
-  let flag = undefined;
-  let invite: {
-    message: string;
-    game_id: number;
-    type: boolean;
-  };
+  let invite: { id: number; type: boolean; displayname: string } | undefined;
 
   // List chat
   const getChannels = () =>
@@ -27,22 +30,7 @@
     displayname: string;
     id: number;
   }> = [];
-  const muteUser = (name: string) => {
-    if (name === $login) {
-      alert("You cannot mute yourself");
-      return;
-    }
-    axios.post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/chat/mute/${name}`,
-      {
-        name: channel,
-        expires: new Date(),
-      },
-      {
-        withCredentials: true,
-      }
-    );
-  };
+
   const sendpm = (
     name: string,
     uid: number,
@@ -56,44 +44,6 @@
       return;
     }
     socket.emit("sendpm", { name, str });
-  };
-  const unmuteUser = (name: string) => {
-    axios.post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/chat/unmute/${name}`,
-      {
-        name: channel,
-      },
-      {
-        withCredentials: true,
-      }
-    );
-  };
-  const unbanUser = (name: string) => {
-    axios.post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/chat/UnBan/${name}`,
-      {
-        name: channel,
-      },
-      {
-        withCredentials: true,
-      }
-    );
-  };
-  const banUser = (name: string) => {
-    if (name === $login) {
-      alert("You cannot ban yourself");
-      return;
-    }
-    axios.post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/chat/ban/${name}`,
-      {
-        name: channel,
-        expires: new Date(),
-      },
-      {
-        withCredentials: true,
-      }
-    );
   };
 
   /* const addAdmin = (name: string) => {
@@ -112,31 +62,27 @@
     );
   }; */
 
-  const socket = chatSocket();
+  const registerListeners = (socket: Socket) => {
+    socket.on("newInvite", (event) => (invite = event));
 
-  onMount(() => socket.emit("joinRoom", { channel }));
-  socket.on("invite", (event) => {
-    invite = event;
-    flag = 1;
-  });
+    socket.on("newMessage", (event) => {
+      messagesList.push(event);
+      messagesList = messagesList;
+    });
 
-  const sendinvite = () => {
-    socket.emit("newinvite", { channel });
+    socket.on("pm", (event) => {
+      console.log("test");
+      alert(event);
+    });
+
+    socket.on("newCustomGame", ({ p1, p2, type }) => {
+      invite = undefined;
+      console.log({ p1, p2, type });
+      if ($id === p1) push(`#/game/custom.${type}.${p2}`);
+      if ($id === p2) push(`#/game/custom.${type}.${p1}`);
+    });
   };
 
-  socket.on("newMessage", (event) => {
-    messagesList.push(event);
-    messagesList = messagesList;
-  });
-  socket.on("pm", (event) => {
-    console.log("test");
-    alert(event);
-  });
-  const accept_invite = () => {
-    console.log(`#/game/custom.${invite.type}.${invite.game_id}`);
-    flag = undefined;
-    push(`#/game/custom.${invite.type}.${invite.game_id}`);
-  };
   const sendmsg = () => {
     socket.emit("sendMessage", { channel, msg });
     messagesList.push({
@@ -148,85 +94,14 @@
     messagesList = messagesList;
     msg = "";
   };
+
+  const socket = chatSocket();
+
+  onMount(() => {
+    registerListeners(socket);
+    socket.emit("joinRoom", { channel });
+  });
 </script>
-
-<!--<h1>{channel}</h1>-->
-<br /><br />
-
-<!--{#each messagesList as { displayname, message, login: userLogin, id }, ina}-->
-<!--  <div class="dropdown p-2 bg-base-100 rounded-box">-->
-<!--    <label tabindex="0" class="" for="unused">{ina + 1}: {displayname}</label>: {message}-->
-<!--    <div-->
-<!--      tabindex="0"-->
-<!--      class="dropdown-content card card-side bg-base-100 shadow-xl max-h-fit max-w-fit"-->
-<!--    >-->
-<!--      <div class="dropdown">-->
-<!--      <div class="card-body max-h-fit bg-neutral-focus">-->
-<!--        <label for="unused" tabindex="0" class="btn m-1">-->
-<!--          <div tabindex="0" class="btn btn-ghost btn-circle avatar">-->
-<!--              <ProfilePic user={userLogin} attributes="h-12 w-12 rounded-full" />-->
-<!--          </div>-->
-<!--        </label>-->
-<!--        <div class="card-actions justify-end">-->
-<!--&lt;!&ndash;          <div class="dropdown">&ndash;&gt;-->
-<!--            <ul-->
-<!--              tabindex="0"-->
-<!--              class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 max-h-full"-->
-<!--            >-->
-<!--              <li>-->
-<!--                <button-->
-<!--                  class="btn btn-primary max-h-fit"-->
-<!--                  id="ban"-->
-<!--                  on:click={() => banppl(userLogin)}>Ban</button-->
-<!--                >-->
-<!--              </li>-->
-<!--              <li>-->
-<!--                <button-->
-<!--                  class="btn btn-secondary"-->
-<!--                  id="unban"-->
-<!--                  on:click={() => unbanppl(userLogin)}>UnBan</button-->
-<!--                >-->
-<!--              </li>-->
-<!--              <li>-->
-<!--                <button-->
-<!--                  class="btn btn-accent max-h-fit"-->
-<!--                  id="mute"-->
-<!--                  on:click={() => muteppl(userLogin)}>Mute</button-->
-<!--                >-->
-<!--              </li>-->
-<!--              <li>-->
-<!--                <button-->
-<!--                  class="btn btn-accent"-->
-<!--                  id="unmute"-->
-<!--                  on:click={() => unmuteppl(userLogin)}>UnMute</button-->
-<!--                >-->
-<!--              </li>-->
-<!--              <li>-->
-<!--                <button-->
-<!--                  class="btn btn-accent"-->
-<!--                  id="add_admin"-->
-<!--                  on:click={() => add_admin(userLogin)}>Add Admin</button-->
-<!--                >-->
-<!--              </li>-->
-<!--            </ul>-->
-<!--            ß-->
-<!--          </div>-->
-<!--        </div>-->
-<!--&lt;!&ndash;        <h2 class="card-title">&ndash;&gt;-->
-<!--&lt;!&ndash;          <a href="#/users/{id}">{displayname}</a>&ndash;&gt;-->
-<!--&lt;!&ndash;        </h2>&ndash;&gt;-->
-<!--        <h2 class="card-title">-->
-<!--          <p>Click the button to watch on Jetflix app.</p>-->
-<!--          <div class="card-actions justify-end">-->
-<!--            <button on:click={() => sendpm(userLogin)} class="btn btn-primary"-->
-<!--              >send pm to {displayname}</button-->
-<!--            >-->
-<!--          </div>-->
-<!--        </h2>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--{/each}-->
 
 <body>
   <div class="container mx-auto">
@@ -346,25 +221,25 @@
                     >
                       <li
                         class="text-gray-50"
-                        on:click={() => banUser(userLogin)}
+                        on:click={() => banUser(userLogin, $login, channel)}
                       >
                         Ban {userLogin}
                       </li>
                       <li
                         class="text-gray-50"
-                        on:click={() => muteUser(userLogin)}
+                        on:click={() => muteUser(userLogin, $login, channel)}
                       >
                         Mute {userLogin}
                       </li>
                       <li
                         class="text-gray-50"
-                        on:click={() => unbanUser(userLogin)}
+                        on:click={() => unbanUser(userLogin, channel)}
                       >
                         Unban {userLogin}
                       </li>
                       <li
                         class="text-gray-50"
-                        on:click={() => unmuteUser(userLogin)}
+                        on:click={() => unmuteUser(userLogin, channel)}
                       >
                         Unmute {userLogin}
                       </li>
@@ -381,10 +256,20 @@
               </ul>
             {/each}
           </div>
-          {#if flag}
-            <br />
-            <button on:click={() => accept_invite()}> {invite.message}</button>
-            <br />
+          {#if invite}
+            <div>
+              {invite.displayname} invited you for a {invite.type
+                ? "modified"
+                : "classic"} pong game!
+              <button
+                class="btn {invite.id === $id ? 'btn-disabled' : ''}"
+                on:click={() => {
+                  if (invite) acceptInvite(socket, channel, invite);
+                }}
+              >
+                Accept
+              </button>
+            </div>
           {/if}
           <div
             class="flex items-center justify-between w-full p-3 border-t border-gray-300"
@@ -409,17 +294,18 @@
                 />
               </svg>
             </button>
-            <button type="invite" on:click={sendinvite}>
-              <svg
-                class="w-5 h-5 text-gray-500 origin-center transform rotate-90"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"
-                />
-              </svg>
+            <button
+              type="invite"
+              class="mr-5"
+              on:click={() => sendInvite(socket, channel, false)}
+            >
+              classic
+            </button>
+            <button
+              type="invite"
+              on:click={() => sendInvite(socket, channel, false)}
+            >
+              modified
             </button>
           </div>
         </div>
