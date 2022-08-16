@@ -19,6 +19,7 @@ import {
 import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
 import { SessionService } from "../../models/session/session.service.js";
 import { UserService } from "../../models/user/user.service.js";
+import { randomInt } from "crypto";
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
@@ -76,6 +77,21 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
       id: 0,
     });
   }
+
+  @SubscribeMessage("newinvite")
+  async makeinvite(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("channel") channelName: string
+  ) {
+    const channel = client.request.channels.find((x) => x.name == channelName);
+    if (!channel) return;
+    this.server.to(channel.id).emit("invite", {
+      message: `${client.request.user.displayname} has invited you for a game`,
+      game_id: client.request.user.id,
+      type: true,
+    });
+  }
+
   @SubscribeMessage("sendpm")
   async handlepm(
     @ConnectedSocket() client: Socket,
