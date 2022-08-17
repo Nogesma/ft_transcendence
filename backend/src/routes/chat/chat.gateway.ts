@@ -49,7 +49,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   }
 
   handleConnection(@ConnectedSocket() client: Socket) {
-    if (!client) return;
     client.on("disconnecting", async () => {
       const username = client.request.user.displayname;
       client.rooms.forEach((r) =>
@@ -72,9 +71,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     if (!channel) return;
 
     const username = client.request.user.displayname;
-    client.join(client.request.user.id.toString());
     client.join(channel.id);
-    console.log(client.request.user.id.toString());
     client.to(channel.id).emit("newMessage", {
       message: `${username} joined the room`,
       login: "ADMIN",
