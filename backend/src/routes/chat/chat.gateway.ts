@@ -68,7 +68,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     @ConnectedSocket() client: Socket,
     @MessageBody("channel") channelName: string
   ) {
-    if (!client || !channelName) return;
     const channel = client.request.channels.find((x) => x.name == channelName);
     if (!channel) return;
 
@@ -89,7 +88,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     @MessageBody("channel") channelName: string,
     @MessageBody("msg") message: string
   ) {
-    if (!client || !channelName || !message) return;
     const channel = client.request.channels.find((x) => x.name == channelName);
     if (!channel) return;
     if (await this.channelBanService.isBanned(client.request.user.id)) {
