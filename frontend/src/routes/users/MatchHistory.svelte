@@ -6,18 +6,11 @@
   dayjs.extend(relativeTime);
   import ProfilePic from "../../lib/ProfilePic.svelte";
   import { displayname, id, login } from "../../stores/settings.js";
+  import { getUserInfo } from "../../utils/info";
 
   export let params: { id: number };
 
   const uid: number = params?.id ?? $id;
-
-  const getUserInfo = () =>
-    axios
-      .get(`${import.meta.env.VITE_BACKEND_URI}/api/info/${uid}`, {
-        withCredentials: true,
-      })
-      .then(({ data }) => data)
-      .catch(console.error);
 
   const getUserMatchHistory = () =>
     axios
@@ -30,7 +23,7 @@
 
   if (uid == $id) [ulogin, udisplayname] = [$login, $displayname];
   else
-    getUserInfo().then(
+    getUserInfo(uid).then(
       ({ login, displayname }) =>
         ([ulogin, udisplayname] = [login, displayname])
     );

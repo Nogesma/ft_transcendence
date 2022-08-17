@@ -11,19 +11,37 @@ export class FriendService {
 
   addFriend = (u1: number, u2: number) =>
     Promise.all([
-      this.friendModel.create({ user: u1, friend: u2, isFriend: true }),
-      this.friendModel.create({ user: u2, friend: u1 }),
+      this.friendModel.create({ user: u1, friend: u2 }),
+      this.friendModel.create({ user: u2, friend: u1, isFriend: false }),
     ]);
 
   getPendingFriendRequest = (user: number) =>
-    this.friendModel.findAll({ where: { user, isFriend: false } });
+    this.friendModel.findAll({
+      where: { user, isFriend: false },
+      attributes: { include: ["friend"] },
+    });
 
   acceptFriendRequest = (user: number, friend: number) =>
-    this.friendModel.update({ isFriend: true }, { where: { user, friend } });
+    Promise.all([
+      this.friendModel.update({ isFriend: true }, { where: { user, friend } }),
+      this.friendModel.update(
+        { isFriend: true },
+        { where: { user: friend, friend: user } }
+      ),
+    ]);
 
   delFriend = (u1: number, u2: number) =>
     Promise.all([
       this.friendModel.destroy({ where: { user: u1, friend: u2 } }),
       this.friendModel.destroy({ where: { user: u2, friend: u1 } }),
     ]);
+
+  getAllFriends = (user: number) =>
+    this.friendModel.findAll({
+      where: { user, isFriend: true },
+      attributes: { include: ["friend"] },
+    });
+
+  isFriend = (user: number, friend: number) =>
+    this.friendModel.findOne({ where: { user, friend } });
 }
