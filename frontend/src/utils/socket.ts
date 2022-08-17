@@ -7,6 +7,11 @@ const chatSocket = () =>
     withCredentials: true,
   });
 
+const pmSocket = () =>
+  io(`${backendUri}/privatemessage`, {
+    withCredentials: true,
+  });
+
 const statusSocket = () =>
   io(`${backendUri}/status`, {
     withCredentials: true,
@@ -17,4 +22,4 @@ const gameSocket = () =>
     withCredentials: true,
   });
 
-export { chatSocket, statusSocket, gameSocket };
+export { chatSocket, statusSocket, gameSocket, pmSocket };

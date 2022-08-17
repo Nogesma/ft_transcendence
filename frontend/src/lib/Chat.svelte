@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { chatSocket } from "../utils/socket";
+  import { pmSocket } from "../utils/socket";
   import axios from "axios";
   import { displayname, login, id } from "../stores/settings";
   import ProfilePic from "./ProfilePic.svelte";
@@ -24,6 +25,7 @@
     });
 
   let msg: string;
+  let pmmsg: string;
   let messagesList: Array<{
     message: string;
     login: string;
@@ -31,22 +33,58 @@
     id: number;
   }> = [];
 
-  const sendpm = (
-    name: string,
-    uid: number,
-    nbr: number,
-    displayname: string
-  ) => {
-    console.log(uid, nbr, displayname); // simply justifying use of this variable for the check, might be or not be used for pms
+  const sendpm = (name: string) => {
     let str = $login;
-    if (str === name) {
-      alert("you cannot send a pm to yourself");
-      return;
-    }
-    socket.emit("sendpm", { name, str });
+    pmsocket.emit("sendpm", { name, str, pmmsg });
   };
 
-  /* const addAdmin = (name: string) => {
+  const removeAdmin = (name: string) => {
+    axios.post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/remove_admin/${name}`,
+      {
+        chan: channel,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+  };
+
+  const ismuted = (name: string) =>
+    axios.post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/is_muted/${name}`,
+      {
+        chan: channel,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+
+  const is_admin = (name: string) => {
+    return axios.post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/is_admin/${name}`,
+      {
+        chan: channel,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+  };
+
+  const isbanned = (name: string) => {
+    return axios.post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/is_banned/${name}`,
+      {
+        chan: channel,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+  };
+  const addAdmin = (name: string) => {
     if (name === $login) {
       alert("You cannot promote yourself as admin");
       return;
@@ -60,8 +98,19 @@
         withCredentials: true,
       }
     );
-  }; */
+  };
 
+  const pmsocket = pmSocket();
+
+  pmsocket.on("pm", (event) => {
+    let pm: {
+      msg: string;
+      login: string;
+      displayname: string;
+    };
+    pm = event;
+    alert(`${pm.displayname} has sent you a message: ${pm.msg}`);
+  });
   const registerListeners = (socket: Socket) => {
     socket.on("newInvite", (event) => (invite = event));
 
@@ -84,6 +133,7 @@
   };
 
   const sendmsg = () => {
+    if (!msg || msg.length === 0) return;
     socket.emit("sendMessage", { channel, msg });
     messagesList.push({
       message: msg,
@@ -189,14 +239,8 @@
             />
           </div>
           <div class="relative w-full p-6 overflow-y-auto h-[40rem]">
-            {#each messagesList as { displayname, message, login: userLogin, id }, ina}
+            {#each messagesList as { displayname, message, login: userLogin }}
               <ul class="space-y-2">
-                <!--              TODO -> when others send message justify start-->
-                <!--              <li class="flex justify-start">-->
-                <!--                <div class="relative max-w-xl px-4 py-2 text-gray-700 rounded shadow">-->
-                <!--                  <span class="block">{message}</span>-->
-                <!--                </div>-->
-                <!--              </li>-->
                 <li class="flex justify-end space-x-3 h-fit p-1 static">
                   <div
                     class="max-w-xl px-4 py-1 text-gray-700 bg-gray-100 rounded shadow static"
@@ -219,6 +263,58 @@
                       tabindex="0"
                       class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-green-400 rounded-box w-52"
                     >
+                      {#await isbanned(userLogin) then banned}
+                        {#if banned}
+                          <li
+                            class="text-gray-50"
+                            on:click={() => banUser(userLogin, $login, channel)}
+                          >
+                            Ban {displayname}
+                          </li>
+                        {:else}
+                          <li
+                            class="text-gray-50"
+                            on:click={() => unbanUser(userLogin, channel)}
+                          >
+                            Unban {displayname}
+                          </li>
+                        {/if}
+                      {/await}
+                      {#await ismuted(userLogin) then muted}
+                        {#if muted}
+                          <li
+                            class="text-gray-50"
+                            on:click={() =>
+                              muteUser(userLogin, $login, channel)}
+                          >
+                            Mute {displayname}
+                          </li>
+                        {:else}
+                          <li
+                            class="text-gray-50"
+                            on:click={() => unmuteUser(userLogin, channel)}
+                          >
+                            Unmute {displayname}
+                          </li>
+                        {/if}
+                      {/await}
+                      {#await is_admin(userLogin) then admin}
+                        {#if admin}
+                          <li
+                            class="text-gray-50"
+                            on:click={() => addAdmin(userLogin)}
+                          >
+                            Add {displayname} as Admin
+                          </li>
+                        {:else}
+                          <li
+                            class="text-gray-50"
+                            on:click={() => removeAdmin(userLogin)}
+                          >
+                            Remove {displayname} as Admin
+                          </li>
+                        {/if}
+                      {/await}
                       <li
                         class="text-gray-50"
                         on:click={() => banUser(userLogin, $login, channel)}
@@ -241,15 +337,22 @@
                         class="text-gray-50"
                         on:click={() => unmuteUser(userLogin, channel)}
                       >
-                        Unmute {userLogin}
+                        View profile
                       </li>
                       <li
                         class="text-gray-50"
-                        on:click={() => sendpm(userLogin, id, ina, displayname)}
+                        on:click={() => sendpm(userLogin)}
                       >
-                        Sendpm {userLogin}
+                        Sendpm {displayname}
                       </li>
-                      <!--                          <li><button on:click={sendmsg}>Logout</button></li>-->
+                      <input
+                        type="text"
+                        placeholder="PmMessage"
+                        class="block w-full py-2 pl-4 mx-3 bg-gray-100 rounded-full outline-none focus:text-gray-700"
+                        name="pmmessage"
+                        required
+                        bind:value={pmmsg}
+                      />
                     </ul>
                   </div>
                 </li>

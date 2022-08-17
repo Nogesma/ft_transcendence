@@ -71,7 +71,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     if (!channel) return;
 
     const username = client.request.user.displayname;
-
     client.join(channel.id);
     client.to(channel.id).emit("newMessage", {
       message: `${username} joined the room`,
@@ -79,17 +78,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
       displayname: "ADMIN",
       id: 0,
     });
-  }
-  @SubscribeMessage("sendpm")
-  async handlepm(
-    @ConnectedSocket() client: Socket,
-    @MessageBody("name") receiverName: string,
-    @MessageBody("str") senderlogin: string
-  ) {
-    if (receiverName === senderlogin) return;
-    const receiver = await this.userService.getUserByLogin(senderlogin);
-    if (!receiver) return;
-    client.to(String(receiver?.id)).emit("pm", { test: String, test2: String });
   }
   @SubscribeMessage("sendMessage")
   async handleEvent(
@@ -99,7 +87,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   ) {
     const channel = client.request.channels.find((x) => x.name == channelName);
     if (!channel) return;
-
+    if (await this.channelBanService.isBanned(client.request.user.id)) {
+      client.leave(channel.id);
+      return;
+    }
     if (await this.channelBanService.isMuted(client.request.user.id)) {
       client.emit("newMessage", {
         message: "You cannot talk because you are muted",
