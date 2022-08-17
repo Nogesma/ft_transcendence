@@ -167,18 +167,14 @@ export class SettingsService {
     req.pipe(bb);
   };
 
+  getFriendList = pipe(
+    this.friendService.getAllFriends,
+    andThen(map(prop("friend")))
+  );
+
   getPendingFriendRequests = pipe(
     this.friendService.getPendingFriendRequest,
-    andThen(
-      map(
-        pipe(
-          prop("friend"),
-          this.userService.getUser,
-          andThen(pick(["id", "displayname"]))
-        )
-      )
-    ),
-    andThen(Promise.all)
+    andThen(map(prop("friend")))
   );
 
   deleteAvatar = (req: Request, login: string) => {
@@ -205,7 +201,17 @@ export class SettingsService {
 
   denyFriendRequest = this.friendService.delFriend;
 
-  addFriend = this.friendService.addFriend;
+  addFriend = async (uid: number, fid: number) => {
+    const isFriend = Boolean(await this.friendService.isFriend(uid, fid));
+
+    if (isFriend)
+      throw new HttpException(
+        "Friend request already sent",
+        HttpStatus.BAD_REQUEST
+      );
+
+    await this.friendService.addFriend(uid, fid).catch(console.error);
+  };
 
   block = this.blockService.blockUser;
   unblock = this.blockService.unblockUser;

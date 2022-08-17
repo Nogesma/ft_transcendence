@@ -6,8 +6,17 @@
   import { displayname, login, id } from "../stores/settings";
   import ProfilePic from "./ProfilePic.svelte";
   import { push } from "svelte-spa-router";
+  import type { Socket } from "socket.io-client";
+  import { acceptInvite, sendInvite } from "../utils/gameInvite.js";
+  import {
+    banUser,
+    muteUser,
+    unbanUser,
+    unmuteUser,
+  } from "../utils/chatManagement.js";
 
   export let channel = "";
+  let invite: { id: number; type: boolean; displayname: string } | undefined;
 
   // List chat
   const getChannels = () =>
@@ -23,66 +32,12 @@
     displayname: string;
     id: number;
   }> = [];
-  const muteUser = (name: string) => {
-    if (name === $login) {
-      alert("You cannot mute yourself");
-      return;
-    }
-    axios.post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/chat/mute/${name}`,
-      {
-        name: channel,
-        expires: new Date(),
-      },
-      {
-        withCredentials: true,
-      }
-    );
-  };
+
   const sendpm = (name: string) => {
-    if (!pmmsg || pmmsg.length === 0) return;
-    console.log(pmmsg);
     let str = $login;
     pmsocket.emit("sendpm", { name, str, pmmsg });
   };
-  const unmuteUser = (name: string) => {
-    axios.post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/chat/unmute/${name}`,
-      {
-        name: channel,
-      },
-      {
-        withCredentials: true,
-      }
-    );
-  };
-  const unbanUser = (name: string) => {
-    axios.post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/chat/UnBan/${name}`,
-      {
-        name: channel,
-      },
-      {
-        withCredentials: true,
-      }
-    );
-  };
-  const banUser = (name: string) => {
-    if (name === $login) {
-      alert("You cannot ban yourself");
-      return;
-    }
-    axios.post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/chat/ban/${name}`,
-      {
-        name: channel,
-        expires: new Date(),
-      },
-      {
-        withCredentials: true,
-      }
-    );
-  };
+
   const removeAdmin = (name: string) => {
     axios.post(
       `${import.meta.env.VITE_BACKEND_URI}/api/chat/remove_admin/${name}`,
@@ -94,8 +49,9 @@
       }
     );
   };
-  const ismuted = (name: string) => {
-    return axios.post(
+
+  const ismuted = (name: string) =>
+    axios.post(
       `${import.meta.env.VITE_BACKEND_URI}/api/chat/is_muted/${name}`,
       {
         chan: channel,
@@ -104,7 +60,7 @@
         withCredentials: true,
       }
     );
-  };
+
   const is_admin = (name: string) => {
     return axios.post(
       `${import.meta.env.VITE_BACKEND_URI}/api/chat/is_admin/${name}`,
@@ -116,6 +72,7 @@
       }
     );
   };
+
   const isbanned = (name: string) => {
     return axios.post(
       `${import.meta.env.VITE_BACKEND_URI}/api/chat/is_banned/${name}`,
@@ -144,13 +101,7 @@
   };
 
   const pmsocket = pmSocket();
-  const socket = chatSocket();
-  onMount(() => socket.emit("joinRoom", { channel }));
 
-  socket.on("newMessage", (event) => {
-    messagesList.push(event);
-    messagesList = messagesList;
-  });
   pmsocket.on("pm", (event) => {
     let pm: {
       msg: string;
@@ -160,6 +111,27 @@
     pm = event;
     alert(`${pm.displayname} has sent you a message: ${pm.msg}`);
   });
+  const registerListeners = (socket: Socket) => {
+    socket.on("newInvite", (event) => (invite = event));
+
+    socket.on("newMessage", (event) => {
+      messagesList.push(event);
+      messagesList = messagesList;
+    });
+
+    socket.on("pm", (event) => {
+      console.log("test");
+      alert(event);
+    });
+
+    socket.on("newCustomGame", ({ p1, p2, type }) => {
+      invite = undefined;
+      console.log({ p1, p2, type });
+      if ($id === p1) push(`#/game/custom.${type}.${p2}`);
+      if ($id === p2) push(`#/game/custom.${type}.${p1}`);
+    });
+  };
+
   const sendmsg = () => {
     if (!msg || msg.length === 0) return;
     socket.emit("sendMessage", { channel, msg });
@@ -172,9 +144,15 @@
     messagesList = messagesList;
     msg = "";
   };
+
+  const socket = chatSocket();
+
+  onMount(() => {
+    registerListeners(socket);
+    socket.emit("joinRoom", { channel });
+  });
 </script>
 
-<br /><br />
 <body>
   <div class="container mx-auto">
     <div class="min-w-full border rounded lg:grid lg:grid-cols-3">
@@ -285,54 +263,79 @@
                       tabindex="0"
                       class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-green-400 rounded-box w-52"
                     >
-                      {#if isbanned(userLogin)}
-                        <li
-                          class="text-gray-50"
-                          on:click={() => banUser(userLogin)}
-                        >
-                          Ban {displayname}
-                        </li>
-                      {:else}
-                        <li
-                          class="text-gray-50"
-                          on:click={() => unbanUser(userLogin)}
-                        >
-                          Unban {displayname}
-                        </li>
-                      {/if}
-                      {#if ismuted(userLogin)}
-                        <li
-                          class="text-gray-50"
-                          on:click={() => muteUser(userLogin)}
-                        >
-                          Mute {displayname}
-                        </li>
-                      {:else}
-                        <li
-                          class="text-gray-50"
-                          on:click={() => unmuteUser(userLogin)}
-                        >
-                          Unmute {displayname}
-                        </li>
-                      {/if}
-                      {#if is_admin(userLogin)}
-                        <li
-                          class="text-gray-50"
-                          on:click={() => addAdmin(userLogin)}
-                        >
-                          Add {displayname} as Admin
-                        </li>
-                      {:else}
-                        <li
-                          class="text-gray-50"
-                          on:click={() => removeAdmin(userLogin)}
-                        >
-                          Remove {displayname} as Admin
-                        </li>
-                      {/if}
+                      {#await isbanned(userLogin) then banned}
+                        {#if banned}
+                          <li
+                            class="text-gray-50"
+                            on:click={() => banUser(userLogin, $login, channel)}
+                          >
+                            Ban {displayname}
+                          </li>
+                        {:else}
+                          <li
+                            class="text-gray-50"
+                            on:click={() => unbanUser(userLogin, channel)}
+                          >
+                            Unban {displayname}
+                          </li>
+                        {/if}
+                      {/await}
+                      {#await ismuted(userLogin) then muted}
+                        {#if muted}
+                          <li
+                            class="text-gray-50"
+                            on:click={() =>
+                              muteUser(userLogin, $login, channel)}
+                          >
+                            Mute {displayname}
+                          </li>
+                        {:else}
+                          <li
+                            class="text-gray-50"
+                            on:click={() => unmuteUser(userLogin, channel)}
+                          >
+                            Unmute {displayname}
+                          </li>
+                        {/if}
+                      {/await}
+                      {#await is_admin(userLogin) then admin}
+                        {#if admin}
+                          <li
+                            class="text-gray-50"
+                            on:click={() => addAdmin(userLogin)}
+                          >
+                            Add {displayname} as Admin
+                          </li>
+                        {:else}
+                          <li
+                            class="text-gray-50"
+                            on:click={() => removeAdmin(userLogin)}
+                          >
+                            Remove {displayname} as Admin
+                          </li>
+                        {/if}
+                      {/await}
                       <li
                         class="text-gray-50"
-                        on:click={() => push(`/users/${$id}`)}
+                        on:click={() => banUser(userLogin, $login, channel)}
+                      >
+                        Ban {userLogin}
+                      </li>
+                      <li
+                        class="text-gray-50"
+                        on:click={() => muteUser(userLogin, $login, channel)}
+                      >
+                        Mute {userLogin}
+                      </li>
+                      <li
+                        class="text-gray-50"
+                        on:click={() => unbanUser(userLogin, channel)}
+                      >
+                        Unban {userLogin}
+                      </li>
+                      <li
+                        class="text-gray-50"
+                        on:click={() => unmuteUser(userLogin, channel)}
                       >
                         View profile
                       </li>
@@ -356,6 +359,21 @@
               </ul>
             {/each}
           </div>
+          {#if invite}
+            <div>
+              {invite.displayname} invited you for a {invite.type
+                ? "modified"
+                : "classic"} pong game!
+              <button
+                class="btn {invite.id === $id ? 'btn-disabled' : ''}"
+                on:click={() => {
+                  if (invite) acceptInvite(socket, channel, invite);
+                }}
+              >
+                Accept
+              </button>
+            </div>
+          {/if}
           <div
             class="flex items-center justify-between w-full p-3 border-t border-gray-300"
           >
@@ -378,6 +396,19 @@
                   d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"
                 />
               </svg>
+            </button>
+            <button
+              type="invite"
+              class="mr-5"
+              on:click={() => sendInvite(socket, channel, false)}
+            >
+              classic
+            </button>
+            <button
+              type="invite"
+              on:click={() => sendInvite(socket, channel, false)}
+            >
+              modified
             </button>
           </div>
         </div>

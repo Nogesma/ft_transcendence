@@ -5,7 +5,7 @@
   import { getUserInfo, getUserStats } from "../utils/info.js";
   import ProfilePic from "../lib/ProfilePic.svelte";
   import Matchmaking from "../lib/Pong/Matchmaking.svelte";
-  import { isNil } from "ramda";
+  import { isEmpty, startsWith } from "ramda";
   import { params, replace } from "svelte-spa-router";
 
   const initCanvas = (width: number, height: number) => {
@@ -68,8 +68,14 @@
         // });
         // });
 
-        s.on("newSpectator", (id) => spectatorList.add(id));
-        s.on("delSpectator", (id) => spectatorList.delete(id));
+        s.on("newSpectator", (id) => {
+          spectatorList.add(id);
+          spectatorList = spectatorList;
+        });
+        s.on("delSpectator", (id) => {
+          spectatorList.delete(id);
+          spectatorList = spectatorList;
+        });
       }
     );
   };
@@ -109,15 +115,16 @@
 
   $: $gameId = $params?.id ?? "";
 
-  $: if (gameId && socket) {
+  $: if (!isEmpty($gameId) && !startsWith("custom", $gameId) && socket) {
     registerListenners(socket);
-    socket.emit("joinGame", gameId);
+
+    socket.emit("joinGame", $gameId);
   }
 </script>
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
-{#if isNil(gameId)}
+{#if isEmpty($gameId) || startsWith("custom", $gameId)}
   {#if socket}
     <Matchmaking {socket} />
   {/if}

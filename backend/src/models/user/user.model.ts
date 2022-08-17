@@ -78,6 +78,9 @@ export class User extends Model {
   @BelongsToMany(() => User, () => Friend, "user")
   friend: User[];
 
+  @BelongsToMany(() => User, () => Friend, "friend")
+  isfriend: User[];
+
   @BelongsToMany(() => User, () => Block, "user")
   block: User[];
 

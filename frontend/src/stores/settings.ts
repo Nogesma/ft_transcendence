@@ -1,4 +1,4 @@
-import { derived, writable } from "svelte/store";
+import { derived, type Writable, writable } from "svelte/store";
 import axios from "axios";
 import { isEmpty, not } from "ramda";
 
@@ -14,6 +14,8 @@ const gameId = writable("");
 
 const updatepfp = writable(0);
 
+const pendingFriends: Writable<number[]> = writable([]);
+
 const pfp = derived([login, updatepfp], ([$login, $updatepfp], set) => {
   if (not(isEmpty($login)))
     axios
@@ -24,4 +26,14 @@ const pfp = derived([login, updatepfp], ([$login, $updatepfp], set) => {
 
 const status = writable(1);
 
-export { isLoggedIn, displayname, id, login, pfp, updatepfp, status, gameId };
+export {
+  isLoggedIn,
+  displayname,
+  id,
+  login,
+  pfp,
+  updatepfp,
+  status,
+  gameId,
+  pendingFriends,
+};

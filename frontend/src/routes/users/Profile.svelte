@@ -68,7 +68,7 @@
         {/if}
         <button
           class="btn btn-primary"
-          on:click={() => push(`/users/history/${uid}`)}
+          on:click={() => push(`/users/${uid}/history`)}
           >Match History
         </button>
         {#if uid === $id}

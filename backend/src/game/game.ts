@@ -1,7 +1,10 @@
+import type { Socket } from "socket.io";
+
 export class Game {
   private spectatorList = new Set<number>();
 
-  private gameId: string;
+  private readonly gameId: string;
+  private readonly type: boolean;
   private readonly player1: number;
   private readonly player2: number;
 
@@ -18,11 +21,13 @@ export class Game {
     gameId: string,
     p1: number,
     p2: number,
+    type: boolean,
     width: number,
     length: number,
     height: number,
     thick: number
   ) {
+    this.type = type;
     this.box = { width, length, height, thick };
     this.gameId = gameId;
     this.player1 = p1;
@@ -33,9 +38,14 @@ export class Game {
     return { box: this.box, speed: this.speed, tick_speed: this.tick_speed };
   };
 
+  getGameId = () => this.gameId;
+
   newSpectator = (id: number) => this.spectatorList.add(id);
 
-  removeSpectator = (id: number) => this.spectatorList.delete(id);
+  removeSpectator = (client: Socket, id: number) => {
+    this.spectatorList.delete(id);
+    client.to(this.gameId).emit("delSpectator", id);
+  };
 
   getInfo = () => ({
     width: this.box.width,

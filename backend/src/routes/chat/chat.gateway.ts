@@ -19,6 +19,7 @@ import {
 import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
 import { SessionService } from "../../models/session/session.service.js";
 import { UserService } from "../../models/user/user.service.js";
+import { isNil } from "ramda";
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
@@ -27,6 +28,9 @@ import { UserService } from "../../models/user/user.service.js";
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   @WebSocketServer()
   server: Server;
+
+  // Map<userid, roomid>
+  invites = new Map<number, { type: boolean; channelId: string }>();
 
   constructor(
     private readonly channelBanService: ChannelBanService,
@@ -106,5 +110,48 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     client
       .to(channel.id)
       .emit("newMessage", { message, login, displayname, id });
+  }
+
+  @SubscribeMessage("sendInvite")
+  handleSendInvite(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("channel") channelName: string,
+    @MessageBody("type") type: boolean
+  ) {
+    if (isNil(type)) return;
+
+    const channel = client.request.channels.find((x) => x.name == channelName);
+    if (!channel) return;
+
+    const { displayname, id } = client.request.user;
+
+    this.invites.set(id, { channelId: channel.id, type });
+
+    this.server.to(channel.id).emit("newInvite", { id, displayname, type });
+  }
+
+  @SubscribeMessage("acceptInvite")
+  handleAcceptInvite(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("channel") channelName: string,
+    @MessageBody("type") type: boolean,
+    @MessageBody("id") opponentId: number
+  ) {
+    const channel = client.request.channels.find((x) => x.name == channelName);
+    if (!channel) return;
+
+    const invite = this.invites.get(opponentId);
+    if (!invite) return;
+
+    if (invite.channelId !== channel.id) return;
+    if (invite.type !== type) return;
+
+    this.invites.delete(opponentId);
+
+    const id = client.request.user.id;
+
+    client
+      .to(channel.id)
+      .emit("newCustomGame", { p1: opponentId, p2: id, type });
   }
 }
