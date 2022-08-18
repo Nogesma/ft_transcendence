@@ -19,6 +19,7 @@ import {
 import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
 import { SessionService } from "../../models/session/session.service.js";
 import { UserService } from "../../models/user/user.service.js";
+import type { ChannelHandshake } from "../../types/socket.js";
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
@@ -43,11 +44,12 @@ export class PrivatemessagesGateway
     );
     this.server.use(socketAuth(this.sessionService));
     this.server.use(addUser);
-    this.server.use(addChannels);
   }
 
   handleConnection(@ConnectedSocket() client: Socket) {
-    client.join(client.request.user.id.toString());
+    const handshake = client.handshake as ChannelHandshake;
+
+    client.join(handshake.user.id.toString());
   }
 
   @SubscribeMessage("sendpm")

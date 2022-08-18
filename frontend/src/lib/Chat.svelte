@@ -150,6 +150,7 @@
   onMount(() => {
     registerListeners(socket);
     socket.emit("joinRoom", { channel });
+    socket.emit("banUser", {});
   });
 </script>
 

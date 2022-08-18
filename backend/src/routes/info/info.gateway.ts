@@ -12,6 +12,8 @@ import { Server, Socket } from "socket.io";
 import { ConfigService } from "@nestjs/config";
 import { addUser, socketAuth, socketCookieParser } from "../../utils/socket.js";
 import { SessionService } from "../../models/session/session.service.js";
+import type { UserHandshake } from "../../types/socket.js";
+import { isNil } from "ramda";
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
@@ -37,13 +39,17 @@ export class InfoGateway
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    client.request.user.status = 1;
-    await client.request.user.save();
+    const handshake = client.handshake as UserHandshake;
+
+    handshake.user.status = 1;
+    await handshake.user.save();
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    client.request.user.status = 0;
-    await client.request.user.save();
+    const handshake = client.handshake as UserHandshake;
+
+    handshake.user.status = 0;
+    await handshake.user.save();
   }
 
   @SubscribeMessage("status")
@@ -52,9 +58,14 @@ export class InfoGateway
     @MessageBody("status") status: number,
     @MessageBody("gameId") gameId: string
   ) {
-    client.request.user.status = status;
-    if (status === 2 || status === 3) client.request.user.currentGame = gameId;
-    else client.request.user.currentGame = "";
-    await client.request.user.save();
+    const handshake = client.handshake as UserHandshake;
+
+    if (isNaN(status)) return;
+
+    handshake.user.status = status;
+    if ((status === 2 || status === 3) && !isNil(gameId))
+      handshake.user.currentGame = gameId;
+    else handshake.user.currentGame = "";
+    await handshake.user.save();
   }
 }
