@@ -21,6 +21,9 @@ export default {
   "/game/:id?": wrap({
     asyncComponent: () => import("./routes/Game.svelte"),
   }),
+  "/chat/:id?": wrap({
+    asyncComponent: () => import("./routes/Chat.svelte"),
+  }),
   "*": wrap({
     asyncComponent: () => import("./routes/404.svelte"),
   }),

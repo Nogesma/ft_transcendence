@@ -1,21 +1,26 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { chatSocket } from "../utils/socket";
-  import { pmSocket } from "../utils/socket";
   import axios from "axios";
-  import { displayname, login, id } from "../stores/settings";
-  import ProfilePic from "./ProfilePic.svelte";
-  import { push } from "svelte-spa-router";
+  import { displayname, login, id, pmSocket } from "../stores/settings";
+  import ProfilePic from "../lib/ProfilePic.svelte";
+  import { params, push } from "svelte-spa-router";
   import type { Socket } from "socket.io-client";
   import { acceptInvite, sendInvite } from "../utils/gameInvite.js";
   import {
+    addAdmin,
     banUser,
+    isAdmin,
+    isBanned,
+    isMuted,
     muteUser,
+    removeAdmin,
     unbanUser,
     unmuteUser,
   } from "../utils/chatManagement.js";
+  import { chatSocket } from "../stores/settings.js";
 
-  export let channel = "";
+  $: channel = $params?.id ?? "";
+
   let invite: { id: number; type: boolean; displayname: string } | undefined;
 
   // List chat
@@ -33,76 +38,10 @@
     id: number;
   }> = [];
 
-  const sendpm = (name: string) => {
-    let str = $login;
-    pmsocket.emit("sendpm", { name, str, pmmsg });
-  };
+  const sendpm = (name: string) =>
+    $pmSocket.emit("sendpm", { name, str: $login, pmmsg });
 
-  const removeAdmin = (name: string) => {
-    axios.post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/chat/remove_admin/${name}`,
-      {
-        chan: channel,
-      },
-      {
-        withCredentials: true,
-      }
-    );
-  };
-
-  const ismuted = (name: string) =>
-    axios.post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/chat/is_muted/${name}`,
-      {
-        chan: channel,
-      },
-      {
-        withCredentials: true,
-      }
-    );
-
-  const is_admin = (name: string) => {
-    return axios.post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/chat/is_admin/${name}`,
-      {
-        chan: channel,
-      },
-      {
-        withCredentials: true,
-      }
-    );
-  };
-
-  const isbanned = (name: string) => {
-    return axios.post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/chat/is_banned/${name}`,
-      {
-        chan: channel,
-      },
-      {
-        withCredentials: true,
-      }
-    );
-  };
-  const addAdmin = (name: string) => {
-    if (name === $login) {
-      alert("You cannot promote yourself as admin");
-      return;
-    }
-    axios.post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/chat/add_admin/${name}`,
-      {
-        chan: channel,
-      },
-      {
-        withCredentials: true,
-      }
-    );
-  };
-
-  const pmsocket = pmSocket();
-
-  pmsocket.on("pm", (event) => {
+  $pmSocket.on("pm", (event) => {
     let pm: {
       msg: string;
       login: string;
@@ -111,6 +50,7 @@
     pm = event;
     alert(`${pm.displayname} has sent you a message: ${pm.msg}`);
   });
+
   const registerListeners = (socket: Socket) => {
     socket.on("newInvite", (event) => (invite = event));
 
@@ -134,7 +74,7 @@
 
   const sendmsg = () => {
     if (!msg || msg.length === 0) return;
-    socket.emit("sendMessage", { channel, msg });
+    $chatSocket.emit("sendMessage", { channel, msg });
     messagesList.push({
       message: msg,
       login: $login,
@@ -145,12 +85,24 @@
     msg = "";
   };
 
-  const socket = chatSocket();
+  $: banUserC = banUser($chatSocket, channel);
+  $: muteUserC = muteUser($chatSocket, channel);
+  $: unBanUserC = unbanUser($chatSocket, channel);
+  $: unMuteUserC = unmuteUser($chatSocket, channel);
+
+  $: addAdminC = addAdmin(channel);
+  $: removeAdminC = removeAdmin(channel);
+
+  $: isBannedC = isBanned(channel);
+  $: isMutedC = isMuted(channel);
+  $: isAdminC = isAdmin(channel);
+
+  $: acceptInviteC = acceptInvite($chatSocket, channel);
+  $: sendInviteC = sendInvite($chatSocket, channel);
 
   onMount(() => {
-    registerListeners(socket);
-    socket.emit("joinRoom", { channel });
-    socket.emit("banUser", {});
+    registerListeners($chatSocket);
+    $chatSocket.emit("joinRoom", { channel });
   });
 </script>
 
@@ -195,10 +147,9 @@
                     class="flex items-center px-3 py-2 text-sm transition duration-150 ease-in-out border-b
                                             border-gray-300 cursor-pointer hover:bg-gray-100 focus:outline-none"
                     on:click={() => {
-                      channel = name;
-                      socket.close();
-                      socket.open();
-                      socket.emit("joinRoom", { channel });
+                      $chatSocket.close();
+                      $chatSocket.open();
+                      $chatSocket.emit("joinRoom", { channel });
                     }}
                   >
                     <img
@@ -264,53 +215,52 @@
                       tabindex="0"
                       class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-green-400 rounded-box w-52"
                     >
-                      {#await isbanned(userLogin) then banned}
+                      {#await isBannedC(userLogin) then banned}
                         {#if banned}
                           <li
                             class="text-gray-50"
-                            on:click={() => banUser(userLogin, $login, channel)}
+                            on:click={() => banUserC(userLogin)}
                           >
                             Ban {displayname}
                           </li>
                         {:else}
                           <li
                             class="text-gray-50"
-                            on:click={() => unbanUser(userLogin, channel)}
+                            on:click={() => unBanUserC(userLogin)}
                           >
                             Unban {displayname}
                           </li>
                         {/if}
                       {/await}
-                      {#await ismuted(userLogin) then muted}
+                      {#await isMutedC(userLogin) then muted}
                         {#if muted}
                           <li
                             class="text-gray-50"
-                            on:click={() =>
-                              muteUser(userLogin, $login, channel)}
+                            on:click={() => muteUserC(userLogin)}
                           >
                             Mute {displayname}
                           </li>
                         {:else}
                           <li
                             class="text-gray-50"
-                            on:click={() => unmuteUser(userLogin, channel)}
+                            on:click={() => unMuteUserC(userLogin)}
                           >
                             Unmute {displayname}
                           </li>
                         {/if}
                       {/await}
-                      {#await is_admin(userLogin) then admin}
+                      {#await isAdminC(userLogin) then admin}
                         {#if admin}
                           <li
                             class="text-gray-50"
-                            on:click={() => addAdmin(userLogin)}
+                            on:click={() => addAdminC(userLogin)}
                           >
                             Add {displayname} as Admin
                           </li>
                         {:else}
                           <li
                             class="text-gray-50"
-                            on:click={() => removeAdmin(userLogin)}
+                            on:click={() => removeAdminC(userLogin)}
                           >
                             Remove {displayname} as Admin
                           </li>
@@ -318,25 +268,25 @@
                       {/await}
                       <li
                         class="text-gray-50"
-                        on:click={() => banUser(userLogin, $login, channel)}
+                        on:click={() => banUserC(userLogin)}
                       >
                         Ban {userLogin}
                       </li>
                       <li
                         class="text-gray-50"
-                        on:click={() => muteUser(userLogin, $login, channel)}
+                        on:click={() => muteUserC(userLogin)}
                       >
                         Mute {userLogin}
                       </li>
                       <li
                         class="text-gray-50"
-                        on:click={() => unbanUser(userLogin, channel)}
+                        on:click={() => unBanUserC(userLogin)}
                       >
                         Unban {userLogin}
                       </li>
                       <li
                         class="text-gray-50"
-                        on:click={() => unmuteUser(userLogin, channel)}
+                        on:click={() => unMuteUserC(userLogin)}
                       >
                         View profile
                       </li>
@@ -368,7 +318,7 @@
               <button
                 class="btn {invite.id === $id ? 'btn-disabled' : ''}"
                 on:click={() => {
-                  if (invite) acceptInvite(socket, channel, invite);
+                  if (invite) acceptInviteC(invite);
                 }}
               >
                 Accept
@@ -401,14 +351,11 @@
             <button
               type="invite"
               class="mr-5"
-              on:click={() => sendInvite(socket, channel, false)}
+              on:click={() => sendInviteC(false)}
             >
               classic
             </button>
-            <button
-              type="invite"
-              on:click={() => sendInvite(socket, channel, false)}
-            >
+            <button type="invite" on:click={() => sendInviteC(true)}>
               modified
             </button>
           </div>

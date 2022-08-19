@@ -9,23 +9,28 @@ import {
   OnGatewayDisconnect,
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
+
 import { ConfigService } from "@nestjs/config";
 import { addUser, socketAuth, socketCookieParser } from "../../utils/socket.js";
+import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
 import { SessionService } from "../../models/session/session.service.js";
+import { UserService } from "../../models/user/user.service.js";
 import type { UserHandshake } from "../../types/socket.js";
 import { isNil } from "ramda";
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
-  namespace: "status",
+  namespace: "privatemessage",
 })
-export class InfoGateway
+export class PmGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer()
   server: Server;
 
   constructor(
+    private readonly channelBanService: ChannelBanService,
+    private readonly userService: UserService,
     private readonly configService: ConfigService<EnvironmentVariables, true>,
     private readonly sessionService: SessionService
   ) {}
@@ -40,6 +45,8 @@ export class InfoGateway
 
   async handleConnection(@ConnectedSocket() client: Socket) {
     const handshake = client.handshake as UserHandshake;
+
+    client.join(handshake.user.id.toString());
 
     handshake.user.status = 1;
     await handshake.user.save();
@@ -67,5 +74,23 @@ export class InfoGateway
       handshake.user.currentGame = gameId;
     else handshake.user.currentGame = "";
     await handshake.user.save();
+  }
+
+  @SubscribeMessage("sendpm")
+  async handlepm(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("name") receiverName: string,
+    @MessageBody("str") senderlogin: string,
+    @MessageBody("pmmsg") msg: string
+  ) {
+    if (!receiverName || !senderlogin || !msg) return;
+    const receiver = await this.userService.getUserByLogin(receiverName);
+    const sender = await this.userService.getUserByLogin(senderlogin);
+    if (!receiver || !sender) return;
+    this.server.to(String(receiver?.id)).emit("pm", {
+      msg,
+      login: senderlogin,
+      displayname: sender?.displayname,
+    });
   }
 }

@@ -203,6 +203,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     const user = await this.userService.getUserByLogin(username);
     if (!user) return;
 
+    // Cannot ban yourself.
+    if (user.id === id) return;
+    // Cannot ban owner.
+    if (user.id === channel.ownerId) return;
+    // Can only ban admin if owner.
+    const isUserAdmin = await this.channelAdminService.getAdmin(
+      channel.id,
+      user.id
+    );
+    if (id !== channel.ownerId && isUserAdmin) return;
+
     const userBan = await this.channelBanService.getUser(channel.id, user.id);
     if (userBan) {
       userBan.type = true;
@@ -213,6 +224,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
 
     // todo: check that it works
     await channel.$remove("member", user);
+    if (isUserAdmin)
+      await this.channelAdminService.removeAdmin(channel.id, user.id);
 
     const sockets = await this.server.fetchSockets();
     const userSocket = find(pathEq(["handshake", "user", "id"], user.id))(
@@ -247,6 +260,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     const date = expires ? dayjs(expires, "'YYYY-MM-DD'") : dayjs(0);
     const user = await this.userService.getUserByLogin(username);
     if (!user) return;
+
+    // Cannot mute yourself.
+    if (user.id === id) return;
+    // Cannot mute owner.
+    if (user.id === channel.ownerId) return;
+    // Can only mute admin if owner.
+    if (
+      id !== channel.ownerId &&
+      (await this.channelAdminService.getAdmin(channel.id, user.id))
+    )
+      return;
 
     const userBan = await this.channelBanService.getUser(channel.id, user.id);
     if (userBan) {

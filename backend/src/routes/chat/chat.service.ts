@@ -20,7 +20,6 @@ import type { User } from "../../models/user/user.model.js";
 import { ChannelAdminService } from "../../models/channelAdmin/channelAdmin.service.js";
 import type { Channel } from "../../models/channel/channel.model.js";
 import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
-import type { Dayjs } from "dayjs";
 
 @Injectable()
 export class ChatService {

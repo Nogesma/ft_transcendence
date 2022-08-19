@@ -33,17 +33,17 @@ export class ChatController {
     return this.chatService.getPublicChannels();
   }
 
-  @Post("is_admin/:name")
+  @Post("isAdmin/:name")
   async isadmin(@Param("name") name: string, @Body("chan") chan: string) {
     return this.chatService.is_admin(name, chan);
   }
 
-  @Post("is_muted/:name")
+  @Post("isMuted/:name")
   async ismuted(@Param("name") name: string, @Body("chan") chan: string) {
     return this.chatService.ismuted(name, chan);
   }
 
-  @Post("is_banned/:name")
+  @Post("isBanned/:name")
   async isbanned(@Param("name") name: string, @Body("chan") chan: string) {
     return this.chatService.isBanned(name, chan);
   }
@@ -113,35 +113,7 @@ export class ChatController {
     return this.chatService.deleteChannel(name, req.session.userId);
   }
 
-  @Post("unban/:user")
-  async unbanUser(
-    @Req() req: AuthenticatedRequest,
-    @Param("user") user: string,
-    @Body("name") chan: string
-  ) {
-    if (!user || !chan)
-      throw new HttpException(
-        "can't have empty parameters",
-        HttpStatus.BAD_REQUEST
-      );
-    return this.chatService.unbanUser(req.session.userId, chan, user);
-  }
-
-  @Post("unmute/:user")
-  async unmuteUser(
-    @Req() req: AuthenticatedRequest,
-    @Param("user") user: string,
-    @Body("name") chan: string
-  ) {
-    if (!user || !chan)
-      throw new HttpException(
-        "can't have empty parameters",
-        HttpStatus.BAD_REQUEST
-      );
-    return this.chatService.unmuteUser(req.session.userId, chan, user);
-  }
-
-  @Post("add_admin/:user")
+  @Post("addAdmin/:user")
   async addAdmin(
     @Req() req: AuthenticatedRequest,
     @Param("user") user: string,
@@ -155,7 +127,7 @@ export class ChatController {
     return this.chatService.addAdmin(req.session.userId, chan, user);
   }
 
-  @Post("remove_admin/:user")
+  @Post("removeAdmin/:user")
   async removeAdmin(
     @Req() req: AuthenticatedRequest,
     @Param("user") user: string,

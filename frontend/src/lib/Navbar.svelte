@@ -2,7 +2,6 @@
   import ProfilePic from "./ProfilePic.svelte";
   import { id, isLoggedIn, login, pendingFriends } from "../stores/settings.js";
   import axios from "axios";
-  import { getPendingFriendRequests } from "../utils/friend";
   import { isEmpty } from "ramda";
   import { push } from "svelte-spa-router";
 
@@ -15,9 +14,6 @@
       )
       .then(() => location.reload());
   };
-
-  $: if ($id !== 0)
-    getPendingFriendRequests().then((x) => ($pendingFriends = x));
 </script>
 
 <div class="navbar bg-base-100">
