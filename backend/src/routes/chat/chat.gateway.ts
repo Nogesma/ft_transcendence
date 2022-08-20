@@ -18,7 +18,7 @@ import {
 import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
 import { SessionService } from "../../models/session/session.service.js";
 import { UserService } from "../../models/user/user.service.js";
-import { find, isNil, pathEq, propEq } from "ramda";
+import { equals, find, isNil, pathEq, propEq, unless } from "ramda";
 import dayjs from "dayjs";
 import { ChannelAdminService } from "../../models/channelAdmin/channelAdmin.service.js";
 import type { ChannelHandshake } from "../../types/socket.js";
@@ -82,8 +82,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     );
     if (!channel) return;
 
-    const username = handshake.user.displayname;
+    client.rooms.forEach(unless(equals(client.id), client.leave));
+
     client.join(channel.id);
+
+    const username = handshake.user.displayname;
     client.to(channel.id).emit("newMessage", {
       message: `${username} joined the room`,
       login: "ADMIN",

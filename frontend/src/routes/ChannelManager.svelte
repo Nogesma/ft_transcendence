@@ -1,9 +1,9 @@
 <script lang="ts">
   import axios from "axios";
-  import JoinChannel from "./JoinChannel.svelte";
-  import CreateChannel from "./CreateChannel.svelte";
-  import DeleteChannel from "./DeleteChannel.svelte";
-  import BanUser from "./BanUser.svelte";
+  import JoinChannel from "../lib/JoinChannel.svelte";
+  import CreateChannel from "../lib/CreateChannel.svelte";
+  import DeleteChannel from "../lib/DeleteChannel.svelte";
+  import BanUser from "../lib/BanUser.svelte";
   import { push } from "svelte-spa-router";
 
   const getChannels = () =>

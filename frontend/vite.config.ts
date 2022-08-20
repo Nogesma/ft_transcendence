@@ -6,6 +6,7 @@ import viteCompression from "vite-plugin-compression";
 export default defineConfig({
   build: {
     sourcemap: true,
+    target: "es2022",
   },
   plugins: [
     svelte(),
