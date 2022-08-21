@@ -151,8 +151,7 @@
                     </h2>
                   </div>
                   <div class="relative mt-6 flex-1 px-4 sm:px-6">
-                    <!-- Replace with your content -->
-                    {#each messagesList as { displayname, message, login: userLogin, id }, ina}
+                    {#each messagesList as { displayname, message, login: userLogin, id }}
                       <!--            <label tabindex="0" class="" for="unused">{ina + 1}: {displayname}</label>: {message}-->
                       <ul class="space-y-2">
                         <!--              TODO -> when others send message justify start-->
@@ -163,8 +162,116 @@
                         <!--              </li>-->
 
                         <li class="flex justify-end space-x-3 h-fit p-1 static">
-                          <div class="indicator">
-                            <p>{userLogin}</p>
+                          <div class="dropdown dropdown-end">
+                            <div
+                              tabindex="0"
+                              class="btn btn-ghost btn-circle avatar justify-start"
+                            >
+                              <ProfilePic
+                                user={userLogin}
+                                attributes="h-8 w-8 rounded-full"
+                              />
+                            </div>
+                            <ul
+                              tabindex="0"
+                              class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-green-400 rounded-box w-52"
+                            >
+                              {#await isBannedC(userLogin) then banned}
+                                {#if banned}
+                                  <li
+                                    class="text-gray-50"
+                                    on:click={() => banUserC(userLogin)}
+                                  >
+                                    Ban {displayname}
+                                  </li>
+                                {:else}
+                                  <li
+                                    class="text-gray-50"
+                                    on:click={() => unBanUserC(userLogin)}
+                                  >
+                                    Unban {displayname}
+                                  </li>
+                                {/if}
+                              {/await}
+                              {#await isMutedC(userLogin) then muted}
+                                {#if muted}
+                                  <li
+                                    class="text-gray-50"
+                                    on:click={() => muteUserC(userLogin)}
+                                  >
+                                    Mute {displayname}
+                                  </li>
+                                {:else}
+                                  <li
+                                    class="text-gray-50"
+                                    on:click={() => unMuteUserC(userLogin)}
+                                  >
+                                    Unmute {displayname}
+                                  </li>
+                                {/if}
+                              {/await}
+                              {#await isAdminC(userLogin) then admin}
+                                {#if admin}
+                                  <li
+                                    class="text-gray-50"
+                                    on:click={() => addAdminC(userLogin)}
+                                  >
+                                    Add {displayname} as Admin
+                                  </li>
+                                {:else}
+                                  <li
+                                    class="text-gray-50"
+                                    on:click={() => removeAdminC(userLogin)}
+                                  >
+                                    Remove {displayname} as Admin
+                                  </li>
+                                {/if}
+                              {/await}
+                              <li
+                                class="text-gray-50"
+                                on:click={() => banUserC(userLogin)}
+                              >
+                                Ban {userLogin}
+                              </li>
+                              <li
+                                class="text-gray-50"
+                                on:click={() => muteUserC(userLogin)}
+                              >
+                                Mute {userLogin}
+                              </li>
+                              <li
+                                class="text-gray-50"
+                                on:click={() => unBanUserC(userLogin)}
+                              >
+                                Unban {userLogin}
+                              </li>
+                              <li
+                                class="text-gray-50"
+                                on:click={() => unMuteUserC(userLogin)}
+                              >
+                                Unmute {userLogin}
+                              </li>
+                              <li
+                                class="text-gray-50"
+                                on:click={() => push(`/users/${id}`)}
+                              >
+                                View profile
+                              </li>
+                              <li
+                                class="text-gray-50"
+                                on:click={() => sendpm(userLogin)}
+                              >
+                                Sendpm {displayname}
+                              </li>
+                              <input
+                                type="text"
+                                placeholder="PmMessage"
+                                class="block w-full py-2 pl-4 mx-3 bg-gray-100 rounded-full outline-none focus:text-gray-700"
+                                name="pmmessage"
+                                required
+                                bind:value={pmmsg}
+                              />
+                            </ul>
                             <div
                               class="max-w-xl px-4 py-1 text-gray-700 bg-gray-100 rounded shadow static"
                             >
@@ -173,12 +280,31 @@
                                 >{message}</span
                               >
                             </div>
-                            <div class="dropdown dropdown-end" />
                           </div>
                         </li>
                       </ul>
                     {/each}
-                    <!-- /End replace -->
+                    {#if invite}
+                      <div>
+                        {invite.displayname} invited you for a {invite.type
+                          ? "modified"
+                          : "classic"} pong game!
+                        <button
+                          class="btn {invite.id === $id ? 'btn-disabled' : ''}"
+                          on:click={() => {
+                            if (invite) acceptInviteC(invite);
+                          }}
+                        >
+                          Accept
+                        </button>
+                      </div>
+                    {/if}
+                    <button class="btn" on:click={() => sendInviteC(false)}>
+                      classic
+                    </button>
+                    <button class="btn" on:click={() => sendInviteC(true)}>
+                      modified
+                    </button>
                     <div
                       class="flex items-center justify-between w-full p-3 border-t border-gray-300"
                     >

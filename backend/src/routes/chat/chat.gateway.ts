@@ -83,12 +83,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     );
     if (!channel) return;
 
-    const { displayname, id } = client.request.user;
+    const { displayname, id } = handshake.user;
 
-    client.rooms.forEach(unless(equals(client.id), client.leave));
-    
+    client.rooms.forEach(unless(equals(client.id), (x) => client.leave(x)));
+
     client.join(channel.id);
-    
+
     let members = this.connectedMembers.get(channel.id);
     if (!members) {
       this.connectedMembers.set(channel.id, new Set());
