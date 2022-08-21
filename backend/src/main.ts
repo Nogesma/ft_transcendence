@@ -8,7 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Sync databases with model before launching app.
-  // This will create any missing table
+  // This will create any missing table.
   const databaseService = app.get(DatabaseService);
   await databaseService.sync();
 

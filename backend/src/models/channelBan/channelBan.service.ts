@@ -21,14 +21,18 @@ export class ChannelBanService {
   unmuteUser = (chan: number, user: number) =>
     this.channelBanModel.destroy({ where: { chan, user, type: false } });
 
-  isBanned = (user: number) =>
-    this.channelBanModel.findOne({ where: { user, type: true } });
+  isBanned = async (chan: number, user: number) =>
+    Boolean(
+      await this.channelBanModel.findOne({ where: { chan, user, type: true } })
+    );
 
-  isMuted = (user: number) =>
-    this.channelBanModel.findOne({ where: { user, type: false } });
+  isMuted = async (chan: number, user: number) =>
+    Boolean(
+      await this.channelBanModel.findOne({ where: { chan, user, type: false } })
+    );
 
-  isInTable = (user: number) =>
-    this.channelBanModel.findOne({ where: { user } });
+  getUser = (chan: number, user: number) =>
+    this.channelBanModel.findOne({ where: { chan, user, type: false } });
 
   getAllBanned = (channel: number) =>
     this.channelBanModel.findAll({ where: { type: true, channel } });

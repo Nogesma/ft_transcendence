@@ -4,20 +4,14 @@
   import routes from "./routes";
   import Navbar from "./lib/Navbar.svelte";
   import { onMount } from "svelte";
-  import { statusSocket } from "./utils/socket";
   import { checkAuthentication } from "./utils/auth";
-  import { gameId, id, status } from "./stores/settings";
-  import type { Socket } from "socket.io-client";
+  import { gameId, pmSocket, status } from "./stores/settings";
 
   if (new URLSearchParams(window.location.search).has("code"))
     push("/auth/oauth2callback" + window.location.search);
   else onMount(checkAuthentication);
 
-  let socket: Socket | null;
-
-  $: if ($id !== 0) socket = statusSocket();
-
-  $: socket && socket.emit("status", { status: $status, gameId: $gameId });
+  $: $pmSocket.emit("status", { status: $status, gameId: $gameId });
 </script>
 
 <div class="h-screen flex flex-col">

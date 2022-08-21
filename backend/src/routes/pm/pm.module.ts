@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { PrivatemessagesGateway } from "./privatemessages.gateway.js";
+import { PmGateway } from "./pm.gateway.js";
 import { ConfigModule } from "@nestjs/config";
 import { SessionModule } from "../../models/session/session.module.js";
 import { UserModule } from "../../models/user/user.module.js";
@@ -18,6 +18,6 @@ import { ChannelBanModule } from "../../models/channelBan/channelBan.module.js";
     ChannelAdminModule,
     ChannelBanModule,
   ],
-  providers: [PrivatemessagesGateway],
+  providers: [PmGateway],
 })
-export class PrivatemessagesModule {}
+export class PmModule {}
