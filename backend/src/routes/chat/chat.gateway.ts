@@ -31,6 +31,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
 
   // Map<userid, roomid>
   invites = new Map<number, { type: boolean; channelId: string }>();
+  connectedMembers = new Map<number, Set<number>>();
 
   constructor(
     private readonly channelBanService: ChannelBanService,
@@ -70,14 +71,29 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     const channel = client.request.channels.find((x) => x.name == channelName);
     if (!channel) return;
 
-    const username = client.request.user.displayname;
+    const { displayname, id } = client.request.user;
+
     client.join(channel.id);
-    client.to(channel.id).emit("newMessage", {
-      message: `${username} joined the room`,
-      login: "ADMIN",
-      displayname: "ADMIN",
-      id: 0,
-    });
+    let members = this.connectedMembers.get(channel.id);
+    if (!members) {
+      this.connectedMembers.set(channel.id, new Set());
+      members = this.connectedMembers.get(channel.id);
+      if (!members) return;
+    }
+    members.add(id);
+
+    this.server
+      .to(client.id)
+      .emit("channelInfo", { memberList: Array.from(members) });
+
+    client.to(channel.id).emit("newMember", { displayname, id });
+
+    // client.to(channel.id).emit("newMessage", {
+    //   message: `${username} joined the room`,
+    //   login: "ADMIN",
+    //   displayname: "ADMIN",
+    //   id: 0,
+    // });
   }
   @SubscribeMessage("sendMessage")
   async handleEvent(
