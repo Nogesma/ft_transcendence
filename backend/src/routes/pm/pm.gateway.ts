@@ -75,23 +75,26 @@ export class PmGateway
     else handshake.user.currentGame = "";
     await handshake.user.save();
   }
-
+  @SubscribeMessage("banpm")
+  async handleBan(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("id") id: number
+  ) {
+    const handshake = client.handshake as UserHandshake;
+    if (!id || isNaN(id)) return;
+    return;
+  }
   @SubscribeMessage("sendpm")
   async handlepm(
     @ConnectedSocket() client: Socket,
-    @MessageBody("name") receiverName: string,
-    @MessageBody("str") senderlogin: string,
-    @MessageBody("sendername") sendername: string,
     @MessageBody("id") id: number,
     @MessageBody("pmmsg") msg: string
   ) {
     const handshake = client.handshake as UserHandshake;
-    if (!receiverName || !senderlogin || !msg || isNaN(id)) return;
+    if (!msg || !id || isNaN(id)) return;
     this.server.to(String(id)).emit("pm", {
       msg,
-      login: senderlogin,
-      displayname: sendername,
-      id: handshake.user.id,
+      displayname: handshake.user.displayname,
     });
   }
 }

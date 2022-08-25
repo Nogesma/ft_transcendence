@@ -5,6 +5,7 @@
   import type { Socket } from "socket.io-client";
   import { acceptInvite, sendInvite } from "../utils/gameInvite.js";
   import {
+    banpm,
     addAdmin,
     banUser,
     isAdmin,
@@ -30,11 +31,8 @@
     id: number;
   }> = [];
 
-  const sendpm = (name: string, id: number) =>
+  const sendpm = (id: number) =>
     $pmSocket.emit("sendpm", {
-      name,
-      str: $login,
-      sendername: $displayname,
       id: id,
       pmmsg,
     });
@@ -42,9 +40,7 @@
   $pmSocket.on("pm", (event) => {
     let pm: {
       msg: string;
-      login: string;
       displayname: string;
-      id: number;
     };
     pm = event;
     alert(`${pm.displayname} has sent you a message: ${pm.msg}`);
@@ -83,7 +79,7 @@
   $: muteUserC = muteUser($chatSocket, channel);
   $: unBanUserC = unbanUser($chatSocket, channel);
   $: unMuteUserC = unmuteUser($chatSocket, channel);
-
+  $: banPmC = banpm($pmSocket, id);
   $: addAdminC = addAdmin(channel);
   $: removeAdminC = removeAdmin(channel);
 
@@ -261,7 +257,13 @@
                               </li>
                               <li
                                 class="text-gray-50"
-                                on:click={() => sendpm(userLogin, id)}
+                                on:click={() => banPmC(id)}
+                              >
+                                banpm {displayname}
+                              </li>
+                              <li
+                                class="text-gray-50"
+                                on:click={() => sendpm(id)}
                               >
                                 Sendpm {displayname}
                               </li>
