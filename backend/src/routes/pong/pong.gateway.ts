@@ -10,16 +10,12 @@ import {
 import { Server, Socket } from "socket.io";
 
 import { ConfigService } from "@nestjs/config";
-import {
-  addStats,
-  addUser,
-  socketAuth,
-  socketCookieParser,
-} from "../../utils/socket.js";
+import { addUser, socketAuth, socketCookieParser } from "../../utils/socket.js";
 import { SessionService } from "../../models/session/session.service.js";
 import { PongService } from "./pong.service.js";
 import { nanoid } from "nanoid";
 import { isNil } from "ramda";
+import type { UserHandshake } from "../../types/socket.js";
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
@@ -49,11 +45,12 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
     );
     this.server.use(socketAuth(this.sessionService));
     this.server.use(addUser);
-    this.server.use(addStats);
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    const id = client.request.user.id;
+    const handshake = client.handshake as UserHandshake;
+
+    const id = handshake.user.id;
 
     this.classicQueue.delete(id);
     this.modifiedQueue.delete(id);
@@ -66,11 +63,13 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() type: boolean
   ) {
+    const handshake = client.handshake as UserHandshake;
+
     if (isNil(type)) return;
 
     const queue = type ? this.modifiedQueue : this.classicQueue;
 
-    queue.set(client.request.user.id, client.id);
+    queue.set(handshake.user.id, client.id);
 
     client.emit("inQueue", null);
 
@@ -98,7 +97,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
 
   @SubscribeMessage("leaveQueue")
   async leaveQueue(@ConnectedSocket() client: Socket) {
-    const id = client.request.user.id;
+    const handshake = client.handshake as UserHandshake;
+
+    const id = handshake.user.id;
 
     this.classicQueue.delete(id);
     this.modifiedQueue.delete(id);
@@ -111,9 +112,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() gameId: string
   ) {
+    const handshake = client.handshake as UserHandshake;
+
     //todo: we need to make sure the user is not in another game, or at least
     // that he isn't using the same socket (this applies for playing and spectating)
-    const id = client.request.user.id;
+    const id = handshake.user.id;
 
     const game = this.pongService.getGame(gameId);
     // we emit an object without any attributes if a game doesn't exist
@@ -135,7 +138,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
     @MessageBody("id") opponentId: number,
     @MessageBody("type") type: boolean
   ) {
-    const id = client.request.user.id;
+    const handshake = client.handshake as UserHandshake;
+
+    const id = handshake.user.id;
 
     if (isNil(type) || isNaN(opponentId)) return;
 
@@ -162,7 +167,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
 
       this.server.to(gameId).emit("matchFound", gameId);
     } else {
-      this.customQueue.set(client.request.user.id, {
+      this.customQueue.set(handshake.user.id, {
         socket: client.id,
         opponent: opponentId,
         type,
@@ -175,7 +180,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() gameId: string
   ) {
-    const id = client.request.user.id;
+    const handshake = client.handshake as UserHandshake;
+
+    const id = handshake.user.id;
 
     const game = this.pongService.getGame(gameId);
     if (!game) return;

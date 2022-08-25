@@ -10,9 +10,10 @@ import {
   Req,
   Res,
 } from "@nestjs/common";
-import type { Request, Response } from "express";
+import type { Response } from "express";
 import { SettingsService } from "./settings.service.js";
 import { UserService } from "../../models/user/user.service.js";
+import type { AuthenticatedRequest } from "../../types/http.js";
 
 @Controller("user")
 export class SettingsController {
@@ -22,7 +23,7 @@ export class SettingsController {
   ) {}
 
   @Get("me")
-  async getUserData(@Req() req: Request) {
+  async getUserData(@Req() req: AuthenticatedRequest) {
     const user = await req.session.$get("user");
     if (!user)
       throw new HttpException(
@@ -33,12 +34,12 @@ export class SettingsController {
   }
 
   @Get("2fa")
-  async get2FAStatus(@Req() req: Request) {
+  async get2FAStatus(@Req() req: AuthenticatedRequest) {
     return this.settingsService.get2FAStatus(req.session.userId);
   }
 
   @Get("2fa/enable")
-  async generateNew2FA(@Req() req: Request) {
+  async generateNew2FA(@Req() req: AuthenticatedRequest) {
     const user = await req.session.$get("user");
     if (!user)
       throw new HttpException(
@@ -49,18 +50,24 @@ export class SettingsController {
   }
 
   @Post("2fa/validate/:code")
-  async validate2FA(@Req() req: Request, @Param("code") code: string) {
+  async validate2FA(
+    @Req() req: AuthenticatedRequest,
+    @Param("code") code: string
+  ) {
     return this.settingsService.validate2FA(req.session.userId, code);
   }
 
   @Post("2fa/disable/:code")
-  async disable2FA(@Req() req: Request, @Param("code") code: string) {
+  async disable2FA(
+    @Req() req: AuthenticatedRequest,
+    @Param("code") code: string
+  ) {
     return this.settingsService.disable2FA(req.session.userId, code);
   }
 
   @Post("name")
   async postDisplayName(
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
     @Body() body: { name: string | undefined }
   ) {
     if (!body.name)
@@ -70,7 +77,7 @@ export class SettingsController {
   }
 
   @Post("avatar")
-  async postAvatar(@Req() req: Request, @Res() res: Response) {
+  async postAvatar(@Req() req: AuthenticatedRequest, @Res() res: Response) {
     const login = (await req.session.$get("user"))?.login;
     if (!login)
       throw new HttpException(
@@ -81,7 +88,7 @@ export class SettingsController {
   }
 
   @Delete("avatar")
-  async deleteAvatar(@Req() req: Request) {
+  async deleteAvatar(@Req() req: AuthenticatedRequest) {
     const login = (await req.session.$get("user"))?.login;
     if (!login)
       throw new HttpException(
@@ -92,17 +99,20 @@ export class SettingsController {
   }
 
   @Get("friends")
-  async getFriendList(@Req() req: Request) {
+  async getFriendList(@Req() req: AuthenticatedRequest) {
     return this.settingsService.getFriendList(req.session.userId);
   }
 
   @Get("friend/requests")
-  async getPendingFriendRequests(@Req() req: Request) {
+  async getPendingFriendRequests(@Req() req: AuthenticatedRequest) {
     return this.settingsService.getPendingFriendRequests(req.session.userId);
   }
 
   @Post("friend/add/:name")
-  async addFriend(@Req() req: Request, @Param("name") name: string) {
+  async addFriend(
+    @Req() req: AuthenticatedRequest,
+    @Param("name") name: string
+  ) {
     const friend = await this.userService.getUserByLogin(name);
 
     if (!friend)
@@ -115,22 +125,28 @@ export class SettingsController {
   }
 
   @Post("friend/requests/accept/:id")
-  async acceptFriendRequest(@Req() req: Request, @Param("id") id: number) {
+  async acceptFriendRequest(
+    @Req() req: AuthenticatedRequest,
+    @Param("id") id: number
+  ) {
     await this.settingsService.acceptFriendRequest(req.session.userId, id);
   }
 
   @Post("friend/requests/deny/:id")
-  async denyFriendRequest(@Req() req: Request, @Param("id") id: number) {
+  async denyFriendRequest(
+    @Req() req: AuthenticatedRequest,
+    @Param("id") id: number
+  ) {
     await this.settingsService.denyFriendRequest(req.session.userId, id);
   }
 
   @Post("block/:id")
-  async blockUser(@Req() req: Request, @Param("id") id: number) {
+  async blockUser(@Req() req: AuthenticatedRequest, @Param("id") id: number) {
     await this.settingsService.block(req.session.userId, id);
   }
 
   @Post("unblock/:id")
-  async unblockUser(@Req() req: Request, @Param("id") id: number) {
+  async unblockUser(@Req() req: AuthenticatedRequest, @Param("id") id: number) {
     await this.settingsService.unblock(req.session.userId, id);
   }
 }

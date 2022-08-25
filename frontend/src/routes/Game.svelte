@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { gameSocket } from "../utils/socket";
+  import { getGameSocket } from "../utils/socket";
   import type { Socket } from "socket.io-client";
   import { id, status, gameId } from "../stores/settings";
   import { getUserInfo, getUserStats } from "../utils/info.js";
@@ -104,18 +104,17 @@
     }
   };
 
-  let socket: Socket | undefined;
   let isSpectating = true;
   let spectatorList = new Set<number>();
 
   let ctx: CanvasRenderingContext2D | null;
   let player1: number, player2: number;
 
-  $: if ($id !== 0) socket = gameSocket();
+  const socket = getGameSocket();
 
   $: $gameId = $params?.id ?? "";
 
-  $: if (!isEmpty($gameId) && !startsWith("custom", $gameId) && socket) {
+  $: if (!isEmpty($gameId) && !startsWith("custom", $gameId)) {
     registerListenners(socket);
 
     socket.emit("joinGame", $gameId);
@@ -125,9 +124,7 @@
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
 {#if isEmpty($gameId) || startsWith("custom", $gameId)}
-  {#if socket}
-    <Matchmaking {socket} />
-  {/if}
+  <Matchmaking {socket} />
 {:else}
   <div class="flex flex-auto justify-around flex-nowrap">
     {#if player1}

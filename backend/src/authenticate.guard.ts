@@ -6,16 +6,11 @@ import {
   Injectable,
   SetMetadata,
 } from "@nestjs/common";
-import type { Session } from "./models/session/session.model.js";
 import { isExpired } from "./utils/date.js";
 import { SessionService } from "./models/session/session.service.js";
 import { Reflector } from "@nestjs/core";
-
-declare module "express" {
-  export interface Request {
-    session: Session;
-  }
-}
+import type { Request } from "express";
+import type { AuthenticatedRequest } from "./types/http.js";
 
 export const IS_PUBLIC_KEY = "isPublic";
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
@@ -35,7 +30,7 @@ export class AuthGuard implements CanActivate {
 
     if (isPublic) return true;
 
-    const req = context.switchToHttp().getRequest();
+    const req: Request = context.switchToHttp().getRequest();
 
     const token = req?.signedCookies?.token;
 
@@ -47,7 +42,7 @@ export class AuthGuard implements CanActivate {
     if (!session || isExpired(session.expires))
       throw new HttpException("Invalid token", HttpStatus.UNAUTHORIZED);
 
-    req.session = session;
+    (req as AuthenticatedRequest).session = session;
 
     return true;
   }

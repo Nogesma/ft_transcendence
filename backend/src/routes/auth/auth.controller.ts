@@ -11,12 +11,13 @@ import type { Request, Response } from "express";
 
 import { AuthService } from "./auth.service.js";
 import { Public } from "../../authenticate.guard.js";
+import type { AuthenticatedRequest } from "../../types/http.js";
 
 @Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Post("logout")
-  async logout(@Req() req: Request, @Res() res: Response) {
+  async logout(@Req() req: AuthenticatedRequest, @Res() res: Response) {
     await req.session.destroy();
     res.clearCookie("token");
     res.status(200).end();

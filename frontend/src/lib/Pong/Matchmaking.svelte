@@ -42,13 +42,9 @@
     });
   };
 
-  const joinQueue = (n: boolean) => {
-    if (socket) socket.emit("joinQueue", n);
-  };
+  const joinQueue = (n: boolean) => socket.emit("joinQueue", n);
 
-  const leaveQueue = () => {
-    if (socket) socket.emit("leaveQueue", null);
-  };
+  const leaveQueue = () => socket.emit("leaveQueue", null);
 
   const secondsToTime = (time: number): string => {
     if (time === Infinity || time == -Infinity) {
