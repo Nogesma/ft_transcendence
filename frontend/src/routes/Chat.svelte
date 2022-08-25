@@ -60,7 +60,9 @@
       if ($id === p2) push(`#/game/custom.${type}.${p1}`);
     });
   };
-
+  const banpm = (banid: number) => {
+    $pmSocket.emit("ban", { id });
+  };
   const sendmsg = () => {
     if (!msg || msg.length === 0) return;
     $chatSocket.emit("sendMessage", { channel, msg });

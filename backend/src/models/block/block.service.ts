@@ -8,7 +8,8 @@ export class BlockService {
     @InjectModel(Block)
     private blockModel: typeof Block
   ) {}
-
+  getblocked = (user: number) =>
+    this.blockModel.findAll({ where: { user: user } });
   blockUser = (user: number, block: number) =>
     this.blockModel.create({ user, block });
 
