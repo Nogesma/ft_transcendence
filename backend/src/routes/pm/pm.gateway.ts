@@ -81,16 +81,17 @@ export class PmGateway
     @ConnectedSocket() client: Socket,
     @MessageBody("name") receiverName: string,
     @MessageBody("str") senderlogin: string,
+    @MessageBody("sendername") sendername: string,
+    @MessageBody("id") id: number,
     @MessageBody("pmmsg") msg: string
   ) {
-    if (!receiverName || !senderlogin || !msg) return;
-    const receiver = await this.userService.getUserByLogin(receiverName);
-    const sender = await this.userService.getUserByLogin(senderlogin);
-    if (!receiver || !sender) return;
-    this.server.to(String(receiver?.id)).emit("pm", {
+    const handshake = client.handshake as UserHandshake;
+    if (!receiverName || !senderlogin || !msg || isNaN(id)) return;
+    this.server.to(String(id)).emit("pm", {
       msg,
       login: senderlogin,
-      displayname: sender?.displayname,
+      displayname: sendername,
+      id: handshake.user.id,
     });
   }
 }

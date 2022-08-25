@@ -30,14 +30,21 @@
     id: number;
   }> = [];
 
-  const sendpm = (name: string) =>
-    $pmSocket.emit("sendpm", { name, str: $login, pmmsg });
+  const sendpm = (name: string, id: number) =>
+    $pmSocket.emit("sendpm", {
+      name,
+      str: $login,
+      sendername: $displayname,
+      id: id,
+      pmmsg,
+    });
 
   $pmSocket.on("pm", (event) => {
     let pm: {
       msg: string;
       login: string;
       displayname: string;
+      id: number;
     };
     pm = event;
     alert(`${pm.displayname} has sent you a message: ${pm.msg}`);
@@ -49,11 +56,6 @@
     socket.on("newMessage", (event) => {
       messagesList.push(event);
       messagesList = messagesList;
-    });
-
-    socket.on("pm", (event) => {
-      console.log("test");
-      alert(event);
     });
 
     socket.on("newCustomGame", ({ p1, p2, type }) => {
@@ -259,7 +261,7 @@
                               </li>
                               <li
                                 class="text-gray-50"
-                                on:click={() => sendpm(userLogin)}
+                                on:click={() => sendpm(userLogin, id)}
                               >
                                 Sendpm {displayname}
                               </li>
