@@ -11,10 +11,6 @@ const unmuteUser = curry((socket: Socket, channel: string, username: string) =>
   socket.emit("unmuteUser", { channel, username })
 );
 
-const banpm = curry((socket: Socket, id: number) =>
-  socket.emit("banpm", { id })
-);
-
 const banUser = curry(
   (socket: Socket, channel: string, username: string, expires?: Date) =>
     socket.emit("banUser", { channel, username, expires })
@@ -85,7 +81,6 @@ const isBanned = curry((channel: string, name: string) =>
 );
 
 export {
-  banpm,
   banUser,
   unbanUser,
   unmuteUser,

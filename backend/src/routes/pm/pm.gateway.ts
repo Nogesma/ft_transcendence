@@ -9,7 +9,6 @@ import {
   OnGatewayDisconnect,
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-
 import { ConfigService } from "@nestjs/config";
 import { addUser, socketAuth, socketCookieParser } from "../../utils/socket.js";
 import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
@@ -74,15 +73,6 @@ export class PmGateway
       handshake.user.currentGame = gameId;
     else handshake.user.currentGame = "";
     await handshake.user.save();
-  }
-  @SubscribeMessage("banpm")
-  async handleBan(
-    @ConnectedSocket() client: Socket,
-    @MessageBody("id") id: number
-  ) {
-    const handshake = client.handshake as UserHandshake;
-    if (!id || isNaN(id)) return;
-    return;
   }
   @SubscribeMessage("sendpm")
   async handlepm(

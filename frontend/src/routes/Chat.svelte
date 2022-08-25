@@ -5,7 +5,6 @@
   import type { Socket } from "socket.io-client";
   import { acceptInvite, sendInvite } from "../utils/gameInvite.js";
   import {
-    banpm,
     addAdmin,
     banUser,
     isAdmin,
@@ -79,7 +78,6 @@
   $: muteUserC = muteUser($chatSocket, channel);
   $: unBanUserC = unbanUser($chatSocket, channel);
   $: unMuteUserC = unmuteUser($chatSocket, channel);
-  $: banPmC = banpm($pmSocket, id);
   $: addAdminC = addAdmin(channel);
   $: removeAdminC = removeAdmin(channel);
 
@@ -254,12 +252,6 @@
                                 on:click={() => push(`/users/${id}`)}
                               >
                                 View profile
-                              </li>
-                              <li
-                                class="text-gray-50"
-                                on:click={() => banPmC(id)}
-                              >
-                                banpm {displayname}
                               </li>
                               <li
                                 class="text-gray-50"
