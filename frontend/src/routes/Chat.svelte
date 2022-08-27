@@ -229,31 +229,37 @@
                                 class="text-gray-50"
                                 on:click={() => banUserC(userLogin)}
                               >
-                                Ban {userLogin}
+                                Ban {displayname}
                               </li>
                               <li
                                 class="text-gray-50"
                                 on:click={() => muteUserC(userLogin)}
                               >
-                                Mute {userLogin}
+                                Mute {displayname}
                               </li>
                               <li
                                 class="text-gray-50"
                                 on:click={() => unBanUserC(userLogin)}
                               >
-                                Unban {userLogin}
+                                Unban {displayname}
                               </li>
                               <li
                                 class="text-gray-50"
                                 on:click={() => unMuteUserC(userLogin)}
                               >
-                                Unmute {userLogin}
+                                Unmute {displayname}
                               </li>
                               <li
                                 class="text-gray-50"
                                 on:click={() => push(`/users/${id}`)}
                               >
                                 View profile
+                              </li>
+                              <li
+                                class="text-gray-50"
+                                on:click={() => banpm(id)}
+                              >
+                                Block {displayname}
                               </li>
                               <li
                                 class="text-gray-50"

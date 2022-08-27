@@ -8,8 +8,10 @@ export class BlockService {
     @InjectModel(Block)
     private blockModel: typeof Block
   ) {}
-  getblocked = (user: number) =>
-    this.blockModel.findAll({ where: { user: user } });
+  getblocked = async (user: number) =>
+    await this.blockModel.findAll({ where: { user: user } });
+  getblocker = async (user: number) =>
+    await this.blockModel.findAll({ where: { block: user } });
   blockUser = (user: number, block: number) =>
     this.blockModel.create({ user, block });
 

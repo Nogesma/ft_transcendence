@@ -8,7 +8,6 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from "@nestjs/websockets";
-import { BlockService } from "../../models/block/block.service.js";
 import { Server, Socket } from "socket.io";
 import { ConfigService } from "@nestjs/config";
 import { addUser, socketAuth, socketCookieParser } from "../../utils/socket.js";
@@ -16,8 +15,7 @@ import { ChannelBanService } from "../../models/channelBan/channelBan.service.js
 import { SessionService } from "../../models/session/session.service.js";
 import { UserService } from "../../models/user/user.service.js";
 import type { UserHandshake } from "../../types/socket.js";
-import { isNil } from "ramda";
-import type { Block } from "typescript";
+import { find, isNil, pathEq } from "ramda";
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
@@ -28,10 +26,8 @@ export class PmGateway
 {
   @WebSocketServer()
   server: Server;
-  blocked: Block[];
 
   constructor(
-    private readonly blockService: BlockService,
     private readonly channelBanService: ChannelBanService,
     private readonly userService: UserService,
     private readonly configService: ConfigService<EnvironmentVariables, true>,
@@ -48,7 +44,12 @@ export class PmGateway
 
   async handleConnection(@ConnectedSocket() client: Socket) {
     const handshake = client.handshake as UserHandshake;
-    this.blocked = await this.blockService.getblocked(handshake.user.id);
+    // handshake.user.block = await handshake.user.blockService.getblocked(
+    //  handshake.user.id
+    // );
+    // handshake.user.blocked_by = await handshake.user.blockService.getblocker(
+    //  handshake.user.id
+    // );
     client.join(handshake.user.id.toString());
 
     handshake.user.status = 1;
@@ -67,7 +68,8 @@ export class PmGateway
     @MessageBody("id") id: number
   ) {
     const handshake = client.handshake as UserHandshake;
-    await this.blockService.blockUser(handshake.user.id, id);
+    await handshake.user.block.blockUser(handshake.user.id, id);
+    await handshake.user.save();
   }
   @SubscribeMessage("status")
   async handleStatusUpdate(
@@ -92,6 +94,8 @@ export class PmGateway
     @MessageBody("pmmsg") msg: string
   ) {
     const handshake = client.handshake as UserHandshake;
+    const is_blocked = find(pathEq(["block"], id))(handshake.user.block);
+    if (!is_blocked) return;
     if (!msg || !id || isNaN(id)) return;
     this.server.to(String(id)).emit("pm", {
       msg,
