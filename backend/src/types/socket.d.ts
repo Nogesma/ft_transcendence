@@ -11,7 +11,9 @@ export type AuthenticatedHandshake = {
 export type UserHandshake = {
   user: User;
 } & AuthenticatedHandshake;
-
+export type BlockHandshake = {
+  block: User[];
+} & UserHandshake;
 export type ChannelHandshake = {
   channels: Channel[];
   muted: Map<number, Date | null>;
