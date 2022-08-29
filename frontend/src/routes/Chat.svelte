@@ -30,9 +30,9 @@
     id: number;
   }> = [];
 
-  const sendpm = (id: number) =>
+  const sendpm = (uid: number) =>
     $pmSocket.emit("sendpm", {
-      id: id,
+      id: uid,
       pmmsg,
     });
 
@@ -61,7 +61,7 @@
     });
   };
   const banpm = (banid: number) => {
-    $pmSocket.emit("ban", { id });
+    $pmSocket.emit("ban", { id: banid });
   };
   const sendmsg = () => {
     if (!msg || msg.length === 0) return;

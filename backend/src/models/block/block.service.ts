@@ -12,8 +12,9 @@ export class BlockService {
     await this.blockModel.findAll({ where: { user: user } });
   getblocker = async (user: number) =>
     await this.blockModel.findAll({ where: { block: user } });
+
   blockUser = (user: number, block: number) =>
-    this.blockModel.create({ user, block });
+    this.blockModel.findOrCreate({ where: { user, block } });
 
   unblockUser = (user: number, block: number) =>
     this.blockModel.destroy({ where: { user, block } });
