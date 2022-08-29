@@ -75,6 +75,11 @@ export class PmGateway
 
     await this.blockService.blockUser(handshake.user.id, id);
     //todo: update blocked_by if user blocked is connected
+    const sockets = await this.server.fetchSockets();
+    const userSocket = find(pathEq(["handshake", "user", "id"], id))(sockets);
+
+    if (!userSocket) return;
+    userSocket.leave(handshake.user.id);
   }
   @SubscribeMessage("status")
   async handleStatusUpdate(
@@ -101,7 +106,13 @@ export class PmGateway
     const handshake = client.handshake as BlockHandshake;
 
     const isBlocked = find(pathEq(["id"], id))(handshake.block);
-    if (isBlocked) return;
+    if (isBlocked) {
+      this.server.to(String(handshake.user.id)).emit("pm", {
+        msg: "You cannot talk to that person",
+        displayname: "Server",
+      });
+      return;
+    }
 
     if (!msg || !id || isNaN(id)) return;
     this.server.to(String(id)).emit("pm", {
