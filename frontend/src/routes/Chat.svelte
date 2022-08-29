@@ -63,6 +63,9 @@
   const banpm = (banid: number) => {
     $pmSocket.emit("ban", { id: banid });
   };
+  const unbanpm = (banid: number) => {
+    $pmSocket.emit("unban", { id: banid });
+  };
   const sendmsg = () => {
     if (!msg || msg.length === 0) return;
     $chatSocket.emit("sendMessage", { channel, msg });
@@ -260,6 +263,12 @@
                                 on:click={() => banpm(id)}
                               >
                                 Block {displayname}
+                              </li>
+                              <li
+                                class="text-gray-50"
+                                on:click={() => unbanpm(id)}
+                              >
+                                UnBlock {displayname}
                               </li>
                               <li
                                 class="text-gray-50"

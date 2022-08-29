@@ -79,7 +79,25 @@ export class PmGateway
     const userSocket = find(pathEq(["handshake", "user", "id"], id))(sockets);
 
     if (!userSocket) return;
-    userSocket.leave(handshake.user.id);
+    userSocket.handshake.user.blocked_by = await this.blockService.getblocker(
+      userSocket.handshake.user.id
+    );
+  }
+  @SubscribeMessage("unban")
+  async unban(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("id") id: number
+  ) {
+    if (isNil(id) || isNaN(id)) return;
+    const handshake = client.handshake as BlockHandshake;
+    await this.blockService.unblockUser(handshake.user.id, id);
+    const sockets = await this.server.fetchSockets();
+    const userSocket = find(pathEq(["handshake", "user", "id"], id))(sockets);
+    handshake.block = await this.blockService.getblocked(handshake.user.id);
+    if (!userSocket) return;
+    userSocket.handshake.user.blocked_by = await this.blockService.getblocker(
+      userSocket.handshake.user.id
+    );
   }
   @SubscribeMessage("status")
   async handleStatusUpdate(
