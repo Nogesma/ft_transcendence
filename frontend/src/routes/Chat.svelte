@@ -30,9 +30,9 @@
     id: number;
   }> = [];
 
-  const sendpm = (id: number) =>
+  const sendpm = (uid: number) =>
     $pmSocket.emit("sendpm", {
-      id: id,
+      id: uid,
       pmmsg,
     });
 
@@ -60,7 +60,12 @@
       if ($id === p2) push(`#/game/custom.${type}.${p1}`);
     });
   };
-
+  const banpm = (banid: number) => {
+    $pmSocket.emit("ban", { id: banid });
+  };
+  const unbanpm = (banid: number) => {
+    $pmSocket.emit("unban", { id: banid });
+  };
   const sendmsg = () => {
     if (!msg || msg.length === 0) return;
     $chatSocket.emit("sendMessage", { channel, msg });
@@ -227,31 +232,43 @@
                                 class="text-gray-50"
                                 on:click={() => banUserC(userLogin)}
                               >
-                                Ban {userLogin}
+                                Ban {displayname}
                               </li>
                               <li
                                 class="text-gray-50"
                                 on:click={() => muteUserC(userLogin)}
                               >
-                                Mute {userLogin}
+                                Mute {displayname}
                               </li>
                               <li
                                 class="text-gray-50"
                                 on:click={() => unBanUserC(userLogin)}
                               >
-                                Unban {userLogin}
+                                Unban {displayname}
                               </li>
                               <li
                                 class="text-gray-50"
                                 on:click={() => unMuteUserC(userLogin)}
                               >
-                                Unmute {userLogin}
+                                Unmute {displayname}
                               </li>
                               <li
                                 class="text-gray-50"
                                 on:click={() => push(`/users/${id}`)}
                               >
                                 View profile
+                              </li>
+                              <li
+                                class="text-gray-50"
+                                on:click={() => banpm(id)}
+                              >
+                                Block {displayname}
+                              </li>
+                              <li
+                                class="text-gray-50"
+                                on:click={() => unbanpm(id)}
+                              >
+                                UnBlock {displayname}
                               </li>
                               <li
                                 class="text-gray-50"

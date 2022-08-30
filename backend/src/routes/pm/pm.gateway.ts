@@ -8,14 +8,20 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from "@nestjs/websockets";
+import { BlockService } from "../../models/block/block.service.js";
 import { Server, Socket } from "socket.io";
 import { ConfigService } from "@nestjs/config";
-import { addUser, socketAuth, socketCookieParser } from "../../utils/socket.js";
+import {
+  addBlock,
+  addUser,
+  socketAuth,
+  socketCookieParser,
+} from "../../utils/socket.js";
 import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
 import { SessionService } from "../../models/session/session.service.js";
 import { UserService } from "../../models/user/user.service.js";
-import type { UserHandshake } from "../../types/socket.js";
-import { isNil } from "ramda";
+import type { BlockHandshake } from "../../types/socket.js";
+import { find, isNil, pathEq } from "ramda";
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
@@ -31,7 +37,8 @@ export class PmGateway
     private readonly channelBanService: ChannelBanService,
     private readonly userService: UserService,
     private readonly configService: ConfigService<EnvironmentVariables, true>,
-    private readonly sessionService: SessionService
+    private readonly sessionService: SessionService,
+    private readonly blockService: BlockService
   ) {}
 
   afterInit() {
@@ -40,11 +47,11 @@ export class PmGateway
     );
     this.server.use(socketAuth(this.sessionService));
     this.server.use(addUser);
+    this.server.use(addBlock);
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    const handshake = client.handshake as UserHandshake;
-
+    const handshake = client.handshake as BlockHandshake;
     client.join(handshake.user.id.toString());
 
     handshake.user.status = 1;
@@ -52,19 +59,48 @@ export class PmGateway
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    const handshake = client.handshake as UserHandshake;
+    const handshake = client.handshake as BlockHandshake;
 
     handshake.user.status = 0;
     await handshake.user.save();
   }
+  @SubscribeMessage("ban")
+  async handleban(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("id") id: number
+  ) {
+    const handshake = client.handshake as BlockHandshake;
+    if (isNil(id) || isNaN(id)) return;
+    if (handshake.user.id === id) return;
+    if (handshake.block.has(id)) return;
+    await this.blockService.blockUser(handshake.user.id, id);
+    //todo: update blocked_by if user blocked is connected
+    const sockets = await this.server.fetchSockets();
+    const userSocket = find(pathEq(["handshake", "user", "id"], id))(sockets);
 
+    if (!userSocket) return;
+    userSocket.handshake.block.add(handshake.user.id);
+  }
+  @SubscribeMessage("unban")
+  async unban(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("id") id: number
+  ) {
+    if (isNil(id) || isNaN(id)) return;
+    const handshake = client.handshake as BlockHandshake;
+    await this.blockService.unblockUser(handshake.user.id, id);
+    const sockets = await this.server.fetchSockets();
+    const userSocket = find(pathEq(["handshake", "user", "id"], id))(sockets);
+    if (!userSocket) return;
+    userSocket.handshake.block.delete(handshake.user.id);
+  }
   @SubscribeMessage("status")
   async handleStatusUpdate(
     @ConnectedSocket() client: Socket,
     @MessageBody("status") status: number,
     @MessageBody("gameId") gameId: string
   ) {
-    const handshake = client.handshake as UserHandshake;
+    const handshake = client.handshake as BlockHandshake;
 
     if (isNaN(status)) return;
 
@@ -80,7 +116,15 @@ export class PmGateway
     @MessageBody("id") id: number,
     @MessageBody("pmmsg") msg: string
   ) {
-    const handshake = client.handshake as UserHandshake;
+    const handshake = client.handshake as BlockHandshake;
+    if (handshake.block.has(id)) {
+      this.server.to(String(handshake.user.id)).emit("pm", {
+        msg: "You cannot talk to that person",
+        displayname: "Server",
+      });
+      return;
+    }
+
     if (!msg || !id || isNaN(id)) return;
     this.server.to(String(id)).emit("pm", {
       msg,

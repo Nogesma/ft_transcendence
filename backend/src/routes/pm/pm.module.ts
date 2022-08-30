@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { PmGateway } from "./pm.gateway.js";
+import { BlockModule } from "../../models/block/block.module.js";
 import { ConfigModule } from "@nestjs/config";
 import { SessionModule } from "../../models/session/session.module.js";
 import { UserModule } from "../../models/user/user.module.js";
@@ -11,6 +12,7 @@ import { ChannelBanModule } from "../../models/channelBan/channelBan.module.js";
 @Module({
   imports: [
     ConfigModule,
+    BlockModule,
     SessionModule,
     UserModule,
     ChannelModule,
