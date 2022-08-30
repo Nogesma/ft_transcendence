@@ -11,6 +11,7 @@ import {
 import { BlockService } from "../../models/block/block.service.js";
 import { Server, Socket } from "socket.io";
 import { ConfigService } from "@nestjs/config";
+import { map } from "ramda";
 import {
   addBlock,
   addUser,
@@ -21,7 +22,7 @@ import { ChannelBanService } from "../../models/channelBan/channelBan.service.js
 import { SessionService } from "../../models/session/session.service.js";
 import { UserService } from "../../models/user/user.service.js";
 import type { BlockHandshake } from "../../types/socket.js";
-import { find, isNil, pathEq } from "ramda";
+import { find, isNil, pathEq, prop } from "ramda";
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
@@ -72,8 +73,9 @@ export class PmGateway
     const handshake = client.handshake as BlockHandshake;
     if (isNil(id) || isNaN(id)) return;
     if (handshake.user.id === id) return;
-
+    if (handshake.block.has(id)) return;
     await this.blockService.blockUser(handshake.user.id, id);
+    handshake.block.add(id);
     //todo: update blocked_by if user blocked is connected
     const sockets = await this.server.fetchSockets();
     const userSocket = find(pathEq(["handshake", "user", "id"], id))(sockets);
@@ -93,7 +95,7 @@ export class PmGateway
     await this.blockService.unblockUser(handshake.user.id, id);
     const sockets = await this.server.fetchSockets();
     const userSocket = find(pathEq(["handshake", "user", "id"], id))(sockets);
-    handshake.block = await this.blockService.getblocked(handshake.user.id);
+    handshake.block.delete(id);
     if (!userSocket) return;
     userSocket.handshake.user.blocked_by = await this.blockService.getblocker(
       userSocket.handshake.user.id
@@ -122,9 +124,7 @@ export class PmGateway
     @MessageBody("pmmsg") msg: string
   ) {
     const handshake = client.handshake as BlockHandshake;
-
-    const isBlocked = find(pathEq(["id"], id))(handshake.block);
-    if (isBlocked) {
+    if (handshake.block.has(id)) {
       this.server.to(String(handshake.user.id)).emit("pm", {
         msg: "You cannot talk to that person",
         displayname: "Server",

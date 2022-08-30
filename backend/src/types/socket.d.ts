@@ -13,7 +13,7 @@ export type UserHandshake = {
 } & AuthenticatedHandshake;
 
 export type BlockHandshake = {
-  block: User[];
+  block: Set<number>;
 } & UserHandshake;
 
 export type ChannelHandshake = {

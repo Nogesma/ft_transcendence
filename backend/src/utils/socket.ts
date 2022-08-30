@@ -11,7 +11,7 @@ import type {
   StatsHandshake,
   UserHandshake,
 } from "../types/socket.js";
-import { forEach } from "ramda";
+import { forEach, map, prop } from "ramda";
 import type { Channel } from "../models/channel/channel.model.js";
 import type { ChannelBanService } from "../models/channelBan/channelBan.service.js";
 
@@ -88,8 +88,7 @@ const addBlock = async (
   const block = await handshake.user?.$get("blocked_by");
 
   if (!block) return next(new Error("User does not have block"));
-
-  (handshake as BlockHandshake).block = block;
+  (handshake as BlockHandshake).block = new Set(map(prop("id"), block));
   next();
 };
 
