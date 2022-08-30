@@ -11,7 +11,6 @@ import {
 import { BlockService } from "../../models/block/block.service.js";
 import { Server, Socket } from "socket.io";
 import { ConfigService } from "@nestjs/config";
-import { map } from "ramda";
 import {
   addBlock,
   addUser,
@@ -22,7 +21,7 @@ import { ChannelBanService } from "../../models/channelBan/channelBan.service.js
 import { SessionService } from "../../models/session/session.service.js";
 import { UserService } from "../../models/user/user.service.js";
 import type { BlockHandshake } from "../../types/socket.js";
-import { find, isNil, pathEq, prop } from "ramda";
+import { find, isNil, pathEq } from "ramda";
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
