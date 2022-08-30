@@ -80,9 +80,6 @@ export class PmGateway
 
     if (!userSocket) return;
     userSocket.handshake.block.add(handshake.user.id);
-    userSocket.handshake.user.blocked_by = await this.blockService.getblocker(
-      userSocket.handshake.user.id
-    );
   }
   @SubscribeMessage("unban")
   async unban(
@@ -96,9 +93,6 @@ export class PmGateway
     const userSocket = find(pathEq(["handshake", "user", "id"], id))(sockets);
     if (!userSocket) return;
     userSocket.handshake.block.delete(handshake.user.id);
-    userSocket.handshake.user.blocked_by = await this.blockService.getblocker(
-      userSocket.handshake.user.id
-    );
   }
   @SubscribeMessage("status")
   async handleStatusUpdate(
