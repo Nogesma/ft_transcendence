@@ -75,12 +75,12 @@ export class PmGateway
     if (handshake.user.id === id) return;
     if (handshake.block.has(id)) return;
     await this.blockService.blockUser(handshake.user.id, id);
-    handshake.block.add(id);
     //todo: update blocked_by if user blocked is connected
     const sockets = await this.server.fetchSockets();
     const userSocket = find(pathEq(["handshake", "user", "id"], id))(sockets);
 
     if (!userSocket) return;
+    userSocket.handshake.block.add(handshake.user.id);
     userSocket.handshake.user.blocked_by = await this.blockService.getblocker(
       userSocket.handshake.user.id
     );
@@ -95,8 +95,8 @@ export class PmGateway
     await this.blockService.unblockUser(handshake.user.id, id);
     const sockets = await this.server.fetchSockets();
     const userSocket = find(pathEq(["handshake", "user", "id"], id))(sockets);
-    handshake.block.delete(id);
     if (!userSocket) return;
+    userSocket.handshake.block.delete(handshake.user.id);
     userSocket.handshake.user.blocked_by = await this.blockService.getblocker(
       userSocket.handshake.user.id
     );
