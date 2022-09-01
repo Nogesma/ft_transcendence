@@ -22,7 +22,7 @@ export default {
     asyncComponent: () => import("./routes/Game.svelte"),
   }),
   "/chat/:id": wrap({
-    asyncComponent: () => import("./routes/Chat.svelte"),
+    asyncComponent: () => import("./routes/FSChat.svelte"),
   }),
   "/chat": wrap({
     asyncComponent: () => import("./routes/ChannelManager.svelte"),

@@ -7,6 +7,7 @@
   import Matchmaking from "../lib/Pong/Matchmaking.svelte";
   import { isEmpty, startsWith } from "ramda";
   import { params, replace } from "svelte-spa-router";
+  import ChatDrawer from "../lib/ChatDrawer.svelte";
 
   const initCanvas = (width: number, height: number) => {
     const cv = <HTMLCanvasElement>document.getElementById("game");
@@ -123,42 +124,46 @@
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
-{#if isEmpty($gameId) || startsWith("custom", $gameId)}
-  <Matchmaking {socket} />
-{:else}
-  <div class="flex flex-auto justify-around flex-nowrap">
-    {#if player1}
-      <div class="flex-col">
-        {#await getUserInfo(player1) then { login, displayname: name }}
+<div class="flex flex-row">
+  <ChatDrawer channel="vfdvdfvdfvfd" />
+
+  {#if isEmpty($gameId) || startsWith("custom", $gameId)}
+    <Matchmaking {socket} />
+  {:else}
+    <div class="flex flex-auto justify-around flex-nowrap">
+      {#if player1}
+        <div class="flex-col">
+          {#await getUserInfo(player1) then { login, displayname: name }}
+            <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
+            {name}
+            {#await getUserStats(player1) then { elo }}
+              {elo}
+            {/await}
+          {/await}
+        </div>
+      {/if}
+
+      <canvas id="game" />
+
+      {#if player2}
+        <div class="flex-col">
+          {#await getUserInfo(player2) then { login, displayname: name }}
+            <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
+            {name}
+            {#await getUserStats(player2) then { elo }}
+              {elo}
+            {/await}
+          {/await}
+        </div>
+      {/if}
+    </div>
+    <div class="flex flex-auto justify-center">
+      {#each [...spectatorList] as spec}
+        {#await getUserInfo(spec) then { login, displayname: name }}
           <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
           {name}
-          {#await getUserStats(player1) then { elo }}
-            {elo}
-          {/await}
         {/await}
-      </div>
-    {/if}
-
-    <canvas id="game" />
-
-    {#if player2}
-      <div class="flex-col">
-        {#await getUserInfo(player2) then { login, displayname: name }}
-          <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
-          {name}
-          {#await getUserStats(player2) then { elo }}
-            {elo}
-          {/await}
-        {/await}
-      </div>
-    {/if}
-  </div>
-  <div class="flex flex-auto justify-center">
-    {#each [...spectatorList] as spec}
-      {#await getUserInfo(spec) then { login, displayname: name }}
-        <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
-        {name}
-      {/await}
-    {/each}
-  </div>
-{/if}
+      {/each}
+    </div>
+  {/if}
+</div>
