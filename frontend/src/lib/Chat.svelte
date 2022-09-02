@@ -1,6 +1,5 @@
 <script lang="ts">
   import { displayname, login, id, pmSocket } from "../stores/settings";
-  import ProfilePic from "./ProfilePic.svelte";
   import { push } from "svelte-spa-router";
   import type { Socket } from "socket.io-client";
   import { acceptInvite, sendInvite } from "../utils/gameInvite.js";
@@ -18,6 +17,7 @@
   import { chatSocket } from "../stores/settings.js";
 
   export let channel: string;
+  export let p = false;
 
   let invite: { id: number; type: boolean; displayname: string } | undefined;
 
@@ -55,11 +55,23 @@
 
     socket.on("newCustomGame", ({ p1, p2, type }) => {
       invite = undefined;
-      console.log({ p1, p2, type });
       if ($id === p1) push(`#/game/custom.${type}.${p2}`);
       if ($id === p2) push(`#/game/custom.${type}.${p1}`);
     });
+
+    socket.on(
+      "channelInfo",
+      ({ memberList }: { memberList: Array<number> }) => {
+        if (!memberList) return leaveChat();
+        connectedMembers = new Set(memberList);
+      }
+    );
   };
+
+  const leaveChat = () => (p ? push("/chat") : (channel = ""));
+
+  let connectedMembers = new Set<number>();
+
   const banpm = (banid: number) => {
     $pmSocket.emit("ban", { id: banid });
   };
@@ -227,6 +239,7 @@
   {/if}
   <button class="btn" on:click={() => sendInviteC(false)}> classic </button>
   <button class="btn" on:click={() => sendInviteC(true)}> modified </button>
+  <button class="btn" on:click={leaveChat}> leave chat </button>
   <div
     class="flex items-center justify-between w-full p-3 border-t border-gray-300"
   >
@@ -251,4 +264,5 @@
       </svg>
     </button>
   </div>
+  {connectedMembers.values()}
 </div>

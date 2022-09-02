@@ -31,7 +31,7 @@
           on:click={() => push("/friends")}
         >
           <div class="indicator">
-            <Icon data={faUserGroup} scale="1.8" />
+            <Icon data={faUserGroup} scale={1.8} />
             {#if !isEmpty($pendingFriends)}
               <span class="badge badge-sm indicator-item badge-error"
                 >{$pendingFriends.length}</span

@@ -124,8 +124,8 @@
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
-<div class="flex flex-row">
-  <ChatDrawer channel="vfdvdfvdfvfd" />
+<div class="flex flex-row h-full">
+  <ChatDrawer />
 
   {#if isEmpty($gameId) || startsWith("custom", $gameId)}
     <Matchmaking {socket} />

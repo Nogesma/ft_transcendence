@@ -192,9 +192,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/vite-plugin-svelte@npm:^1.0.3":
-  version: 1.0.3
-  resolution: "@sveltejs/vite-plugin-svelte@npm:1.0.3"
+"@sveltejs/vite-plugin-svelte@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "@sveltejs/vite-plugin-svelte@npm:1.0.4"
   dependencies:
     "@rollup/pluginutils": ^4.2.1
     debug: ^4.3.4
@@ -205,11 +205,11 @@ __metadata:
   peerDependencies:
     diff-match-patch: ^1.0.5
     svelte: ^3.44.0
-    vite: ^3.0.0
+    vite: ^3.0.0 || ^3.1.0-beta.1
   peerDependenciesMeta:
     diff-match-patch:
       optional: true
-  checksum: a2aa251d2321ddc641ba953f081b28d5368573843b008f218b01bbb35824bff33f93a274e4278881cb1410fec7dc29d83d838dc5efadcbe5bb4e660bdc358bb0
+  checksum: 4d11bfe19ab9be8e0e31ec2d032b381ae964610e82decc7cef9513d836b7f6b7848297656e3b1d90c659ffed27cf34d634ef4930516d11ea4dccf93d51c006fa
   languageName: node
   linkType: hard
 
@@ -275,12 +275,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/three@npm:^0.143.2":
-  version: 0.143.2
-  resolution: "@types/three@npm:0.143.2"
+"@types/three@npm:^0.144.0":
+  version: 0.144.0
+  resolution: "@types/three@npm:0.144.0"
   dependencies:
     "@types/webxr": "*"
-  checksum: 34687c9b026bf4c095de131c0cd7b393d1ec251ceb2cdc178ac7f2500fe8326f762333c03a06854f2e381304d4e3b4fe53b1cabc882de623e6e6a67e5dba6f67
+  checksum: 7ce69e1a48ba6d19dc9efb78c5c67a3e66c036f240386dd700eda7a5964e44550066ac45bc0997bd4fe7be446edae356313d992361c18415191468dfdbfb454d
   languageName: node
   linkType: hard
 
@@ -1622,11 +1622,11 @@ __metadata:
     "@fortawesome/free-regular-svg-icons": ^6.2.0
     "@fortawesome/free-solid-svg-icons": ^6.2.0
     "@fortawesome/sharp-solid-svg-icons": ^6.2.0
-    "@sveltejs/vite-plugin-svelte": ^1.0.3
+    "@sveltejs/vite-plugin-svelte": ^1.0.4
     "@tsconfig/svelte": ^3.0.0
     "@types/qrcode": ^1.5.0
     "@types/ramda": ^0.28.15
-    "@types/three": ^0.143.2
+    "@types/three": ^0.144.0
     "@typescript-eslint/eslint-plugin": ^5.36.1
     "@typescript-eslint/parser": ^5.36.1
     autoprefixer: ^10.4.8
@@ -1643,7 +1643,7 @@ __metadata:
     qrcode: ^1.5.1
     ramda: ^0.28.0
     socket.io-client: ^4.5.1
-    svelte: ^3.49.0
+    svelte: ^3.50.0
     svelte-awesome: ^3.0.0
     svelte-check: ^2.9.0
     svelte-preprocess: ^4.10.7
@@ -3256,10 +3256,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"svelte@npm:^3.49.0":
-  version: 3.49.0
-  resolution: "svelte@npm:3.49.0"
-  checksum: 5b7cb8dbf6b6581b50fab1de63cbcb81816081a1240b03e234b299268fff2f3237bf8f92b683a848f95453353b5694dfe26fa05a55da185a4bb0cd8b80d87dd4
+"svelte@npm:^3.50.0":
+  version: 3.50.0
+  resolution: "svelte@npm:3.50.0"
+  checksum: cc8e8fd14bac3add208b00b9c2ffd64d343f29f84a626899762b3c9d00010cab5f49dce44d376acb270f996c860ad49b727d2bf140f434f2b959061b22249548
   languageName: node
   linkType: hard
 

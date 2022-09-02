@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Chat from "../lib/Chat.svelte";
+  import ChannelManager from "../lib/ChannelManager.svelte";
   import { params } from "svelte-spa-router";
 
   $: channel = $params?.id ?? "";
 </script>
 
-<Chat {channel} />
+<ChannelManager {channel} p={true} />

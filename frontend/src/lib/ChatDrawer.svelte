@@ -1,17 +1,17 @@
 <script>
-  import Chat from "./Chat.svelte";
-
   import Icon from "svelte-awesome";
   import {
     faArrowRightFromBracket,
     faX,
   } from "@fortawesome/free-solid-svg-icons";
-  export let channel;
+
+  import ChannelManager from "./ChannelManager.svelte";
 
   let showChat = true;
+  let channel = "";
 </script>
 
-<div class="border-accent border">
+<div class="border-accent border flex-shrink-0 {showChat ? 'w-1/6' : ''}">
   <div
     tabindex="0"
     class="btn btn-ghost btn-circle"
@@ -25,7 +25,8 @@
       {/if}
     </div>
   </div>
+
   {#if showChat}
-    <Chat {channel} />
+    <ChannelManager bind:channel p={false} />
   {/if}
 </div>
