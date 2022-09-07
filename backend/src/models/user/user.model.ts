@@ -31,6 +31,7 @@ export class User extends Model {
   declare id: number;
 
   @AllowNull(false)
+  @Unique
   @Column
   login: string;
 

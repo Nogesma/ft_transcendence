@@ -1,8 +1,14 @@
 <script lang="ts">
   import Icon from "svelte-awesome";
-  import { faUserGroup } from "@fortawesome/free-solid-svg-icons";
+  import { faMessage, faUserGroup } from "@fortawesome/free-solid-svg-icons";
   import ProfilePic from "./ProfilePic.svelte";
-  import { id, isLoggedIn, login, pendingFriends } from "../stores/settings.js";
+  import {
+    id,
+    isLoggedIn,
+    login,
+    pendingFriends,
+    pendingPM,
+  } from "../stores/settings.js";
   import axios from "axios";
   import { isEmpty } from "ramda";
   import { push } from "svelte-spa-router";
@@ -14,7 +20,8 @@
         {},
         { withCredentials: true }
       )
-      .then(() => location.reload());
+      .then(() => location.reload())
+      .catch(console.error);
   };
 </script>
 
@@ -24,6 +31,22 @@
   </div>
   {#if $isLoggedIn}
     <div class="flex-none space-x-4">
+      <div class="dropdown dropdown-end">
+        <div
+          tabindex="0"
+          class="btn btn-ghost btn-circle"
+          on:click={() => push("/pm")}
+        >
+          <div class="indicator">
+            <Icon data={faMessage} scale={1.5} />
+            {#if $pendingPM}
+              <span class="badge badge-sm indicator-item badge-error"
+                >{$pendingPM}</span
+              >
+            {/if}
+          </div>
+        </div>
+      </div>
       <div class="dropdown dropdown-end">
         <div
           tabindex="0"

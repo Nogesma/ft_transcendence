@@ -29,6 +29,13 @@ const pfp = derived([login, updatepfp], ([$login, $updatepfp], set) => {
 const status = writable(1);
 
 const pmSocket = readable(getPmSocket());
+
+const privateMessages = writable(
+  new Map<number, { message: string; me: boolean }[]>()
+);
+
+const pendingPM = writable(0);
+
 const chatSocket = readable(getChatSocket());
 
 export {
@@ -43,4 +50,6 @@ export {
   pendingFriends,
   pmSocket,
   chatSocket,
+  pendingPM,
+  privateMessages,
 };

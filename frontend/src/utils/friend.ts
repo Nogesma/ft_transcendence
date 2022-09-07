@@ -21,7 +21,8 @@ const getPendingFriendRequests = (): Promise<number[]> =>
     .get(`${import.meta.env.VITE_BACKEND_URI}/api/user/friend/requests`, {
       withCredentials: true,
     })
-    .then(({ data }) => data);
+    .then(({ data }) => data)
+    .catch(console.error);
 
 const acceptFriendRequest = (friendId: number) =>
   axios
@@ -34,7 +35,8 @@ const acceptFriendRequest = (friendId: number) =>
         withCredentials: true,
       }
     )
-    .then(({ data }) => data);
+    .then(({ data }) => data)
+    .catch(console.error);
 
 const denyFriendRequest = (friendId: number) =>
   axios
@@ -47,14 +49,16 @@ const denyFriendRequest = (friendId: number) =>
         withCredentials: true,
       }
     )
-    .then(({ data }) => data);
+    .then(({ data }) => data)
+    .catch(console.error);
 
 const getFriendList = () =>
   axios
     .get(`${import.meta.env.VITE_BACKEND_URI}/api/user/friends`, {
       withCredentials: true,
     })
-    .then(({ data }) => data);
+    .then(({ data }) => data)
+    .catch(console.error);
 
 export {
   addFriend,

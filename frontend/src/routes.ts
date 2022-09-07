@@ -24,6 +24,9 @@ export default {
   "/chat/:id?": wrap({
     asyncComponent: () => import("./routes/FSChat.svelte"),
   }),
+  "/pm": wrap({
+    asyncComponent: () => import("./routes/PrivateMessage.svelte"),
+  }),
   "*": wrap({
     asyncComponent: () => import("./routes/404.svelte"),
   }),

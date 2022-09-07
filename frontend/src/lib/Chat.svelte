@@ -15,8 +15,7 @@
     unmuteUser,
   } from "../utils/chatManagement.js";
   import { chatSocket } from "../stores/settings.js";
-  import { getUserInfo, getUserStats } from "../utils/info.js";
-  import ProfilePic from "./ProfilePic.svelte";
+  import { getUserInfo } from "../utils/info.js";
 
   export let channel: string;
   export let p = false;
@@ -254,17 +253,16 @@
     <button class="btn" on:click={leaveChat}> leave chat</button>
     <div class="flex flex-auto justify-center">
       {#each [...connectedMembers.values()] as spec}
-        {#await getUserInfo(spec) then { login, displayname: name }}
-          <!--        <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />-->
+        {#await getUserInfo(spec) then { displayname: name }}
           {name}
         {/await}
       {/each}
     </div>
   </div>
-  <div class="flex">
+  <div class="flex rounded bg-base-200 p-2">
     <form class="form-control" on:submit|preventDefault={sendmsg}>
       <label class="input-group">
-        <input bind:value={msg} type="text" class="input input-bordered" />
+        <input bind:value={msg} type="text" class="input bg-base-200" />
         <button type="submit">
           <svg
             class="w-5 h-5 text-gray-500 origin-center transform rotate-90"

@@ -24,9 +24,7 @@
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
 <div>
-  {#await setupGame()}
-    <h1>Loading...</h1>
-  {:then data}
+  {#await setupGame() then data}
     Game id: {gid}
     <Pong width={1000} height={500} params={data} />
   {:catch err}

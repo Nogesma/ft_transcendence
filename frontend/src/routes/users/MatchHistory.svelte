@@ -17,7 +17,8 @@
       .get(`${import.meta.env.VITE_BACKEND_URI}/api/info/game/history/${uid}`, {
         withCredentials: true,
       })
-      .then(({ data }) => data);
+      .then(({ data }) => data)
+      .catch(console.error);
 
   let ulogin: string, udisplayname: string;
 
@@ -29,9 +30,7 @@
     );
 </script>
 
-{#await getUserMatchHistory()}
-  ...
-{:then matches}
+{#await getUserMatchHistory() then matches}
   <table class="table table-zebra w-full">
     <thead>
       <tr>

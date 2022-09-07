@@ -11,10 +11,16 @@
   export let channel = "";
   export let p = false;
 
+  //todo: move to utils/
   const getChannels = () =>
-    axios.get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/channels`, {
-      withCredentials: true,
-    });
+    axios
+      .get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/channels`, {
+        withCredentials: true,
+      })
+      .catch((e) => {
+        console.error(e);
+        return { data: [] };
+      });
 </script>
 
 {#if isEmpty(channel)}
