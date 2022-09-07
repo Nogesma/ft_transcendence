@@ -11,7 +11,11 @@
   let channel = "";
 </script>
 
-<div class="border-accent border flex-shrink-0 {showChat ? 'w-1/6' : ''}">
+<div
+  class="flex flex-col border-accent border flex-shrink-0 {showChat
+    ? 'w-1/5'
+    : ''}"
+>
   <div
     tabindex="0"
     class="btn btn-ghost btn-circle"

@@ -18,24 +18,22 @@
 </script>
 
 {#if isEmpty(channel)}
-  <div class="flex flex-col">
-    {#await getChannels() then { data }}
-      {#each data as { name }}
-        <button
-          class="btn"
-          on:click={() => (p ? push(`/chat/${name}`) : (channel = name))}
-          >{name}
-        </button>
-      {/each}
-      <JoinChannel />
-      <CreateChannel />
-      <DeleteChannel />
-      <BanUser />
-      <!--    <LeaveChannel />-->
-    {:catch err}
-      <p>{err}</p>
-    {/await}
-  </div>
+  {#await getChannels() then { data }}
+    {#each data as { name }}
+      <button
+        class="btn"
+        on:click={() => (p ? push(`/chat/${name}`) : (channel = name))}
+        >{name}
+      </button>
+    {/each}
+    <JoinChannel />
+    <CreateChannel />
+    <DeleteChannel />
+    <BanUser />
+    <!--    <LeaveChannel />-->
+  {:catch err}
+    <p>{err}</p>
+  {/await}
 {:else}
   <Chat bind:channel {p} />
 {/if}
