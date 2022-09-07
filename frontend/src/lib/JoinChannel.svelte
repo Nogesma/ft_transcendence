@@ -3,14 +3,18 @@
   import Modal from "./Modal.svelte";
 
   const getPublicChannels = () =>
-    axios.get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/public`, {
-      withCredentials: true,
-    });
-  // .catch(() => push("/auth/login"))
+    axios
+      .get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/public`, {
+        withCredentials: true,
+      })
+      .catch((e) => {
+        console.error(e);
+        return { data: [] };
+      });
 
-  export const joinChannel = () => {
-    try {
-      axios.post(
+  export const joinChannel = () =>
+    axios
+      .post(
         `${import.meta.env.VITE_BACKEND_URI}/api/chat/join/${channelName}`,
         {
           password: channelPassword,
@@ -19,11 +23,9 @@
         {
           withCredentials: true,
         }
-      );
-    } catch (e) {
-      alert(e);
-    }
-  };
+      )
+      .catch(console.error);
+
   let channelType: string;
   let channelName: string;
 
@@ -44,9 +46,7 @@
       </select>
 
       {#if channelType === "Public"}
-        {#await getPublicChannels()}
-          <p>waiting...</p>
-        {:then { data }}
+        {#await getPublicChannels() then { data }}
           <div class="flex flex-row flex-wrap mt-4 -ml-4 -mb-4 flex-auto">
             {#each data as { name }}
               <label

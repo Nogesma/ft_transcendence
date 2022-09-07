@@ -50,6 +50,19 @@ export class InfoService {
     )
   );
 
+  getUserId = pipe(
+    this.userService.getUserByLogin,
+    andThen(
+      ifElse(
+        isNil,
+        () => {
+          throw new HttpException("User not found", HttpStatus.NOT_FOUND);
+        },
+        (x) => pick(["id"], x.toJSON())
+      )
+    )
+  );
+
   a = async (id: number) => {
     const user = this.userService.getUser(id);
 

@@ -21,63 +21,73 @@ const unbanUser = curry((socket: Socket, channel: string, username: string) =>
 );
 
 const addAdmin = curry((channel: string, name: string) =>
-  axios.post(
-    `${import.meta.env.VITE_BACKEND_URI}/api/chat/addAdmin/${name}`,
-    {
-      chan: channel,
-    },
-    {
-      withCredentials: true,
-    }
-  )
+  axios
+    .post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/addAdmin/${name}`,
+      {
+        chan: channel,
+      },
+      {
+        withCredentials: true,
+      }
+    )
+    .catch(console.error)
 );
 
 const removeAdmin = curry((channel: string, name: string) =>
-  axios.post(
-    `${import.meta.env.VITE_BACKEND_URI}/api/chat/removeAdmin/${name}`,
-    {
-      chan: channel,
-    },
-    {
-      withCredentials: true,
-    }
-  )
+  axios
+    .post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/removeAdmin/${name}`,
+      {
+        chan: channel,
+      },
+      {
+        withCredentials: true,
+      }
+    )
+    .catch(console.error)
 );
 
 const isMuted = curry((channel: string, name: string) =>
-  axios.post(
-    `${import.meta.env.VITE_BACKEND_URI}/api/chat/isMuted/${name}`,
-    {
-      chan: channel,
-    },
-    {
-      withCredentials: true,
-    }
-  )
+  axios
+    .post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/isMuted/${name}`,
+      {
+        chan: channel,
+      },
+      {
+        withCredentials: true,
+      }
+    )
+    .catch(console.error)
 );
 
 const isAdmin = curry((channel: string, name: string) =>
-  axios.post(
-    `${import.meta.env.VITE_BACKEND_URI}/api/chat/isAdmin/${name}`,
-    {
-      chan: channel,
-    },
-    {
-      withCredentials: true,
-    }
-  )
+  axios
+    .post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/isAdmin/${name}`,
+      {
+        chan: channel,
+      },
+      {
+        withCredentials: true,
+      }
+    )
+    .catch(console.error)
 );
 
 const isBanned = curry((channel: string, name: string) =>
-  axios.post(
-    `${import.meta.env.VITE_BACKEND_URI}/api/chat/isBanned/${name}`,
-    {
-      chan: channel,
-    },
-    {
-      withCredentials: true,
-    }
-  )
+  axios
+    .post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/isBanned/${name}`,
+      {
+        chan: channel,
+      },
+      {
+        withCredentials: true,
+      }
+    )
+    .catch(console.error)
 );
 
 export {

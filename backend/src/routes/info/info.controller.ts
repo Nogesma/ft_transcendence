@@ -7,6 +7,7 @@ import {
 } from "@nestjs/common";
 
 import { InfoService } from "./info.service.js";
+import { isNil } from "ramda";
 
 @Controller("info")
 export class InfoController {
@@ -18,6 +19,14 @@ export class InfoController {
       throw new HttpException("id is not a number", HttpStatus.BAD_REQUEST);
 
     return this.infoService.getUserInfo(id);
+  }
+
+  @Get("id/:name")
+  async getUserId(@Param("name") name: string) {
+    if (isNil(name))
+      throw new HttpException("name is nil", HttpStatus.BAD_REQUEST);
+
+    return this.infoService.getUserId(name);
   }
 
   @Get("stats/:id")

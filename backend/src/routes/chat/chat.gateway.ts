@@ -81,7 +81,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
       propEq("name", channelName),
       handshake.channels as Channel[]
     );
-    if (!channel) return;
+    if (!channel) {
+      this.server.to(client.id).emit("channelInfo", { memberList: null });
+      return;
+    }
 
     const { displayname, id } = handshake.user;
 

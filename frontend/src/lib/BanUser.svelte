@@ -3,14 +3,16 @@
 
   //TODO Get the userID instead of its name:
   const banUser = (channelName: string, userName: string) =>
-    axios.post(
-      `${
-        import.meta.env.VITE_BACKEND_URI
-      }/api/chat/ban/${channelName}/${userName}`,
-      {
-        withCredentials: true,
-      }
-    );
+    axios
+      .post(
+        `${
+          import.meta.env.VITE_BACKEND_URI
+        }/api/chat/ban/${channelName}/${userName}`,
+        {
+          withCredentials: true,
+        }
+      )
+      .catch(console.error);
 
   let userName: string;
   let channelName: string;

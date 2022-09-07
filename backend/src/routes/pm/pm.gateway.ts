@@ -64,36 +64,45 @@ export class PmGateway
     handshake.user.status = 0;
     await handshake.user.save();
   }
+
   @SubscribeMessage("ban")
-  async handleban(
+  async handleBan(
     @ConnectedSocket() client: Socket,
     @MessageBody("id") id: number
   ) {
     const handshake = client.handshake as BlockHandshake;
+
     if (isNil(id) || isNaN(id)) return;
     if (handshake.user.id === id) return;
     if (handshake.block.has(id)) return;
-    await this.blockService.blockUser(handshake.user.id, id);
-    //todo: update blocked_by if user blocked is connected
+
+    await this.blockService.blockUser(handshake.user.id, id).catch();
+
     const sockets = await this.server.fetchSockets();
     const userSocket = find(pathEq(["handshake", "user", "id"], id))(sockets);
-
     if (!userSocket) return;
+
     userSocket.handshake.block.add(handshake.user.id);
   }
+
   @SubscribeMessage("unban")
-  async unban(
+  async handleUnban(
     @ConnectedSocket() client: Socket,
     @MessageBody("id") id: number
   ) {
     if (isNil(id) || isNaN(id)) return;
+
     const handshake = client.handshake as BlockHandshake;
-    await this.blockService.unblockUser(handshake.user.id, id);
+
+    await this.blockService.unblockUser(handshake.user.id, id).catch();
+
     const sockets = await this.server.fetchSockets();
     const userSocket = find(pathEq(["handshake", "user", "id"], id))(sockets);
     if (!userSocket) return;
+
     userSocket.handshake.block.delete(handshake.user.id);
   }
+
   @SubscribeMessage("status")
   async handleStatusUpdate(
     @ConnectedSocket() client: Socket,
@@ -110,25 +119,28 @@ export class PmGateway
     else handshake.user.currentGame = "";
     await handshake.user.save();
   }
-  @SubscribeMessage("sendpm")
-  async handlepm(
+
+  @SubscribeMessage("sendMessage")
+  async handleNewMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody("id") id: number,
-    @MessageBody("pmmsg") msg: string
+    @MessageBody("message") message: string
   ) {
     const handshake = client.handshake as BlockHandshake;
+
     if (handshake.block.has(id)) {
-      this.server.to(String(handshake.user.id)).emit("pm", {
-        msg: "You cannot talk to that person",
-        displayname: "Server",
+      this.server.to(handshake.user.id).emit("newPM", {
+        message: "You cannot talk to that person",
+        id: 0,
       });
       return;
     }
 
-    if (!msg || !id || isNaN(id)) return;
-    this.server.to(String(id)).emit("pm", {
-      msg,
-      displayname: handshake.user.displayname,
+    if (!message || !id || isNaN(id)) return;
+
+    this.server.to(String(id)).emit("newPM", {
+      message,
+      id: handshake.user.id,
     });
   }
 }

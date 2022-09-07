@@ -18,7 +18,7 @@
         }
       )
       .then(({ data }) => console.log(data))
-      .catch();
+      .catch(console.error);
     window.location.reload();
   };
 

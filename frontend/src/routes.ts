@@ -21,11 +21,11 @@ export default {
   "/game/:id?": wrap({
     asyncComponent: () => import("./routes/Game.svelte"),
   }),
-  "/chat/:id": wrap({
-    asyncComponent: () => import("./routes/Chat.svelte"),
+  "/chat/:id?": wrap({
+    asyncComponent: () => import("./routes/FSChat.svelte"),
   }),
-  "/chat": wrap({
-    asyncComponent: () => import("./routes/ChannelManager.svelte"),
+  "/pm": wrap({
+    asyncComponent: () => import("./routes/PrivateMessage.svelte"),
   }),
   "*": wrap({
     asyncComponent: () => import("./routes/404.svelte"),

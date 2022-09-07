@@ -3,9 +3,14 @@
   import Modal from "./Modal.svelte";
 
   const getChannels = () =>
-    axios.get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/channels`, {
-      withCredentials: true,
-    });
+    axios
+      .get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/channels`, {
+        withCredentials: true,
+      })
+      .catch((e) => {
+        console.error(e);
+        return { data: [] };
+      });
 
   const deleteChannel = (channelName: string) =>
     axios
@@ -17,7 +22,7 @@
         }
       )
       .then(({ data }) => console.log(data))
-      .catch();
+      .catch(console.error);
 </script>
 
 <label for="delete-modal" class="modal-button btn">Delete Channel</label>
@@ -27,9 +32,7 @@
     <div class="flex flex-col">
       <h3 class="text-lg font-bold pb-4">Delete channel</h3>
 
-      {#await getChannels()}
-        <p>waiting...</p>
-      {:then { data }}
+      {#await getChannels() then { data }}
         <div class="flex flex-row flex-wrap mt-4 -ml-4 -mb-4 flex-auto">
           {#each data as { name }}
             <label

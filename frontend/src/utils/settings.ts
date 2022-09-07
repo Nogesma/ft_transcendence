@@ -9,7 +9,8 @@ const resetAvatar = (updatepfp: Writable<number>) =>
     .delete(`${import.meta.env.VITE_BACKEND_URI}/api/user/avatar`, {
       withCredentials: true,
     })
-    .then(() => updatepfp.update(inc));
+    .then(() => updatepfp.update(inc))
+    .catch(console.error);
 
 const request2FA = async (tfa_enabled: boolean, elem: HTMLElement) => {
   if (!tfa_enabled)
@@ -25,6 +26,10 @@ const request2FA = async (tfa_enabled: boolean, elem: HTMLElement) => {
           elem.firstChild as Node
         );
         return null;
+      })
+      .catch((e) => {
+        console.error(e);
+        return null;
       });
   return new Promise<null>(() => null);
 };
@@ -39,7 +44,7 @@ const updateUserName = async (name: string) =>
       }
     )
     .then(getUserData)
-    .catch((err) => console.error(err));
+    .catch(console.error);
 
 const uploadAvatar = async (file: FileList, updatepfp: Writable<number>) => {
   const form = new FormData();
@@ -52,7 +57,8 @@ const uploadAvatar = async (file: FileList, updatepfp: Writable<number>) => {
         "Content-Type": "multipart/form-data",
       },
     })
-    .then(() => updatepfp.update(inc));
+    .then(() => updatepfp.update(inc))
+    .catch(console.error);
 };
 
 const getTFAStatus = () =>
