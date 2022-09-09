@@ -27,16 +27,13 @@
   {#await getChannels() then { data }}
     {#each data as { name }}
       <button
-        class="btn"
+        class="btn m-2"
         on:click={() => (p ? push(`/chat/${name}`) : (channel = name))}
         >{name}
       </button>
     {/each}
     <JoinChannel />
     <CreateChannel />
-    <DeleteChannel />
-    <BanUser />
-    <!--    <LeaveChannel />-->
   {:catch err}
     <p>{err}</p>
   {/await}

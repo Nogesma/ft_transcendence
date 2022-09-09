@@ -7,15 +7,11 @@
 
   import ChannelManager from "./ChannelManager.svelte";
 
-  let showChat = true;
+  let showChat = false;
   let channel = "";
 </script>
 
-<div
-  class="flex flex-col border-accent border flex-shrink-0 {showChat
-    ? 'w-1/5'
-    : ''}"
->
+<div class="flex flex-col flex-shrink-0 {showChat ? 'w-1/5' : ''} rounded">
   <div
     tabindex="0"
     class="btn btn-ghost btn-circle"
