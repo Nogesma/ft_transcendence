@@ -117,7 +117,7 @@
       {channel}
     </h2>
   </div>
-  <div class="mt-6 flex-1 px-4 sm:px-6">
+  <div class="mt-6 flex-1 px-4 sm:px-6 bg-gray-600 overflow-auto border border-blue-400">
     {#each messagesList as { displayname, message, login: userLogin, id }}
       <!--            <label tabindex="0" class="" for="unused">{ina + 1}: {displayname}</label>: {message}-->
       <ul class="space-y-2">
@@ -132,23 +132,23 @@
           <div class="dropdown dropdown-end">
             <div
               tabindex="0"
-              class="btn btn-ghost btn-circle avatar justify-start"
+              class="justify-start"
             >
               {displayname}
               <!--            <ProfilePic user={userLogin} attributes="h-8 w-8 rounded-full" />-->
             </div>
             <ul
               tabindex="0"
-              class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-green-400 rounded-box w-52"
+              class="menu menu-compact dropdown-content mt-3 p-2 font-medium text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white rounded-box w-52 text-sm"
             >
               {#await isBannedC(userLogin) then banned}
                 {#if banned}
-                  <li class="text-gray-50" on:click={() => banUserC(userLogin)}>
+                  <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => banUserC(userLogin)}>
                     Ban {displayname}
                   </li>
                 {:else}
                   <li
-                    class="text-gray-50"
+                    class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
                     on:click={() => unBanUserC(userLogin)}
                   >
                     Unban {displayname}
@@ -158,14 +158,14 @@
               {#await isMutedC(userLogin) then muted}
                 {#if muted}
                   <li
-                    class="text-gray-50"
+                    class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
                     on:click={() => muteUserC(userLogin)}
                   >
                     Mute {displayname}
                   </li>
                 {:else}
                   <li
-                    class="text-gray-50"
+                    class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
                     on:click={() => unMuteUserC(userLogin)}
                   >
                     Unmute {displayname}
@@ -175,48 +175,48 @@
               {#await isAdminC(userLogin) then admin}
                 {#if admin}
                   <li
-                    class="text-gray-50"
+                    class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
                     on:click={() => addAdminC(userLogin)}
                   >
                     Add {displayname} as Admin
                   </li>
                 {:else}
                   <li
-                    class="text-gray-50"
+                    class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
                     on:click={() => removeAdminC(userLogin)}
                   >
                     Remove {displayname} as Admin
                   </li>
                 {/if}
               {/await}
-              <li class="text-gray-50" on:click={() => banUserC(userLogin)}>
+              <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => banUserC(userLogin)}>
                 Ban {displayname}
               </li>
-              <li class="text-gray-50" on:click={() => muteUserC(userLogin)}>
+              <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => muteUserC(userLogin)}>
                 Mute {displayname}
               </li>
-              <li class="text-gray-50" on:click={() => unBanUserC(userLogin)}>
+              <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => unBanUserC(userLogin)}>
                 Unban {displayname}
               </li>
-              <li class="text-gray-50" on:click={() => unMuteUserC(userLogin)}>
+              <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => unMuteUserC(userLogin)}>
                 Unmute {displayname}
               </li>
-              <li class="text-gray-50" on:click={() => push(`/users/${id}`)}>
+              <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => push(`/users/${id}`)}>
                 View profile
               </li>
-              <li class="text-gray-50" on:click={() => banpm(id)}>
+              <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => banpm(id)}>
                 Block {displayname}
               </li>
-              <li class="text-gray-50" on:click={() => unbanpm(id)}>
+              <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => unbanpm(id)}>
                 UnBlock {displayname}
               </li>
-              <li class="text-gray-50" on:click={() => sendpm(id)}>
+              <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => sendpm(id)}>
                 Sendpm {displayname}
               </li>
               <input
                 type="text"
                 placeholder="PmMessage"
-                class="block w-full py-2 pl-4 mx-3 bg-gray-100 rounded-full outline-none focus:text-gray-700"
+                class="py-2 px-4 w-full rounded border-b border-gray-200 dark:border-gray-600"
                 name="pmmessage"
                 required
                 bind:value={pmmsg}
@@ -225,9 +225,9 @@
             <div
               class="max-w-xl px-4 py-1 text-gray-700 bg-gray-100 rounded shadow static"
             >
-              <span class="block inline-block text-center justify-end"
-                >{message}</span
-              >
+              <span class="block inline-block text-center justify-end">
+                {message}
+              </span>
             </div>
           </div>
         </li>
@@ -248,21 +248,29 @@
         </button>
       </div>
     {/if}
-    <button class="btn" on:click={() => sendInviteC(false)}> classic</button>
-    <button class="btn" on:click={() => sendInviteC(true)}> modified</button>
-    <button class="btn" on:click={leaveChat}> leave chat</button>
-    <div class="flex flex-auto justify-center">
-      {#each [...connectedMembers.values()] as spec}
-        {#await getUserInfo(spec) then { displayname: name }}
-          {name}
-        {/await}
-      {/each}
+    <div class="flex">
+      <button class="btn w-24 m-1" on:click={() => sendInviteC(false)}> classic</button>
+      <button class="btn w-24 m-1" on:click={() => sendInviteC(true)}> modified</button>
+      <button class="btn w-24 m-1" on:click={leaveChat}> leave chat</button>
     </div>
   </div>
+  <span>Active users:</span>
+  <div class="flex flex-auto justify-left origin-center h-6 border border-green-400">
+    {#each [...connectedMembers.values()] as spec}
+      <li >
+        <ul class="m-1">
+          {#await getUserInfo(spec) then { displayname: name }}
+            {name}
+          {/await}
+        </ul>
+      </li>
+    {/each}
+  </div>
   <div class="flex rounded bg-base-200 p-2">
+
     <form class="form-control" on:submit|preventDefault={sendmsg}>
       <label class="input-group">
-        <input bind:value={msg} type="text" class="input bg-base-200" />
+        <input bind:value={msg} type="text" class="input bg-base-200 w-96 h-6" />
         <button type="submit">
           <svg
             class="w-5 h-5 text-gray-500 origin-center transform rotate-90"

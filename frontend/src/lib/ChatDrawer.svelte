@@ -11,7 +11,7 @@
   let channel = "";
 </script>
 
-<div class="flex flex-col flex-shrink-0 {showChat ? 'w-1/5' : ''} rounded">
+<div class="flex flex-col flex-shrink-0 {showChat ? 'w-96' : ''} rounded">
   <div
     tabindex="0"
     class="btn btn-ghost btn-circle"
