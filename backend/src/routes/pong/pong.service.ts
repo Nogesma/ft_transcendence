@@ -20,7 +20,8 @@ export class PongService {
     player2: number,
     type: boolean
   ) => {
-    const game = new Game(gameId, player1, player2, type, 400, 30, 300, 2);
+    const game = new Game(gameId, player1, player2, type);
+
     this.games.set(gameId, game);
     return { game_id: game, params: game.get_params() };
   };

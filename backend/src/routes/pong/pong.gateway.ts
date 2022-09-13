@@ -130,6 +130,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
     }
 
     client.emit("gameInfo", game.getInfo());
+    game.startGame(this.server);
   }
 
   @SubscribeMessage("customGame")
@@ -196,5 +197,21 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
       // unwanted disconnections where the player will have a chance to join again
       // will be handled in the handleDisconnection function
     }
+  }
+
+  @SubscribeMessage("move")
+  handleMove(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("dir") move: number,
+    @MessageBody("game") gameId: string
+  ) {
+    const handshake = client.handshake as UserHandshake;
+    const id = handshake.user.id;
+
+    const game = this.pongService.getGame(gameId);
+    if (!game) return;
+    if (!game.isPlayer(id)) return;
+
+    game.applyMove(id, move);
   }
 }

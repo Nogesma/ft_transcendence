@@ -2,8 +2,6 @@
   import axios from "axios";
   import JoinChannel from "./JoinChannel.svelte";
   import CreateChannel from "./CreateChannel.svelte";
-  import DeleteChannel from "./DeleteChannel.svelte";
-  import BanUser from "./BanUser.svelte";
   import { isEmpty } from "ramda";
   import Chat from "./Chat.svelte";
   import { push } from "svelte-spa-router";

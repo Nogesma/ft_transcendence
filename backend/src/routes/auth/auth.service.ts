@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { default as axios } from "axios";
+import axios from "axios";
 import type { Response } from "express";
 import { nanoid } from "nanoid";
 import dayjs from "dayjs";

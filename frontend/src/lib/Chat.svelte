@@ -117,7 +117,9 @@
       {channel}
     </h2>
   </div>
-  <div class="mt-6 flex-1 px-4 sm:px-6 bg-gray-600 overflow-auto border border-blue-400">
+  <div
+    class="mt-6 flex-1 px-4 sm:px-6 bg-gray-600 overflow-auto border border-blue-400"
+  >
     {#each messagesList as { displayname, message, login: userLogin, id }}
       <!--            <label tabindex="0" class="" for="unused">{ina + 1}: {displayname}</label>: {message}-->
       <ul class="space-y-2">
@@ -130,10 +132,7 @@
 
         <li class="flex justify-end space-x-3 h-fit p-1 static">
           <div class="dropdown dropdown-end">
-            <div
-              tabindex="0"
-              class="justify-start"
-            >
+            <div tabindex="0" class="justify-start">
               {displayname}
               <!--            <ProfilePic user={userLogin} attributes="h-8 w-8 rounded-full" />-->
             </div>
@@ -143,7 +142,10 @@
             >
               {#await isBannedC(userLogin) then banned}
                 {#if banned}
-                  <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => banUserC(userLogin)}>
+                  <li
+                    class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
+                    on:click={() => banUserC(userLogin)}
+                  >
                     Ban {displayname}
                   </li>
                 {:else}
@@ -189,28 +191,52 @@
                   </li>
                 {/if}
               {/await}
-              <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => banUserC(userLogin)}>
+              <li
+                class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
+                on:click={() => banUserC(userLogin)}
+              >
                 Ban {displayname}
               </li>
-              <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => muteUserC(userLogin)}>
+              <li
+                class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
+                on:click={() => muteUserC(userLogin)}
+              >
                 Mute {displayname}
               </li>
-              <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => unBanUserC(userLogin)}>
+              <li
+                class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
+                on:click={() => unBanUserC(userLogin)}
+              >
                 Unban {displayname}
               </li>
-              <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => unMuteUserC(userLogin)}>
+              <li
+                class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
+                on:click={() => unMuteUserC(userLogin)}
+              >
                 Unmute {displayname}
               </li>
-              <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => push(`/users/${id}`)}>
+              <li
+                class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
+                on:click={() => push(`/users/${id}`)}
+              >
                 View profile
               </li>
-              <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => banpm(id)}>
+              <li
+                class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
+                on:click={() => banpm(id)}
+              >
                 Block {displayname}
               </li>
-              <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => unbanpm(id)}>
+              <li
+                class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
+                on:click={() => unbanpm(id)}
+              >
                 UnBlock {displayname}
               </li>
-              <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600" on:click={() => sendpm(id)}>
+              <li
+                class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
+                on:click={() => sendpm(id)}
+              >
                 Sendpm {displayname}
               </li>
               <input
@@ -249,15 +275,21 @@
       </div>
     {/if}
     <div class="flex">
-      <button class="btn w-24 m-1" on:click={() => sendInviteC(false)}> classic</button>
-      <button class="btn w-24 m-1" on:click={() => sendInviteC(true)}> modified</button>
+      <button class="btn w-24 m-1" on:click={() => sendInviteC(false)}>
+        classic</button
+      >
+      <button class="btn w-24 m-1" on:click={() => sendInviteC(true)}>
+        modified</button
+      >
       <button class="btn w-24 m-1" on:click={leaveChat}> leave chat</button>
     </div>
   </div>
   <span>Active users:</span>
-  <div class="flex flex-auto justify-left origin-center h-6 border border-green-400">
+  <div
+    class="flex flex-auto justify-left origin-center h-6 border border-green-400"
+  >
     {#each [...connectedMembers.values()] as spec}
-      <li >
+      <li>
         <ul class="m-1">
           {#await getUserInfo(spec) then { displayname: name }}
             {name}
@@ -267,10 +299,13 @@
     {/each}
   </div>
   <div class="flex rounded bg-base-200 p-2">
-
     <form class="form-control" on:submit|preventDefault={sendmsg}>
       <label class="input-group">
-        <input bind:value={msg} type="text" class="input bg-base-200 w-96 h-6" />
+        <input
+          bind:value={msg}
+          type="text"
+          class="input bg-base-200 w-96 h-6"
+        />
         <button type="submit">
           <svg
             class="w-5 h-5 text-gray-500 origin-center transform rotate-90"
