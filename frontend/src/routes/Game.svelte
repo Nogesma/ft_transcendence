@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Ball, Bar, Player } from "../game";
   import { getGameSocket } from "../utils/socket";
   import type { Socket } from "socket.io-client";
   import { id, status, gameId } from "../stores/settings";
@@ -8,31 +9,23 @@
   import { isEmpty, startsWith } from "ramda";
   import { params, replace } from "svelte-spa-router";
   import ChatDrawer from "../lib/ChatDrawer.svelte";
+  import { calculateState } from "../utils/game";
 
-  type Bar = {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-  };
+  let ball: Ball, p1: Player, p2: Player;
 
-  type Ball = {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-    dx: number;
-    dy: number;
-  };
+  let WIDTH = 0,
+    HEIGHT = 0;
 
   const initCanvas = (width: number, height: number) => {
-    console.log({ width, height });
-    canvas = <HTMLCanvasElement>document.getElementById("game");
+    const canvas = <HTMLCanvasElement>document.getElementById("game");
 
     if (!canvas) throw new Error("Canvas does not exist.");
 
-    canvas.height = height;
-    canvas.width = width;
+    WIDTH = width;
+    HEIGHT = height;
+
+    canvas.width = WIDTH;
+    canvas.height = HEIGHT;
 
     ctx = canvas.getContext("2d");
 
@@ -42,29 +35,44 @@
   };
 
   const staticCanvas = () => {
-    if (!ctx || !canvas) return;
+    if (!ctx) return;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
     ctx.fillStyle = "#000";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
     ctx.fillStyle = "#fff";
 
     for (let i = 0; i < 15; i++) {
-      ctx.fillRect(canvas.width / 2, 20 + 30 * i, 5, 15);
+      ctx.fillRect(WIDTH / 2, 20 + 30 * i, 5, 15);
     }
 
+    if (!p1 || !p2) return;
+
     ctx.font = "50px sans-serif";
-    ctx.fillText(String(score[0]), canvas.width / 4, 50);
-    ctx.fillText(String(score[1]), (3 * canvas.width) / 4, 50);
+    ctx.fillText(String(p1.score), WIDTH / 4, 50);
+    ctx.fillText(String(p2.score), (3 * WIDTH) / 4, 50);
   };
 
-  const updateCanvas = ({ ball, bars }: { ball: Ball; bars: [Bar, Bar] }) => {
-    if (!ctx || !canvas) return;
+  const updateData = ({ ball: b, bars }: { ball: Ball; bars: [Bar, Bar] }) => {
+    ball = b;
+    p1.bar = bars[0];
+    p2.bar = bars[1];
+  };
+
+  const updateState = (dt: number) => {
+    if (!p1 || !p2 || !ball) return;
+    calculateState(p1, p2, ball, dt, HEIGHT);
+    updateCanvas();
+  };
+
+  const updateCanvas = () => {
+    if (!ctx) return;
 
     staticCanvas();
-    ctx.fillRect(bars[0].x, bars[0].y, bars[0].w, bars[0].h);
-    ctx.fillRect(bars[1].x, bars[1].y, bars[1].w, bars[1].h);
+    if (!p1 || !p2) return;
+    ctx.fillRect(p1.bar.x, p1.bar.y, p1.bar.w, p1.bar.h);
+    ctx.fillRect(p2.bar.x, p2.bar.y, p2.bar.w, p2.bar.h);
     ctx.fillRect(ball.x, ball.y, ball.w, ball.h);
   };
 
@@ -74,14 +82,14 @@
       ({
         width,
         height,
-        p1,
-        p2,
+        player1,
+        player2,
         spectators,
       }: {
         width: number;
         height: number;
-        p1: number;
-        p2: number;
+        player1: Player;
+        player2: Player;
         spectators: Set<number>;
       }) => {
         if (!width) replace("/game");
@@ -93,19 +101,37 @@
           }
         }, 100);
 
-        player1 = p1;
-        player2 = p2;
+        p1 = player1;
+        p2 = player2;
+        id1 = p1.id;
+        id2 = p2.id;
         spectatorList = new Set(spectators);
 
-        isSpectating = $id !== p1 && $id !== p2;
+        if ($id === p1.id) player = p1;
+        else if ($id === p2.id) player = p2;
 
-        if (isSpectating) $status = 3;
+        if (!player) $status = 3;
         else $status = 2;
 
-        // for now fps is tied to server tick rate, and no movement prediction is happening, we only update the display
-        // when receiving new information from the server.
-        s.on("gameState", updateCanvas);
-        s.on("updateScore", (s: [number, number]) => (score = s));
+        s.on("gameState", updateData);
+
+        let prev = 0;
+        function first(timestamp: number) {
+          prev = timestamp;
+          window.requestAnimationFrame(frame);
+        }
+        function frame(timestamp: number) {
+          const dt = (timestamp - prev) * 0.001;
+          prev = timestamp;
+          updateState(dt);
+          window.requestAnimationFrame(frame);
+        }
+        window.requestAnimationFrame(first);
+
+        s.on("updateScore", (s: [number, number]) => {
+          p1.score = s[0];
+          p2.score = s[1];
+        });
 
         s.on("newSpectator", (id) => {
           spectatorList.add(id);
@@ -119,13 +145,9 @@
     );
   };
 
-  let isSpectating = true;
   let spectatorList = new Set<number>();
 
-  let canvas: HTMLCanvasElement | null;
   let ctx: CanvasRenderingContext2D | null;
-  let player1: number, player2: number;
-  let score = [0, 0];
 
   const socket = getGameSocket();
 
@@ -137,24 +159,34 @@
     socket.emit("joinGame", $gameId);
   }
 
+  let player: Player | null = null;
+  // we need to store the id separately otherwise svelte will refresh every time we update the player state
+  let id1: number, id2: number;
+
   const handleKeydown = (event: KeyboardEvent) => {
-    if (isSpectating) return;
+    if (!player) return;
 
     if (event.key === "ArrowUp") {
       event.preventDefault();
-      socket.volatile.emit("move", { dir: -1, game: $gameId });
+      if (player.bar.direction !== -1)
+        socket.volatile.emit("move", { dir: -1, game: $gameId });
+      player.bar.direction = -1;
     } else if (event.key === "ArrowDown") {
       event.preventDefault();
-      socket.volatile.emit("move", { dir: 1, game: $gameId });
+      if (player.bar.direction !== 1)
+        socket.volatile.emit("move", { dir: 1, game: $gameId });
+      player.bar.direction = 1;
     }
   };
 
   const handleKeyup = (event: KeyboardEvent) => {
-    if (isSpectating) return;
+    if (!player) return;
 
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
       event.preventDefault();
-      socket.volatile.emit("move", { dir: 0, game: $gameId });
+      if (player.bar.direction !== 0)
+        socket.volatile.emit("move", { dir: 0, game: $gameId });
+      player.bar.direction = 0;
     }
   };
 </script>
@@ -169,12 +201,12 @@
   {:else}
     <div class="flex flex-auto flex-col">
       <div class="flex flex-row flex-auto justify-evenly flex-nowrap">
-        {#if player1}
+        {#if p1}
           <div class="flex-col">
-            {#await getUserInfo(player1) then { login, displayname: name }}
+            {#await getUserInfo(id1) then { login, displayname: name }}
               <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
               {name}
-              {#await getUserStats(player1) then { elo }}
+              {#await getUserStats(id1) then { elo }}
                 {elo}
               {/await}
             {/await}
@@ -183,12 +215,12 @@
 
         <canvas id="game" />
 
-        {#if player2}
+        {#if p1}
           <div class="flex-col">
-            {#await getUserInfo(player2) then { login, displayname: name }}
+            {#await getUserInfo(id2) then { login, displayname: name }}
               <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
               {name}
-              {#await getUserStats(player2) then { elo }}
+              {#await getUserStats(id2) then { elo }}
                 {elo}
               {/await}
             {/await}
