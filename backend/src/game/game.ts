@@ -32,7 +32,7 @@ export class Game {
   private readonly WIDTH = 640;
   private readonly HEIGHT = 480;
 
-  private readonly TICK_RATE = 33;
+  private readonly TICK_RATE = 16;
   private interval: NodeJS.Timer | null;
 
   private readonly BAR_W = 10;
@@ -214,12 +214,22 @@ export class Game {
       this.ball.dx = -this.ball.dx;
       // tp ball in front of the bar to avoid multiple collisions.
       if (this.ball.x < 30) this.ball.x = 30;
+      this.ball.dy =
+        this.BALL_SPEED *
+        ((this.ball.y + this.ball.h / 2 - this.p1.bar.y) / (this.p1.bar.h / 2) -
+          1) *
+        1.3;
     } else if (this.checkCollision(this.ball, this.p2.bar)) {
       // dx is positive
       if (this.ball.dx < this.MAX_SPEED) this.ball.dx += 50;
       this.ball.dx = -this.ball.dx;
       // tp ball in front of the bar to avoid multiple collisions.
       if (this.ball.x > this.WIDTH - 30) this.ball.x = this.WIDTH - 30;
+      this.ball.dy =
+        this.BALL_SPEED *
+        ((this.ball.y + this.ball.h / 2 - this.p2.bar.y) / (this.p2.bar.h / 2) -
+          1) *
+        1.3;
     }
   };
 
