@@ -9,7 +9,6 @@ jobs:
 
   docker-backend:
     runs-on: ubuntu-latest
-    needs: [ build-backend ]
     steps:
       - uses: actions/checkout@v3
       - uses: docker/login-action@v2
@@ -27,7 +26,6 @@ jobs:
 
   docker-frontend:
     runs-on: ubuntu-latest
-    needs: [ build-frontend ]
     steps:
       - uses: actions/checkout@v3
       - uses: docker/login-action@v2
