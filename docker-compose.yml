@@ -6,8 +6,7 @@ services:
     build: frontend
     restart: always
     networks:
-      front:
-      back:
+      - web
     ports:
       - "80:80"
       - "443:443"
@@ -21,7 +20,7 @@ services:
     restart: always
     image: postgres:14.4-alpine
     networks:
-      back:
+      - db
     volumes:
       - db:/var/lib/postgresql/data
     env_file:
@@ -34,7 +33,8 @@ services:
     restart: always
     build: backend
     networks:
-      back:
+      - db
+      - web
     volumes:
       - avatars:/files
     env_file:
@@ -47,5 +47,5 @@ volumes:
   caddy_config: {}
 
 networks:
-  front:
-  back:
+  db:
+  web:

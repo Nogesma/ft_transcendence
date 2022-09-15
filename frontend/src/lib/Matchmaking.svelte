@@ -4,7 +4,7 @@
   import { divide, split, startsWith } from "ramda";
   import { replace } from "svelte-spa-router";
   import { onMount } from "svelte";
-  import { gameId } from "../../stores/settings";
+  import { gameId } from "../stores/settings";
 
   export let socket: Socket;
 

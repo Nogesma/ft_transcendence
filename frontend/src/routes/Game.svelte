@@ -4,7 +4,7 @@
   import { id, status, gameId } from "../stores/settings";
   import { getUserInfo, getUserStats } from "../utils/info.js";
   import ProfilePic from "../lib/ProfilePic.svelte";
-  import Matchmaking from "../lib/Pong/Matchmaking.svelte";
+  import Matchmaking from "../lib/Matchmaking.svelte";
   import { isEmpty, startsWith } from "ramda";
   import { params, replace } from "svelte-spa-router";
   import ChatDrawer from "../lib/ChatDrawer.svelte";
