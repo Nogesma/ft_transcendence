@@ -1,5 +1,13 @@
 FROM node:16 AS builder
 
+ARG VITE_CLIENT_ID
+ARG VITE_REDIRECT_URI
+ARG VITE_BACKEND_URI
+
+ENV VITE_CLIENT_ID=$VITE_CLIENT_ID
+ENV VITE_REDIRECT_URI=$VITE_REDIRECT_URI
+ENV VITE_BACKEND_URI=$VITE_BACKEND_URI
+
 ENV NODE_ENV production
 
 WORKDIR /build/
@@ -10,8 +18,7 @@ COPY .yarn .yarn
 
 RUN yarn install --immutable
 
-COPY .env \
-    index.html \
+COPY index.html \
     svelte.config.js \
     postcss.config.cjs \
     tailwind.config.cjs \
