@@ -2,8 +2,13 @@ version: '3.9'
 
 services:
   transcendence:
-    container_name: transcendence
-    build: frontend
+    container_name: frontend
+    build:
+      context: frontend
+      args:
+        VITE_CLIENT_ID: --
+        VITE_REDIRECT_URI: --
+        VITE_BACKEND_URI: --
     restart: always
     networks:
       - web
