@@ -189,7 +189,10 @@ export class Game {
     this.ball.y += this.ball.dy * dt;
 
     // Ball bounce on top/bottom
-    if (this.ball.y < 0 || this.ball.y > this.HEIGHT - this.ball.h)
+    if (
+      (this.ball.y < 0 && this.ball.dy < 0) ||
+      (this.ball.y > this.HEIGHT - this.ball.h && this.ball.dy > 0)
+    )
       this.ball.dy = -this.ball.dy;
 
     // If ball is out of frame on the x-axis, score a point.

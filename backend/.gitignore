@@ -43,3 +43,4 @@ lerna-debug.log*
 !.yarn/versions
 
 uploads
+/tokengen.js
