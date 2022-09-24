@@ -41,7 +41,7 @@ export class Game {
 
   private readonly BALL_W = 10;
   private readonly BALL_H = 10;
-  private readonly BALL_SPEED = 150;
+  private readonly BALL_SPEED = 200;
   private readonly MAX_SPEED = 400;
 
   private readonly type: boolean;
@@ -73,6 +73,17 @@ export class Game {
       score: 0,
     };
 
+    console.log(
+      "started game:\n gameID: ",
+      gameId,
+      "\n custom: ",
+      type,
+      "\n player1: ",
+      id1,
+      "\n player2: ",
+      id2
+    );
+
     this.p2 = {
       id: id2,
       bar: this.initBar(true),
@@ -88,6 +99,7 @@ export class Game {
       dy: this.getRandomSpeed(this.BALL_SPEED),
       dx: this.BALL_SPEED,
     };
+    this.normalize_speed();
   }
 
   newSpectator = (id: number) => this.spectatorList.add(id);
@@ -155,6 +167,7 @@ export class Game {
       dy: Math.floor(Math.random() * this.BALL_SPEED * 2) - this.BALL_SPEED,
       dx: dir ? this.BALL_SPEED : -this.BALL_SPEED,
     };
+    this.normalize_speed();
 
     this.p1.bar.w = this.BAR_W;
     this.p1.bar.h = this.BAR_H;
@@ -234,6 +247,7 @@ export class Game {
           1) *
         1.3;
     }
+    this.normalize_speed();
   };
 
   private startGame = (server: Server) => {
@@ -279,4 +293,12 @@ export class Game {
 
   private getRandomSpeed = (max: number) =>
     Math.floor(Math.random() * max * 2) - max;
+
+  private normalize_speed = () => {
+    let ratio =
+      this.BALL_SPEED /
+      Math.sqrt(this.ball.dx * this.ball.dx + this.ball.dy * this.ball.dy);
+    this.ball.dx = this.ball.dx * ratio;
+    this.ball.dy = this.ball.dy * ratio;
+  };
 }
