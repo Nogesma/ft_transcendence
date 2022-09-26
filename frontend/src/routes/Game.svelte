@@ -9,7 +9,7 @@
   import { isEmpty, startsWith } from "ramda";
   import { params, replace } from "svelte-spa-router";
   import ChatDrawer from "../lib/ChatDrawer.svelte";
-  import { calculateState } from "../utils/game";
+  // import { calculateState } from "../utils/game";
   import UserCard from "../lib/UserCard.svelte";
 
   let ball: Ball, p1: Player, p2: Player;
@@ -69,7 +69,9 @@
 
   const updateState = (dt: number) => {
     if (!p1 || !p2 || !ball) return;
-    calculateState(p1, p2, ball, dt, HEIGHT);
+    // disable client-side prediction for now.
+    dt;
+    // calculateState(p1, p2, ball, dt, HEIGHT);
     updateCanvas();
   };
 

@@ -41,7 +41,7 @@ export class Game {
 
   private readonly BALL_W = 10;
   private readonly BALL_H = 10;
-  private readonly BALL_SPEED = 150;
+  private readonly BALL_SPEED = 200;
   private readonly MAX_SPEED = 400;
 
   private readonly type: boolean;
@@ -73,6 +73,17 @@ export class Game {
       score: 0,
     };
 
+    console.log(
+      "started game:\n gameID: ",
+      gameId,
+      "\n custom: ",
+      type,
+      "\n player1: ",
+      id1,
+      "\n player2: ",
+      id2
+    );
+
     this.p2 = {
       id: id2,
       bar: this.initBar(true),
@@ -88,6 +99,7 @@ export class Game {
       dy: this.getRandomSpeed(this.BALL_SPEED),
       dx: this.BALL_SPEED,
     };
+    this.normalizeSpeed();
   }
 
   newSpectator = (id: number) => this.spectatorList.add(id);
@@ -155,6 +167,7 @@ export class Game {
       dy: Math.floor(Math.random() * this.BALL_SPEED * 2) - this.BALL_SPEED,
       dx: dir ? this.BALL_SPEED : -this.BALL_SPEED,
     };
+    this.normalizeSpeed();
 
     this.p1.bar.w = this.BAR_W;
     this.p1.bar.h = this.BAR_H;
@@ -189,12 +202,11 @@ export class Game {
     this.ball.y += this.ball.dy * dt;
 
     // Ball bounce on top/bottom
-    if (this.ball.y < 0 || this.ball.y > this.HEIGHT - this.ball.h)
+    if (
+      (this.ball.y < 0 && this.ball.dy < 0) ||
+      (this.ball.y > this.HEIGHT - this.ball.h && this.ball.dy > 0)
+    )
       this.ball.dy = -this.ball.dy;
-    // teleport the ball on the wall to avoid getting it stuck on the other side of the wall.
-    if (this.ball.y < 0) this.ball.y = 0;
-    if (this.ball.y > this.HEIGHT - this.ball.h)
-      this.ball.y = this.HEIGHT - this.ball.h;
 
     // If ball is out of frame on the x-axis, score a point.
     if (this.ball.x < 0 || this.ball.x > this.WIDTH - this.ball.w) {
@@ -205,35 +217,39 @@ export class Game {
         .to(this.gameId)
         .emit("updateScore", [this.p1.score, this.p2.score]);
 
-      if (this.p1.score >= 10 || this.p2.score >= 10) this.endGame();
+      if (this.p1.score >= 10 || this.p2.score >= 10) return this.endGame();
 
       // Reset ball and bars to default
       this.resetGameState(this.ball.x < 0);
     }
+    this.handleBarCollision();
+    this.normalizeSpeed();
+  };
 
+  private handleBarCollision = () => {
     // Check collision with paddles
     if (this.checkCollision(this.ball, this.p1.bar)) {
-      // dx is negative
+      // if dx is positive, we already ran this branch in the last game loop iteration, exit.
+      if (this.ball.dx > 0) return;
       if (this.ball.dx > -this.MAX_SPEED) this.ball.dx -= 50;
+
       this.ball.dx = -this.ball.dx;
-      // tp ball in front of the bar to avoid multiple collisions.
-      if (this.ball.x < 30) this.ball.x = 30;
+
       this.ball.dy =
         this.BALL_SPEED *
         ((this.ball.y + this.ball.h / 2 - this.p1.bar.y) / (this.p1.bar.h / 2) -
           1) *
-        1.3;
+        1.7;
     } else if (this.checkCollision(this.ball, this.p2.bar)) {
-      // dx is positive
+      // if dx is negative, we already ran this branch in the last game loop iteration, exit.
+      if (this.ball.dx < 0) return;
       if (this.ball.dx < this.MAX_SPEED) this.ball.dx += 50;
       this.ball.dx = -this.ball.dx;
-      // tp ball in front of the bar to avoid multiple collisions.
-      if (this.ball.x > this.WIDTH - 30) this.ball.x = this.WIDTH - 30;
       this.ball.dy =
         this.BALL_SPEED *
         ((this.ball.y + this.ball.h / 2 - this.p2.bar.y) / (this.p2.bar.h / 2) -
           1) *
-        1.3;
+        1.7;
     }
   };
 
@@ -280,4 +296,12 @@ export class Game {
 
   private getRandomSpeed = (max: number) =>
     Math.floor(Math.random() * max * 2) - max;
+
+  private normalizeSpeed = () => {
+    const ratio =
+      this.BALL_SPEED /
+      Math.sqrt(this.ball.dx * this.ball.dx + this.ball.dy * this.ball.dy);
+    this.ball.dx = this.ball.dx * ratio;
+    this.ball.dy = this.ball.dy * ratio;
+  };
 }

@@ -542,14 +542,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@humanwhocodes/config-array@npm:^0.10.4":
-  version: 0.10.4
-  resolution: "@humanwhocodes/config-array@npm:0.10.4"
+"@humanwhocodes/config-array@npm:^0.10.5":
+  version: 0.10.5
+  resolution: "@humanwhocodes/config-array@npm:0.10.5"
   dependencies:
     "@humanwhocodes/object-schema": ^1.2.1
     debug: ^4.1.1
     minimatch: ^3.0.4
-  checksum: d480e5d57e6d787565b6cff78e27c3d1b380692d4ffb0ada7d7f5957a56c9032f034da05a3e443065dbd0671ebf4d859036ced34e96b325bbc1badbae3c05300
+  checksum: af4fa2633c57414be22ddba0a072cc611ef9a07104542fa24bde918a0153b89b6e08ca6a20ccc9079de6079e219e2406e38414d1b662db8bb59a3ba9d6eee6e3
   languageName: node
   linkType: hard
 
@@ -1545,10 +1545,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=10.0.0, @types/node@npm:^18.7.18":
+"@types/node@npm:*, @types/node@npm:>=10.0.0":
   version: 18.7.18
   resolution: "@types/node@npm:18.7.18"
   checksum: 8aec61f0f96e2a69ce51f1f40f949ca578bbb4fe05d7c0b8ce3aeeb848e90f755837f17f6ac132ca404d974fe9b2974150ad3b4984fc9dc7c3ceddb10bae0167
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^18.7.22":
+  version: 18.7.22
+  resolution: "@types/node@npm:18.7.22"
+  checksum: 81016612ad01eee71aa518b9e91c71a54706bbc948c3e9655f80aba75cd4b646cde9b023bf284679c403d6d17b971edc4deec0457421254bbdb78e9773d04804
   languageName: node
   linkType: hard
 
@@ -2336,7 +2343,7 @@ __metadata:
     "@types/express": ^4.17.14
     "@types/jest": 29.0.3
     "@types/joi": ^17.2.3
-    "@types/node": ^18.7.18
+    "@types/node": ^18.7.22
     "@types/ramda": ^0.28.15
     "@types/sequelize": ^4.28.14
     "@types/speakeasy": ^2.0.7
@@ -2348,26 +2355,26 @@ __metadata:
     busboy: ^1.6.0
     cookie-parser: ^1.4.6
     dayjs: ^1.11.5
-    eslint: ^8.23.1
+    eslint: ^8.24.0
     eslint-config-prettier: ^8.5.0
     eslint-plugin-prettier: ^4.2.1
     file-type: ^18.0.0
     jest: 29.0.3
-    joi: ^17.6.0
+    joi: ^17.6.1
     nanoid: ^4.0.0
     pg: ^8.8.0
     prettier: ^2.7.1
     ramda: ^0.28.0
     reflect-metadata: ^0.1.13
-    rxjs: ^7.5.6
-    sequelize: ^6.23.0
+    rxjs: ^7.5.7
+    sequelize: ^6.23.1
     sequelize-cli: ^6.4.1
     sequelize-typescript: ^2.1.3
     socket.io: ^4.5.2
     source-map-support: ^0.5.21
     speakeasy: ^2.0.0
     supertest: ^6.2.4
-    ts-jest: 29.0.1
+    ts-jest: 29.0.2
     ts-loader: ^9.4.1
     ts-node: ^10.9.1
     tsconfig-paths: 4.1.0
@@ -3496,12 +3503,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^8.23.1":
-  version: 8.23.1
-  resolution: "eslint@npm:8.23.1"
+"eslint@npm:^8.24.0":
+  version: 8.24.0
+  resolution: "eslint@npm:8.24.0"
   dependencies:
     "@eslint/eslintrc": ^1.3.2
-    "@humanwhocodes/config-array": ^0.10.4
+    "@humanwhocodes/config-array": ^0.10.5
     "@humanwhocodes/gitignore-to-minimatch": ^1.0.2
     "@humanwhocodes/module-importer": ^1.0.1
     ajv: ^6.10.0
@@ -3541,7 +3548,7 @@ __metadata:
     text-table: ^0.2.0
   bin:
     eslint: bin/eslint.js
-  checksum: a727e15492786a03b438bcf021db49f715680679846a7b8d79b98ad34576f2a570404ffe882d3c3e26f6359bff7277ef11fae5614bfe8629adb653f20d018c71
+  checksum: ca293ce7116599b742d7ab4d43db469beec22f40dd272092d809498be3cff3a7c567769f9763bdf6799aac13dd53447b93a99629b7b54092783046eb57eaced6
   languageName: node
   linkType: hard
 
@@ -5142,7 +5149,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"joi@npm:*, joi@npm:^17.6.0":
+"joi@npm:*":
   version: 17.6.0
   resolution: "joi@npm:17.6.0"
   dependencies:
@@ -5152,6 +5159,19 @@ __metadata:
     "@sideway/formula": ^3.0.0
     "@sideway/pinpoint": ^2.0.0
   checksum: eaf62f6c02f2edb1042f1ab04fc23a5918a2cb8f54bec84c6e1033624d8a462c10ae9518af55a3ba84f1793960450d58094eda308e7ef93c17edd4e3c8ef31d5
+  languageName: node
+  linkType: hard
+
+"joi@npm:^17.6.1":
+  version: 17.6.1
+  resolution: "joi@npm:17.6.1"
+  dependencies:
+    "@hapi/hoek": ^9.0.0
+    "@hapi/topo": ^5.0.0
+    "@sideway/address": ^4.1.3
+    "@sideway/formula": ^3.0.0
+    "@sideway/pinpoint": ^2.0.0
+  checksum: fcaf094869a5b9ee9fd41cdb087b93ea95a5ff1a77a061caac2637ffdd86c9860ee7c016645e9f0134a99cb0ba374723f78a350ce0d9f4d4d95cc466963d8028
   languageName: node
   linkType: hard
 
@@ -6692,12 +6712,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rxjs@npm:^7.5.5, rxjs@npm:^7.5.6":
+"rxjs@npm:^7.5.5":
   version: 7.5.6
   resolution: "rxjs@npm:7.5.6"
   dependencies:
     tslib: ^2.1.0
   checksum: fc05f01364a74dac57490fb3e07ea63b422af04017fae1db641a009073f902ef69f285c5daac31359620dc8d9aee7d81e42b370ca2a8573d1feae0b04329383b
+  languageName: node
+  linkType: hard
+
+"rxjs@npm:^7.5.7":
+  version: 7.5.7
+  resolution: "rxjs@npm:7.5.7"
+  dependencies:
+    tslib: ^2.1.0
+  checksum: edabcdb73b0f7e0f5f6e05c2077aff8c52222ac939069729704357d6406438acca831c24210db320aba269e86dbe1a400f3769c89101791885121a342fb15d9c
   languageName: node
   linkType: hard
 
@@ -6822,9 +6851,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sequelize@npm:^6.23.0":
-  version: 6.23.0
-  resolution: "sequelize@npm:6.23.0"
+"sequelize@npm:^6.23.1":
+  version: 6.23.1
+  resolution: "sequelize@npm:6.23.1"
   dependencies:
     "@types/debug": ^4.1.7
     "@types/validator": ^13.7.1
@@ -6861,7 +6890,7 @@ __metadata:
       optional: true
     tedious:
       optional: true
-  checksum: bee85b96c5520284a7bca5b5ef296a8acbe43299003e95eee89a803b2841e36f56c39cf7826f3217e5a9206095b861b64e7981a6b7da0534decf278454eb9b71
+  checksum: cb34d8b6cd4c3aba19bb1d6c6af4904d6526053fab611e1ae39cc5ba8f949b5e0c581806bf02aef07bd4a87782ec7096d6f0df77bcb3c46cc1361ac04818141e
   languageName: node
   linkType: hard
 
@@ -7463,9 +7492,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-jest@npm:29.0.1":
-  version: 29.0.1
-  resolution: "ts-jest@npm:29.0.1"
+"ts-jest@npm:29.0.2":
+  version: 29.0.2
+  resolution: "ts-jest@npm:29.0.2"
   dependencies:
     bs-logger: 0.x
     fast-json-stable-stringify: 2.x
@@ -7492,7 +7521,7 @@ __metadata:
       optional: true
   bin:
     ts-jest: cli.js
-  checksum: f126675beb0d103d440b0297dc331ce37ba0f1e1a8002f4e97bfeb9043cf21b4de03deebf11ac1f08b7e4978d87f6a1c71e398b1c2f8535df3b684338786408e
+  checksum: 66ece9c36e0b3b00ed617c1aad254578c77bca60409cf0d316c353ae94c9f05bc5be541366be94df6b1bc33c974701f0cd5304aa9f86c1b94917709575a13ba9
   languageName: node
   linkType: hard
 
