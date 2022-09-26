@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { displayname } from "../stores/settings.js";
+  import { displayname, status } from "../stores/settings.js";
   import { push } from "svelte-spa-router";
+
+  $status = 1;
 </script>
 
 <div class="flex flex-col h-full justify-evenly gap-4">

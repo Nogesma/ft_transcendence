@@ -22,8 +22,8 @@ export class GameService {
 
     if (!p1User || !p2User) throw new Error("User does not exist");
 
-    let p1Stats = await p1User.$get("stats");
-    let p2Stats = await p2User.$get("stats");
+    const p1Stats = await p1User.$get("stats");
+    const p2Stats = await p2User.$get("stats");
 
     if (!p1Stats || !p2Stats) throw new Error("User does not have stats");
 

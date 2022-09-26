@@ -9,6 +9,13 @@
   export let channel = "";
   export let p = false;
 
+  export let messagesList: Array<{
+    message: string;
+    login: string;
+    displayname: string;
+    id: number;
+  }> = [];
+
   //todo: move to utils/
   const getChannels = () =>
     axios
@@ -36,5 +43,5 @@
     <p>{err}</p>
   {/await}
 {:else}
-  <Chat bind:channel {p} />
+  <Chat bind:channel bind:messagesList {p} />
 {/if}

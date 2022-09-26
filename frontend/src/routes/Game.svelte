@@ -10,6 +10,7 @@
   import { params, replace } from "svelte-spa-router";
   import ChatDrawer from "../lib/ChatDrawer.svelte";
   import { calculateState } from "../utils/game";
+  import UserCard from "../lib/UserCard.svelte";
 
   let ball: Ball, p1: Player, p2: Player;
 
@@ -56,8 +57,14 @@
 
   const updateData = ({ ball: b, bars }: { ball: Ball; bars: [Bar, Bar] }) => {
     ball = b;
+    let d = p1.bar.direction;
+
     p1.bar = bars[0];
+    p1.bar.direction = d;
+
+    d = p2.bar.direction;
     p2.bar = bars[1];
+    p2.bar.direction = d;
   };
 
   const updateState = (dt: number) => {
@@ -201,28 +208,48 @@
   {:else}
     <div class="flex flex-auto flex-col">
       <div class="flex flex-row flex-auto justify-evenly flex-nowrap">
-        {#if p1}
+        {#if id1}
           <div class="flex-col">
             {#await getUserInfo(id1) then { login, displayname: name }}
-              <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
-              {name}
-              {#await getUserStats(id1) then { elo }}
-                {elo}
-              {/await}
+              <div class="dropdown">
+                <div tabindex="0">
+                  <ProfilePic
+                    user={login}
+                    attributes="h-10 w-10 rounded-full"
+                  />
+                  {name}
+                  {#await getUserStats(id1) then { elo }}
+                    {elo}
+                  {/await}
+                </div>
+                <div tabindex="0" class="dropdown-content menu w-80">
+                  <UserCard id={id1} />
+                </div>
+              </div>
             {/await}
           </div>
         {/if}
 
         <canvas id="game" />
 
-        {#if p1}
+        {#if id2}
           <div class="flex-col">
             {#await getUserInfo(id2) then { login, displayname: name }}
-              <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
-              {name}
-              {#await getUserStats(id2) then { elo }}
-                {elo}
-              {/await}
+              <div class="dropdown dropdown-end">
+                <div tabindex="0">
+                  <ProfilePic
+                    user={login}
+                    attributes="h-10 w-10 rounded-full"
+                  />
+                  {name}
+                  {#await getUserStats(id2) then { elo }}
+                    {elo}
+                  {/await}
+                </div>
+                <div tabindex="0" class="dropdown-content menu w-80">
+                  <UserCard id={id2} />
+                </div>
+              </div>
             {/await}
           </div>
         {/if}

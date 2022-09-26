@@ -191,6 +191,10 @@ export class Game {
     // Ball bounce on top/bottom
     if (this.ball.y < 0 || this.ball.y > this.HEIGHT - this.ball.h)
       this.ball.dy = -this.ball.dy;
+    // teleport the ball on the wall to avoid getting it stuck on the other side of the wall.
+    if (this.ball.y < 0) this.ball.y = 0;
+    if (this.ball.y > this.HEIGHT - this.ball.h)
+      this.ball.y = this.HEIGHT - this.ball.h;
 
     // If ball is out of frame on the x-axis, score a point.
     if (this.ball.x < 0 || this.ball.x > this.WIDTH - this.ball.w) {

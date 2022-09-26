@@ -36,7 +36,7 @@
   <Modal id="change-displayname">
     <svelte:fragment slot="content">
       <div class="flex flex-col">
-        <h3 class="text-lg font-bold pb-4">CHange display name</h3>
+        <h3 class="text-lg font-bold pb-4">Change display name</h3>
         <label class="input-group">
           <span>Name</span>
           <input

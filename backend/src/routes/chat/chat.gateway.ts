@@ -61,18 +61,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
       const handshake = client.handshake as ChannelHandshake;
       const username = handshake.user.displayname;
       client.rooms.forEach((r) =>
-        client.to(r).emit("newMessage", {
-          message: `${username} left the room`,
-          login: "ADMIN",
-          displayname: "ADMIN",
-          id: 0,
-        })
+        client
+          .to(r)
+          .emit("delMember", { displayname: username, id: handshake.user.id })
       );
     });
   }
 
   @SubscribeMessage("joinRoom")
-  async handleRoomJoin(
+  handleRoomJoin(
     @ConnectedSocket() client: Socket,
     @MessageBody("channel") channelName: string
   ) {
@@ -88,7 +85,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
 
     const { displayname, id } = handshake.user;
 
-    client.rooms.forEach(unless(equals(client.id), (x) => client.leave(x)));
+    this.handleRoomLeave(client);
 
     client.join(channel.id);
 
@@ -107,8 +104,24 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     client.to(channel.id).emit("newMember", { displayname, id });
   }
 
+  @SubscribeMessage("leaveRooms")
+  handleRoomLeave(@ConnectedSocket() client: Socket) {
+    const handshake = client.handshake as ChannelHandshake;
+
+    client.rooms.forEach(
+      unless(equals(client.id), (x) => {
+        client.to(x).emit("delMember", {
+          displayname: handshake.user.displayname,
+          id: handshake.user.id,
+        });
+        client.leave(x);
+        this.connectedMembers.get(Number(x))?.delete(handshake.user.id);
+      })
+    );
+  }
+
   @SubscribeMessage("sendMessage")
-  async handleEvent(
+  handleEvent(
     @ConnectedSocket() client: Socket,
     @MessageBody("channel") channelName: string,
     @MessageBody("msg") message: string

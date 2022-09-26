@@ -3,6 +3,7 @@
   import { login } from "../stores/settings";
   import { pfp } from "../stores/settings.js";
   import { always, cond, equals, T } from "ramda";
+  import fallbackProfilePicture from "../assets/rick.jpg";
 
   export let attributes: string;
   // todo: maybe protect from xss in username?
@@ -15,8 +16,9 @@
       .then(() => `/imgs/${u}.jpg`)
       .catch(() => `https://cdn.intra.42.fr/users/${u}.jpg`);
 
+  let img: string | Promise<string>;
   // typescript hack because it can't find the type of pfp and img src needs to be a string
-  $: img = $pfp as string;
+  $: img = user === $login ? ($pfp as string) : getProfilePicture(user);
 
   const getStatus = cond<[number], [string, string]>([
     [equals(1), always(["badge-success", "Online"])],
@@ -26,6 +28,8 @@
   ]);
 
   const [colour, text] = getStatus(status);
+
+  $: console.log(img);
 </script>
 
 <div class={status !== -1 ? "indicator" : ""}>
@@ -37,11 +41,12 @@
       >
     </span>
   {/if}
-  {#if user === $login}
-    <img src={img} class={attributes} alt="userPFP" />
-  {:else}
-    {#await getProfilePicture(user) then url}
-      <img src={url} class={attributes} alt="userPFP" />
-    {/await}
-  {/if}
+  {#await img then src}
+    <img
+      {src}
+      class={attributes}
+      alt="userPFP"
+      on:error={() => (img = fallbackProfilePicture)}
+    />
+  {/await}
 </div>

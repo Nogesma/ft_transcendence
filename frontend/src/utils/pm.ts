@@ -7,7 +7,7 @@ const initPM = (socket: Socket) => {
     privateMessages.update((pm) => {
       const m = pm.get(id);
       if (m) m.push({ message, me: false });
-      else pm.set(id, [message]);
+      else pm.set(id, [{ message, me: false }]);
 
       return pm;
     });

@@ -1,21 +1,14 @@
 <script lang="ts">
-  import { displayname, login, id, pmSocket } from "../stores/settings";
+  import { displayname, login, id } from "../stores/settings";
   import { push } from "svelte-spa-router";
   import type { Socket } from "socket.io-client";
   import { acceptInvite, sendInvite } from "../utils/gameInvite.js";
-  import {
-    addAdmin,
-    banUser,
-    isAdmin,
-    isBanned,
-    isMuted,
-    muteUser,
-    removeAdmin,
-    unbanUser,
-    unmuteUser,
-  } from "../utils/chatManagement.js";
+  import { banUser, muteUser } from "../utils/chatManagement.js";
   import { chatSocket } from "../stores/settings.js";
   import { getUserInfo } from "../utils/info.js";
+  import UserCard from "./UserCard.svelte";
+  import ChatMenu from "./ChatMenu.svelte";
+  import { pick } from "ramda";
 
   export let channel: string;
   export let p = false;
@@ -23,28 +16,12 @@
   let invite: { id: number; type: boolean; displayname: string } | undefined;
 
   let msg: string;
-  let pmmsg: string;
-  let messagesList: Array<{
+  export let messagesList: Array<{
     message: string;
     login: string;
     displayname: string;
     id: number;
   }> = [];
-
-  const sendpm = (uid: number) =>
-    $pmSocket.emit("sendpm", {
-      id: uid,
-      pmmsg,
-    });
-
-  $pmSocket.on("pm", (event) => {
-    let pm: {
-      msg: string;
-      displayname: string;
-    };
-    pm = event;
-    alert(`${pm.displayname} has sent you a message: ${pm.msg}`);
-  });
 
   const registerListeners = (socket: Socket) => {
     socket.on("newInvite", (event) => (invite = event));
@@ -63,22 +40,45 @@
     socket.on(
       "channelInfo",
       ({ memberList }: { memberList: Array<number> }) => {
-        if (!memberList) return leaveChat();
+        if (!memberList) return leaveChat(socket);
         connectedMembers = new Set(memberList);
       }
     );
+
+    socket.on("newMember", ({ displayname, id }) => {
+      connectedMembers.add(id);
+      messagesList.push({
+        message: `${displayname} joined.`,
+        login: "",
+        displayname: "",
+        id: 0,
+      });
+
+      messagesList = messagesList;
+      connectedMembers = connectedMembers;
+    });
+
+    socket.on("delMember", ({ displayname, id }) => {
+      connectedMembers.delete(id);
+      messagesList.push({
+        message: `${displayname} left.`,
+        login: "",
+        displayname: "",
+        id: 0,
+      });
+
+      messagesList = messagesList;
+      connectedMembers = connectedMembers;
+    });
   };
 
-  const leaveChat = () => (p ? push("/chat") : (channel = ""));
+  const leaveChat = (socket: Socket) => {
+    socket.emit("leaveRooms");
+    p ? push("/chat") : (channel = "");
+  };
 
   let connectedMembers = new Set<number>();
 
-  const banpm = (banid: number) => {
-    $pmSocket.emit("ban", { id: banid });
-  };
-  const unbanpm = (banid: number) => {
-    $pmSocket.emit("unban", { id: banid });
-  };
   const sendmsg = () => {
     if (!msg || msg.length === 0) return;
     $chatSocket.emit("sendMessage", { channel, msg });
@@ -94,14 +94,6 @@
 
   $: banUserC = banUser($chatSocket, channel);
   $: muteUserC = muteUser($chatSocket, channel);
-  $: unBanUserC = unbanUser($chatSocket, channel);
-  $: unMuteUserC = unmuteUser($chatSocket, channel);
-  $: addAdminC = addAdmin(channel);
-  $: removeAdminC = removeAdmin(channel);
-
-  $: isBannedC = isBanned(channel);
-  $: isMutedC = isMuted(channel);
-  $: isAdminC = isAdmin(channel);
 
   $: acceptInviteC = acceptInvite($chatSocket, channel);
   $: sendInviteC = sendInvite($chatSocket, channel);
@@ -109,18 +101,43 @@
   registerListeners($chatSocket);
 
   $: $chatSocket.emit("joinRoom", { channel });
+
+  let cardIndex = -1;
+  let menuIndex = -1;
+  let pos = { x: 0, y: 0 };
+
+  const openMenu = (e: MouseEvent, i: number) => {
+    pos = pick(["x", "y"])(e);
+    menuIndex = i;
+    cardIndex = -1;
+  };
 </script>
 
-<div class="flex flex-col h-full">
+<div class="flex flex-col h-full bg-base-200 rounded-md">
   <div class="px-4 sm:px-6">
     <h2 class="text-lg font-medium text-gray-900" id="slide-over-title">
       {channel}
     </h2>
   </div>
+  <span>Active users:</span>
   <div
-    class="mt-6 flex-1 px-4 sm:px-6 bg-gray-600 overflow-auto border border-blue-400"
+    class="flex flex-auto justify-left origin-center h-6 border border-green-400"
   >
-    {#each messagesList as { displayname, message, login: userLogin, id }}
+    {#each [...connectedMembers.values()] as spec}
+      <li>
+        <ul class="m-1">
+          {#await getUserInfo(spec) then { displayname: name }}
+            {name}
+          {/await}
+        </ul>
+      </li>
+    {/each}
+  </div>
+
+  <div
+    class="mt-6 flex-1 px-4 sm:px-6 bg-gray-600 border border-blue-400 basis-5/6 flex-grow-0"
+  >
+    {#each messagesList as { displayname, message, login: userLogin, id }, i}
       <!--            <label tabindex="0" class="" for="unused">{ina + 1}: {displayname}</label>: {message}-->
       <ul class="space-y-2">
         <!--              TODO -> when others send message justify start-->
@@ -132,122 +149,21 @@
 
         <li class="flex justify-end space-x-3 h-fit p-1 static">
           <div class="dropdown dropdown-end">
-            <div tabindex="0" class="justify-start">
+            <div
+              tabindex="0"
+              class="text-right hover:underline"
+              on:contextmenu|preventDefault={(e) => openMenu(e, i)}
+              on:click={() => (cardIndex = i)}
+            >
               {displayname}
               <!--            <ProfilePic user={userLogin} attributes="h-8 w-8 rounded-full" />-->
             </div>
-            <ul
-              tabindex="0"
-              class="menu menu-compact dropdown-content mt-3 p-2 font-medium text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white rounded-box w-52 text-sm"
-            >
-              {#await isBannedC(userLogin) then banned}
-                {#if banned}
-                  <li
-                    class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
-                    on:click={() => banUserC(userLogin)}
-                  >
-                    Ban {displayname}
-                  </li>
-                {:else}
-                  <li
-                    class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
-                    on:click={() => unBanUserC(userLogin)}
-                  >
-                    Unban {displayname}
-                  </li>
-                {/if}
-              {/await}
-              {#await isMutedC(userLogin) then muted}
-                {#if muted}
-                  <li
-                    class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
-                    on:click={() => muteUserC(userLogin)}
-                  >
-                    Mute {displayname}
-                  </li>
-                {:else}
-                  <li
-                    class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
-                    on:click={() => unMuteUserC(userLogin)}
-                  >
-                    Unmute {displayname}
-                  </li>
-                {/if}
-              {/await}
-              {#await isAdminC(userLogin) then admin}
-                {#if admin}
-                  <li
-                    class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
-                    on:click={() => addAdminC(userLogin)}
-                  >
-                    Add {displayname} as Admin
-                  </li>
-                {:else}
-                  <li
-                    class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
-                    on:click={() => removeAdminC(userLogin)}
-                  >
-                    Remove {displayname} as Admin
-                  </li>
-                {/if}
-              {/await}
-              <li
-                class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
-                on:click={() => banUserC(userLogin)}
-              >
-                Ban {displayname}
-              </li>
-              <li
-                class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
-                on:click={() => muteUserC(userLogin)}
-              >
-                Mute {displayname}
-              </li>
-              <li
-                class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
-                on:click={() => unBanUserC(userLogin)}
-              >
-                Unban {displayname}
-              </li>
-              <li
-                class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
-                on:click={() => unMuteUserC(userLogin)}
-              >
-                Unmute {displayname}
-              </li>
-              <li
-                class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
-                on:click={() => push(`/users/${id}`)}
-              >
-                View profile
-              </li>
-              <li
-                class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
-                on:click={() => banpm(id)}
-              >
-                Block {displayname}
-              </li>
-              <li
-                class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
-                on:click={() => unbanpm(id)}
-              >
-                UnBlock {displayname}
-              </li>
-              <li
-                class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
-                on:click={() => sendpm(id)}
-              >
-                Sendpm {displayname}
-              </li>
-              <input
-                type="text"
-                placeholder="PmMessage"
-                class="py-2 px-4 w-full rounded border-b border-gray-200 dark:border-gray-600"
-                name="pmmessage"
-                required
-                bind:value={pmmsg}
-              />
-            </ul>
+
+            <div tabindex="0" class="dropdown-content menu w-80">
+              {#if i === cardIndex}
+                <UserCard {id} />
+              {/if}
+            </div>
             <div
               class="max-w-xl px-4 py-1 text-gray-700 bg-gray-100 rounded shadow static"
             >
@@ -258,6 +174,19 @@
           </div>
         </li>
       </ul>
+
+      {#if i === menuIndex}
+        <ChatMenu
+          on:click={() => (menuIndex = -1)}
+          on:clickoutside={() => (menuIndex = -1)}
+          {pos}
+          {id}
+          {displayname}
+          {userLogin}
+          banUser={banUserC}
+          muteUser={muteUserC}
+        />
+      {/if}
     {/each}
     {#if invite}
       <div>
@@ -274,29 +203,17 @@
         </button>
       </div>
     {/if}
-    <div class="flex">
-      <button class="btn w-24 m-1" on:click={() => sendInviteC(false)}>
-        classic</button
-      >
-      <button class="btn w-24 m-1" on:click={() => sendInviteC(true)}>
-        modified</button
-      >
-      <button class="btn w-24 m-1" on:click={leaveChat}> leave chat</button>
-    </div>
   </div>
-  <span>Active users:</span>
-  <div
-    class="flex flex-auto justify-left origin-center h-6 border border-green-400"
-  >
-    {#each [...connectedMembers.values()] as spec}
-      <li>
-        <ul class="m-1">
-          {#await getUserInfo(spec) then { displayname: name }}
-            {name}
-          {/await}
-        </ul>
-      </li>
-    {/each}
+  <div class="flex">
+    <button class="btn w-24 m-1" on:click={() => sendInviteC(false)}>
+      classic</button
+    >
+    <button class="btn w-24 m-1" on:click={() => sendInviteC(true)}>
+      modified</button
+    >
+    <button class="btn w-24 m-1" on:click={() => leaveChat($chatSocket)}>
+      leave chat</button
+    >
   </div>
   <div class="flex rounded bg-base-200 p-2">
     <form class="form-control" on:submit|preventDefault={sendmsg}>
