@@ -19,14 +19,15 @@
       )
       .then(({ data }) => console.log(data))
       .catch(console.error);
-    window.location.reload();
+    //todo: we should not reload to not lose user data
+    // window.location.reload();
   };
 
   // Clear password when type changes
   $: channelPassword = "" && channelPublic;
 </script>
 
-<label for="create-modal" class="modal-button btn">Create Channel</label>
+<label for="create-modal" class="modal-button btn m-2">Create Channel</label>
 
 <Modal id="create-modal">
   <svelte:fragment slot="content">

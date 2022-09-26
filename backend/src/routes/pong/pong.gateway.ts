@@ -124,12 +124,16 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
 
     client.join(gameId);
 
-    if (game.isSpectator(id)) {
+    if (!game.isPlayer(id)) {
       game.newSpectator(id);
       client.to(gameId).emit("newSpectator", id);
+
+      client.emit("gameInfo", game.getInfo());
+      return;
     }
 
     client.emit("gameInfo", game.getInfo());
+    game.setReady(this.server, id);
   }
 
   @SubscribeMessage("customGame")
@@ -189,12 +193,28 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
 
     client.leave(gameId);
 
-    if (game.isSpectator(id)) {
+    if (!game.isPlayer(id)) {
       game.removeSpectator(client, id);
     } else {
       //todo: player chose to leave the game, forfeit immediatly.
       // unwanted disconnections where the player will have a chance to join again
       // will be handled in the handleDisconnection function
     }
+  }
+
+  @SubscribeMessage("move")
+  handleMove(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("dir") move: number,
+    @MessageBody("game") gameId: string
+  ) {
+    const handshake = client.handshake as UserHandshake;
+    const id = handshake.user.id;
+
+    const game = this.pongService.getGame(gameId);
+    if (!game) return;
+    if (!game.isPlayer(id)) return;
+
+    game.applyMove(id, move);
   }
 }

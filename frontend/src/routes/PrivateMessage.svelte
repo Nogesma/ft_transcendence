@@ -6,6 +6,7 @@
   import { getFriendList } from "../utils/friend.js";
   import axios from "axios";
   import { isEmpty } from "ramda";
+  import Promise from "bluebird";
 
   let selectedPmId = 0;
 
@@ -37,6 +38,28 @@
   $: if ($pendingPM > 0) $pendingPM = 0;
 
   $: currentPm = $privateMessages.get(selectedPmId);
+
+  let userInfo = new Map<number, { login: string; displayname: string }>();
+
+  privateMessages.subscribe((value) =>
+    Promise.each(
+      value,
+      async ([key, value]: [
+        key: number,
+        value: { message: string; me: boolean }[]
+      ]) => {
+        // we need this because typescript doesn't like it when we only get [key]
+        // as argument.
+        value;
+
+        if (userInfo.has(key)) return;
+        userInfo.set(
+          key,
+          (await getUserInfo(key)) as { login: string; displayname: string }
+        );
+      }
+    ).then(() => (userInfo = userInfo))
+  );
 </script>
 
 <div class="flex h-full">
@@ -46,15 +69,13 @@
         <label for="newpm-modal" class="modal-button">New private message</label
         >
       </li>
-      {#each [...$privateMessages.keys()] as id}
-        {#await getUserInfo(id) then { login, displayname }}
-          <li class="rounded {id === selectedPmId ? 'bordered' : ''}">
-            <div on:click={() => (selectedPmId = id)}>
-              <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
-              {displayname}
-            </div>
-          </li>
-        {/await}
+      {#each [...userInfo] as [id, { login, displayname }]}
+        <li class="rounded {id === selectedPmId ? 'bordered' : ''}">
+          <div on:click={() => (selectedPmId = id)}>
+            <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
+            {displayname}
+          </div>
+        </li>
       {/each}
     </ul>
     <div class="flex flex-auto flex-col w-2/3 m-2 bg-base-300 rounded">
@@ -124,18 +145,17 @@
             class="flex flex-row flex-wrap mt-4 -ml-4 -mb-4 flex-auto modal-action"
           >
             {#each friendList as id}
-              {#if !$privateMessages.has(id)}
-                {#await getUserInfo(id) then { displayname: name }}
-                  <label
-                    for="newpm-modal"
-                    class="btn flex-auto mb-4 ml-4"
-                    on:click={() => {
-                      $privateMessages.set(id, []);
-                      $privateMessages = $privateMessages;
-                    }}>{name}</label
-                  >
-                {/await}
-              {/if}
+              {#await getUserInfo(id) then { displayname: name }}
+                <label
+                  for="newpm-modal"
+                  class="btn flex-auto mb-4 ml-4"
+                  on:click={() => {
+                    if ($privateMessages.has(id)) return;
+                    $privateMessages.set(id, []);
+                    $privateMessages = $privateMessages;
+                  }}>{name}</label
+                >
+              {/await}
             {/each}
           </div>
         {:catch err}

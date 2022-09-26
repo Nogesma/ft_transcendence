@@ -1,27 +1,31 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Game } from "./game.model.js";
-import type { User } from "../user/user.model.js";
 import { StatsService } from "../stats/stats.service.js";
 import dayjs from "dayjs";
 import { getElo } from "../../utils/elo.js";
+import { UserService } from "../user/user.service.js";
 
 @Injectable()
 export class GameService {
   constructor(
     @InjectModel(Game)
     private gameModel: typeof Game,
-    private readonly statsService: StatsService
+    private readonly statsService: StatsService,
+    private readonly userService: UserService
   ) {}
 
-  newGame = async (p1: User, p2: User, p1win: boolean) => {
+  newGame = async (p1: number, p2: number, p1win: boolean) => {
     const date = dayjs();
+    const p1User = await this.userService.getUser(p1);
+    const p2User = await this.userService.getUser(p2);
 
-    let p1Stats = await p1.$get("stats");
-    let p2Stats = await p2.$get("stats");
+    if (!p1User || !p2User) throw new Error("User does not exist");
 
-    if (!p1Stats) p1Stats = await this.statsService.initStats(p1.id);
-    if (!p2Stats) p2Stats = await this.statsService.initStats(p2.id);
+    const p1Stats = await p1User.$get("stats");
+    const p2Stats = await p2User.$get("stats");
+
+    if (!p1Stats || !p2Stats) throw new Error("User does not have stats");
 
     const scoreP1 = getElo(
       p1Stats.wins + p1Stats.losses,
@@ -46,8 +50,8 @@ export class GameService {
         opponentElo: p2Stats.elo,
         playerScore: scoreP1,
         opponentScore: scoreP2,
-        playerId: p1.id,
-        opponentId: p2.id,
+        playerId: p1,
+        opponentId: p2,
         date,
       }),
       this.gameModel.create({
@@ -56,8 +60,8 @@ export class GameService {
         opponentElo: p1Stats.elo,
         playerScore: scoreP2,
         opponentScore: scoreP1,
-        playerId: p2.id,
-        opponentId: p1.id,
+        playerId: p2,
+        opponentId: p1,
         date,
       }),
       this.statsService.updateStats(p1Stats, p2Stats, p1win, scoreP1),
