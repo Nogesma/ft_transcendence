@@ -9,6 +9,7 @@ import { ChannelModule } from "../../models/channel/channel.module.js";
 import { ChannelMemberModule } from "../../models/channelMember/channelMember.module.js";
 import { ChannelAdminModule } from "../../models/channelAdmin/channelAdmin.module.js";
 import { ChannelBanModule } from "../../models/channelBan/channelBan.module.js";
+import { FriendModule } from "../../models/friend/friend.module.js";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ChannelBanModule } from "../../models/channelBan/channelBan.module.js";
     ChannelMemberModule,
     ChannelAdminModule,
     ChannelBanModule,
+    FriendModule,
   ],
   controllers: [ChatController],
   providers: [ChatService, ChatGateway],

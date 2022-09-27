@@ -202,13 +202,13 @@
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
-<div class="flex flex-row h-full">
+<div class="flex flex-row h-full w-full">
   <ChatDrawer />
 
   {#if isEmpty($gameId) || startsWith("custom", $gameId)}
     <Matchmaking {socket} />
   {:else}
-    <div class="flex flex-auto flex-col">
+    <div class="flex flex-auto flex-col" style="height: {HEIGHT}px">
       <div class="flex flex-row flex-auto justify-evenly flex-nowrap">
         {#if id1}
           <div class="flex-col">

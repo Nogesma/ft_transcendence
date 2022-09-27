@@ -201,7 +201,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
 
     this.invites.delete(opponentId);
 
-    client
+    this.server
       .to(channel.id)
       .emit("newCustomGame", { p1: opponentId, p2: handshake.user.id, type });
   }

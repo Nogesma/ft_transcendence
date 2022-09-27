@@ -137,7 +137,7 @@
   <div
     class="mt-6 flex-1 px-4 sm:px-6 bg-gray-600 border border-blue-400 basis-5/6 flex-grow-0"
   >
-    {#each messagesList as { displayname, message, login: userLogin, id }, i}
+    {#each messagesList as { displayname, message, login: userLogin, id: uid }, i}
       <!--            <label tabindex="0" class="" for="unused">{ina + 1}: {displayname}</label>: {message}-->
       <ul class="space-y-2">
         <!--              TODO -> when others send message justify start-->
@@ -147,21 +147,26 @@
         <!--                </div>-->
         <!--              </li>-->
 
-        <li class="flex justify-end space-x-3 h-fit p-1 static">
-          <div class="dropdown dropdown-end">
+        <li
+          class="flex {$id === uid
+            ? 'justify-end'
+            : 'justify-start'} space-x-3 h-fit p-1 static"
+        >
+          <div
+            class="dropdown {$id === uid ? 'dropdown-end' : 'dropdown-left'}"
+          >
             <div
               tabindex="0"
-              class="text-right hover:underline"
+              class="{$id === uid ? 'text-right' : 'text-left'} hover:underline"
               on:contextmenu|preventDefault={(e) => openMenu(e, i)}
               on:click={() => (cardIndex = i)}
             >
               {displayname}
-              <!--            <ProfilePic user={userLogin} attributes="h-8 w-8 rounded-full" />-->
             </div>
 
             <div tabindex="0" class="dropdown-content menu w-80">
               {#if i === cardIndex}
-                <UserCard {id} />
+                <UserCard id={uid} />
               {/if}
             </div>
             <div
@@ -180,9 +185,10 @@
           on:click={() => (menuIndex = -1)}
           on:clickoutside={() => (menuIndex = -1)}
           {pos}
-          {id}
+          {uid}
           {displayname}
           {userLogin}
+          {channel}
           banUser={banUserC}
           muteUser={muteUserC}
         />

@@ -20,6 +20,7 @@ import type { User } from "../../models/user/user.model.js";
 import { ChannelAdminService } from "../../models/channelAdmin/channelAdmin.service.js";
 import type { Channel } from "../../models/channel/channel.model.js";
 import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
+import { FriendService } from "../../models/friend/friend.service.js";
 
 @Injectable()
 export class ChatService {
@@ -29,7 +30,8 @@ export class ChatService {
     private readonly channelService: ChannelService,
     private readonly channelMemberService: ChannelMemberService,
     private readonly channelAdminService: ChannelAdminService,
-    private readonly channelBanService: ChannelBanService
+    private readonly channelBanService: ChannelBanService,
+    private readonly friendService: FriendService
   ) {}
 
   getJoinedChannels = async (user: User) => {
@@ -54,7 +56,6 @@ export class ChatService {
       throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
 
     if (await this.channelBanService.isBanned(channel.id, id)) {
-      console.log("banned");
       throw new HttpException(
         "You are banned so go away",
         HttpStatus.FORBIDDEN
@@ -166,6 +167,7 @@ export class ChatService {
       throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
     return await this.channelAdminService.getAdmin(channel.id, user.id);
   };
+
   ismuted = async (name: string, chan: string) => {
     const channel = await this.channelService.getChannelByName(chan);
     const user = await this.userService.getUserByLogin(name);
@@ -174,6 +176,7 @@ export class ChatService {
       throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
     return await this.channelBanService.isMuted(channel.id, user.id);
   };
+
   isBanned = async (name: string, chan: string) => {
     const channel = await this.channelService.getChannelByName(chan);
     const user = await this.userService.getUserByLogin(name);
@@ -222,5 +225,39 @@ export class ChatService {
         "Member can only be banned by an admin",
         HttpStatus.FORBIDDEN
       );
+  };
+
+  getPerms = async (id: number, chan: string, uid: number) => {
+    let admin = false;
+    let friend = false;
+    let block = false;
+
+    const channel = await this.channelService.getChannelByName(chan);
+    if (!channel)
+      throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
+
+    if (id === channel.ownerId) {
+      admin = true;
+    }
+    const admins = await channel.$get("admin");
+    if (
+      !admin &&
+      admins.find((u) => u.id === id) &&
+      !admins.find((u) => u.id === uid)
+    )
+      admin = true;
+
+    console.log(id);
+    const user = await this.userService.getUser(id);
+    if (!user)
+      throw new HttpException(
+        "User not found",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+
+    if ((await user.$get("block")).find((u) => u.id === uid)) block = true;
+    if (await this.friendService.isFriend(id, uid)) friend = true;
+
+    return { admin, friend, block };
   };
 }

@@ -140,4 +140,15 @@ export class ChatController {
       );
     return this.chatService.removeAdmin(req.session.userId, chan, user);
   }
+
+  @Get("perms/:chan/:id")
+  async getPerms(
+    @Req() req: AuthenticatedRequest,
+    @Param("chan") chan: string,
+    @Param("id") id: number
+  ) {
+    if (!id || isNaN(id))
+      throw new HttpException("id is not valid", HttpStatus.BAD_REQUEST);
+    return this.chatService.getPerms(req.session.userId, chan, id);
+  }
 }

@@ -42,13 +42,14 @@ export class Game {
   private readonly BALL_W = 10;
   private readonly BALL_H = 10;
   private readonly BALL_SPEED = 200;
-  private readonly MAX_SPEED = 400;
+  private readonly MAX_SPEED = 500;
 
   private readonly type: boolean;
   private readonly p1: Player;
   private readonly p2: Player;
   private readonly spectatorList = new Set<number>();
 
+  private currentBallSpeed = this.BALL_SPEED;
   private ball: Ball;
 
   private readonly gameService: GameService;
@@ -99,6 +100,7 @@ export class Game {
       dy: this.getRandomSpeed(this.BALL_SPEED),
       dx: this.BALL_SPEED,
     };
+
     this.normalizeSpeed();
   }
 
@@ -231,7 +233,10 @@ export class Game {
     if (this.checkCollision(this.ball, this.p1.bar)) {
       // if dx is positive, we already ran this branch in the last game loop iteration, exit.
       if (this.ball.dx > 0) return;
-      if (this.ball.dx > -this.MAX_SPEED) this.ball.dx -= 50;
+      if (this.ball.dx > -this.MAX_SPEED) {
+        this.currentBallSpeed += 50;
+        this.ball.dx = -this.currentBallSpeed;
+      }
 
       this.ball.dx = -this.ball.dx;
 
@@ -243,7 +248,10 @@ export class Game {
     } else if (this.checkCollision(this.ball, this.p2.bar)) {
       // if dx is negative, we already ran this branch in the last game loop iteration, exit.
       if (this.ball.dx < 0) return;
-      if (this.ball.dx < this.MAX_SPEED) this.ball.dx += 50;
+      if (this.ball.dx < this.MAX_SPEED) {
+        this.currentBallSpeed += 50;
+        this.ball.dx = this.currentBallSpeed;
+      }
       this.ball.dx = -this.ball.dx;
       this.ball.dy =
         this.BALL_SPEED *
@@ -299,7 +307,7 @@ export class Game {
 
   private normalizeSpeed = () => {
     const ratio =
-      this.BALL_SPEED /
+      this.currentBallSpeed /
       Math.sqrt(this.ball.dx * this.ball.dx + this.ball.dy * this.ball.dy);
     this.ball.dx = this.ball.dx * ratio;
     this.ball.dy = this.ball.dy * ratio;
