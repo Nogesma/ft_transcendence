@@ -74,17 +74,6 @@ export class Game {
       score: 0,
     };
 
-    console.log(
-      "started game:\n gameID: ",
-      gameId,
-      "\n custom: ",
-      type,
-      "\n player1: ",
-      id1,
-      "\n player2: ",
-      id2
-    );
-
     this.p2 = {
       id: id2,
       bar: this.initBar(true),
@@ -169,6 +158,7 @@ export class Game {
       dy: Math.floor(Math.random() * this.BALL_SPEED * 2) - this.BALL_SPEED,
       dx: dir ? this.BALL_SPEED : -this.BALL_SPEED,
     };
+    this.currentBallSpeed = this.BALL_SPEED;
     this.normalizeSpeed();
 
     this.p1.bar.w = this.BAR_W;
@@ -186,7 +176,10 @@ export class Game {
       bars: [this.p1.bar, this.p2.bar],
     });
 
-  private calculateState = (server: Server, dt: number) => {
+  private sendCountdown = (server: Server, time: number) =>
+    server.to(this.gameId).emit("gameCountdown", time);
+
+  private calculateState = (server: Server, dt: number): void => {
     // Apply player move
     this.p1.bar.y += this.p1.bar.direction * this.p1.bar.speed * dt;
     this.p2.bar.y += this.p2.bar.direction * this.p2.bar.speed * dt;
@@ -219,7 +212,10 @@ export class Game {
         .to(this.gameId)
         .emit("updateScore", [this.p1.score, this.p2.score]);
 
-      if (this.p1.score >= 10 || this.p2.score >= 10) return this.endGame();
+      if (this.p1.score >= 10 || this.p2.score >= 10) {
+        this.endGame();
+        return;
+      }
 
       // Reset ball and bars to default
       this.resetGameState(this.ball.x < 0);
@@ -265,13 +261,25 @@ export class Game {
     let timestamp = null;
     let prev = Date.now();
 
-    this.interval = setInterval(() => {
-      timestamp = Date.now();
-      this.calculateState(server, (timestamp - prev) * 0.001);
-      prev = timestamp;
+    let countdown = 3;
 
-      this.sendState(server);
-    }, this.TICK_RATE);
+    this.sendCountdown(server, countdown--);
+    let inter = setInterval(
+      () => this.sendCountdown(server, countdown--),
+      1000
+    );
+
+    setTimeout(() => {
+      clearInterval(inter);
+      this.sendCountdown(server, -1);
+      this.interval = setInterval(() => {
+        timestamp = Date.now();
+        this.calculateState(server, (timestamp - prev) * 0.001);
+        prev = timestamp;
+
+        this.sendState(server);
+      }, this.TICK_RATE);
+    }, 3000);
   };
 
   private endGame = async () => {

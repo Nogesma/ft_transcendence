@@ -17,6 +17,8 @@
   let WIDTH = 0,
     HEIGHT = 0;
 
+  let countdown = -1;
+
   const initCanvas = (width: number, height: number) => {
     const canvas = <HTMLCanvasElement>document.getElementById("game");
 
@@ -53,6 +55,10 @@
     ctx.font = "50px sans-serif";
     ctx.fillText(String(p1.score), WIDTH / 4, 50);
     ctx.fillText(String(p2.score), (3 * WIDTH) / 4, 50);
+
+    if (countdown !== -1) {
+      ctx.fillText(String(countdown), WIDTH / 2, HEIGHT / 2);
+    }
   };
 
   const updateData = ({ ball: b, bars }: { ball: Ball; bars: [Bar, Bar] }) => {
@@ -68,7 +74,7 @@
   };
 
   const updateState = (dt: number) => {
-    if (!p1 || !p2 || !ball) return;
+    // if (!p1 || !p2 || !ball) return;
     // disable client-side prediction for now.
     dt;
     // calculateState(p1, p2, ball, dt, HEIGHT);
@@ -79,7 +85,7 @@
     if (!ctx) return;
 
     staticCanvas();
-    if (!p1 || !p2) return;
+    if (!p1 || !p2 || !ball) return;
     ctx.fillRect(p1.bar.x, p1.bar.y, p1.bar.w, p1.bar.h);
     ctx.fillRect(p2.bar.x, p2.bar.y, p2.bar.w, p2.bar.h);
     ctx.fillRect(ball.x, ball.y, ball.w, ball.h);
@@ -136,6 +142,8 @@
           window.requestAnimationFrame(frame);
         }
         window.requestAnimationFrame(first);
+
+        s.on("gameCountdown", (c: number) => (countdown = c));
 
         s.on("updateScore", (s: [number, number]) => {
           p1.score = s[0];
