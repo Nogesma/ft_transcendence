@@ -13,7 +13,6 @@
   let elem: HTMLElement;
   let file: FileList;
   let name: string;
-  let tfa: Promise<null>;
 </script>
 
 {#await getTFAStatus() then tfa_enabled}
@@ -28,7 +27,7 @@
     <label
       for="toggle-2fa"
       class="btn btn-primary modal-button"
-      on:click={() => (tfa = request2FA(tfa_enabled, elem))}
+      on:click={() => request2FA(tfa_enabled, elem)}
       >{tfa_enabled ? "Disable" : "Enable"} 2FA</label
     >
   </div>
@@ -103,29 +102,11 @@
           <h3 class="text-lg font-bold pb-4">Enable 2FA</h3>
 
           <div class="flex flex-auto justify-center mb-5" bind:this={elem} />
-
-          {#await tfa then _}
-            {#if elem && elem.firstChild}
-              <div
-                class="btn btn-active btn-primary"
-                on:click={() => {
-                  //if (elem.firstChild) elem.removeChild(elem.firstChild);
-                  elem.appendChild(new HTMLElement());
-                  // todo: find why modal closes when updating elem
-                  elem = elem;
-                }}
-              >
-                ok
-              </div>
-            {:else}
-              cdscdscs
-              <TFAInput
-                modalId="toggle-2fa"
-                url="api/user/2fa/validate"
-                successMessage="2FA has been enabled"
-              />
-            {/if}
-          {/await}
+          <TFAInput
+            modalId="toggle-2fa"
+            url="api/user/2fa/validate"
+            successMessage="2FA has been enabled"
+          />
         {/if}
       </div>
     </svelte:fragment>

@@ -26,7 +26,6 @@
           success = true;
           getUserData();
           if (isEmpty(successMessage)) {
-            console.log("EMPTY!");
             (<HTMLInputElement>document.getElementById(modalId)).checked =
               false;
             window.history.replaceState({}, document.title, "/");

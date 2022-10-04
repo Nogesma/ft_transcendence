@@ -16,6 +16,22 @@ const addFriend = (friendName: string) =>
       status: 1,
     }));
 
+const delFriend = (friendName: string) =>
+  axios
+    .post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/user/friend/del/${friendName}`,
+      {},
+      { withCredentials: true }
+    )
+    .then(() => ({
+      message: `Friend request sent to ${friendName} !`,
+      status: 0,
+    }))
+    .catch(({ response }) => ({
+      message: response.data.message,
+      status: 1,
+    }));
+
 const getPendingFriendRequests = (): Promise<number[]> =>
   axios
     .get(`${import.meta.env.VITE_BACKEND_URI}/api/user/friend/requests`, {
@@ -62,6 +78,7 @@ const getFriendList = () =>
 
 export {
   addFriend,
+  delFriend,
   getPendingFriendRequests,
   acceptFriendRequest,
   denyFriendRequest,

@@ -28,8 +28,6 @@
   ]);
 
   const [colour, text] = getStatus(status);
-
-  $: console.log(img);
 </script>
 
 <div class={status !== -1 ? "indicator" : ""}>

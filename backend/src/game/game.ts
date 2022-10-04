@@ -42,13 +42,14 @@ export class Game {
   private readonly BALL_W = 10;
   private readonly BALL_H = 10;
   private readonly BALL_SPEED = 200;
-  private readonly MAX_SPEED = 400;
+  private readonly MAX_SPEED = 500;
 
   private readonly type: boolean;
   private readonly p1: Player;
   private readonly p2: Player;
   private readonly spectatorList = new Set<number>();
 
+  private currentBallSpeed = this.BALL_SPEED;
   private ball: Ball;
 
   private readonly gameService: GameService;
@@ -73,17 +74,6 @@ export class Game {
       score: 0,
     };
 
-    console.log(
-      "started game:\n gameID: ",
-      gameId,
-      "\n custom: ",
-      type,
-      "\n player1: ",
-      id1,
-      "\n player2: ",
-      id2
-    );
-
     this.p2 = {
       id: id2,
       bar: this.initBar(true),
@@ -99,6 +89,7 @@ export class Game {
       dy: this.getRandomSpeed(this.BALL_SPEED),
       dx: this.BALL_SPEED,
     };
+
     this.normalizeSpeed();
   }
 
@@ -167,6 +158,7 @@ export class Game {
       dy: Math.floor(Math.random() * this.BALL_SPEED * 2) - this.BALL_SPEED,
       dx: dir ? this.BALL_SPEED : -this.BALL_SPEED,
     };
+    this.currentBallSpeed = this.BALL_SPEED;
     this.normalizeSpeed();
 
     this.p1.bar.w = this.BAR_W;
@@ -184,7 +176,10 @@ export class Game {
       bars: [this.p1.bar, this.p2.bar],
     });
 
-  private calculateState = (server: Server, dt: number) => {
+  private sendCountdown = (server: Server, time: number) =>
+    server.to(this.gameId).emit("gameCountdown", time);
+
+  private calculateState = (server: Server, dt: number): void => {
     // Apply player move
     this.p1.bar.y += this.p1.bar.direction * this.p1.bar.speed * dt;
     this.p2.bar.y += this.p2.bar.direction * this.p2.bar.speed * dt;
@@ -217,7 +212,10 @@ export class Game {
         .to(this.gameId)
         .emit("updateScore", [this.p1.score, this.p2.score]);
 
-      if (this.p1.score >= 10 || this.p2.score >= 10) return this.endGame();
+      if (this.p1.score >= 10 || this.p2.score >= 10) {
+        this.endGame();
+        return;
+      }
 
       // Reset ball and bars to default
       this.resetGameState(this.ball.x < 0);
@@ -231,7 +229,10 @@ export class Game {
     if (this.checkCollision(this.ball, this.p1.bar)) {
       // if dx is positive, we already ran this branch in the last game loop iteration, exit.
       if (this.ball.dx > 0) return;
-      if (this.ball.dx > -this.MAX_SPEED) this.ball.dx -= 50;
+      if (this.ball.dx > -this.MAX_SPEED) {
+        this.currentBallSpeed += 50;
+        this.ball.dx = -this.currentBallSpeed;
+      }
 
       this.ball.dx = -this.ball.dx;
 
@@ -243,7 +244,10 @@ export class Game {
     } else if (this.checkCollision(this.ball, this.p2.bar)) {
       // if dx is negative, we already ran this branch in the last game loop iteration, exit.
       if (this.ball.dx < 0) return;
-      if (this.ball.dx < this.MAX_SPEED) this.ball.dx += 50;
+      if (this.ball.dx < this.MAX_SPEED) {
+        this.currentBallSpeed += 50;
+        this.ball.dx = this.currentBallSpeed;
+      }
       this.ball.dx = -this.ball.dx;
       this.ball.dy =
         this.BALL_SPEED *
@@ -255,15 +259,28 @@ export class Game {
 
   private startGame = (server: Server) => {
     let timestamp = null;
-    let prev = Date.now();
 
-    this.interval = setInterval(() => {
-      timestamp = Date.now();
-      this.calculateState(server, (timestamp - prev) * 0.001);
-      prev = timestamp;
+    let countdown = 3;
 
-      this.sendState(server);
-    }, this.TICK_RATE);
+    this.sendCountdown(server, countdown--);
+    const inter = setInterval(
+      () => this.sendCountdown(server, countdown--),
+      1000
+    );
+
+    setTimeout(() => {
+      clearInterval(inter);
+      this.sendCountdown(server, -1);
+
+      let prev = Date.now();
+      this.interval = setInterval(() => {
+        timestamp = Date.now();
+        this.calculateState(server, (timestamp - prev) * 0.001);
+        prev = timestamp;
+
+        this.sendState(server);
+      }, this.TICK_RATE);
+    }, 3000);
   };
 
   private endGame = async () => {
@@ -299,7 +316,7 @@ export class Game {
 
   private normalizeSpeed = () => {
     const ratio =
-      this.BALL_SPEED /
+      this.currentBallSpeed /
       Math.sqrt(this.ball.dx * this.ball.dx + this.ball.dy * this.ball.dy);
     this.ball.dx = this.ball.dx * ratio;
     this.ball.dy = this.ball.dy * ratio;

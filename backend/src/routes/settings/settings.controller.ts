@@ -124,6 +124,22 @@ export class SettingsController {
     await this.settingsService.addFriend(req.session.userId, friend.id);
   }
 
+  @Post("friend/del/:name")
+  async delFriend(
+    @Req() req: AuthenticatedRequest,
+    @Param("name") name: string
+  ) {
+    const friend = await this.userService.getUserByLogin(name);
+
+    if (!friend)
+      throw new HttpException(
+        "This user does not exists",
+        HttpStatus.BAD_REQUEST
+      );
+
+    await this.settingsService.delFriend(req.session.userId, friend.id);
+  }
+
   @Post("friend/requests/accept/:id")
   async acceptFriendRequest(
     @Req() req: AuthenticatedRequest,
