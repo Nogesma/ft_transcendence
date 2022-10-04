@@ -259,12 +259,11 @@ export class Game {
 
   private startGame = (server: Server) => {
     let timestamp = null;
-    let prev = Date.now();
 
     let countdown = 3;
 
     this.sendCountdown(server, countdown--);
-    let inter = setInterval(
+    const inter = setInterval(
       () => this.sendCountdown(server, countdown--),
       1000
     );
@@ -272,6 +271,8 @@ export class Game {
     setTimeout(() => {
       clearInterval(inter);
       this.sendCountdown(server, -1);
+
+      let prev = Date.now();
       this.interval = setInterval(() => {
         timestamp = Date.now();
         this.calculateState(server, (timestamp - prev) * 0.001);

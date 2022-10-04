@@ -9,7 +9,6 @@
   import UserCard from "./UserCard.svelte";
   import ChatMenu from "./ChatMenu.svelte";
   import { pick } from "ramda";
-  import axios from "axios";
 
   export let channel: string;
   export let p = false;
@@ -23,8 +22,6 @@
     displayname: string;
     id: number;
   }> = [];
-
-  const blockedUsers = new Set<number>();
 
   const registerListeners = (socket: Socket) => {
     socket.on("newInvite", (event) => (invite = event));

@@ -13,7 +13,6 @@
   let elem: HTMLElement;
   let file: FileList;
   let name: string;
-  let tfa: Promise<null>;
 </script>
 
 {#await getTFAStatus() then tfa_enabled}
@@ -28,7 +27,7 @@
     <label
       for="toggle-2fa"
       class="btn btn-primary modal-button"
-      on:click={() => (tfa = request2FA(tfa_enabled, elem))}
+      on:click={() => request2FA(tfa_enabled, elem)}
       >{tfa_enabled ? "Disable" : "Enable"} 2FA</label
     >
   </div>
