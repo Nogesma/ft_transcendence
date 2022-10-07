@@ -5,6 +5,7 @@
   import { getUserInfo, getUserStats } from "../../utils/info.js";
   import Settings from "../../lib/Settings.svelte";
   import { isEmpty } from "ramda";
+  import { addFriend } from "../../utils/friend.js";
 
   export let params: { id: number };
 
@@ -67,6 +68,12 @@
             >Spectate
           </button>
         {/if}
+        <button class="btn btn-secondary" on:click={() => addFriend(login)}
+          >Add as friend
+        </button>
+        <button class="btn btn-secondary" on:click={() => Block(login)}
+          >Block
+        </button>
         <button
           class="btn btn-primary"
           on:click={() => push(`/users/${uid}/history`)}
