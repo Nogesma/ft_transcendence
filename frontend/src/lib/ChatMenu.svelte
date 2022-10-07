@@ -1,12 +1,17 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
-  import { push } from "svelte-spa-router";
+  import { id } from "../stores/settings";
+  import axios from "axios";
+  import { addFriend, delFriend } from "../utils/friend.js";
+  import { blockUser, unblockUser } from "../utils/chatManagement.js";
 
   export let pos = { x: 0, y: 0 };
-  export let id = 0;
+  export let uid = 0;
   export let displayname = "";
   export let userLogin = "";
+  export let channel = "";
+
   export let banUser: (userLogin: string) => void;
   export let muteUser: (userLogin: string) => void;
 
@@ -26,56 +31,56 @@
     if (pos.y > window.innerHeight - rect.height) pos.y -= rect.height;
   };
 
-  let admin = true; //todo: if user is admin
-
-  const blockUser = (id: number) => {
-    id;
-  }; //todo
+  const getUserPermissions = (uid: number) =>
+    axios
+      .get(
+        `${import.meta.env.VITE_BACKEND_URI}/api/chat/perms/${channel}/${uid}`,
+        { withCredentials: true }
+      )
+      .then(({ data }) => data)
+      .catch(console.error);
 </script>
 
 <svelte:body on:click={onPageClick} />
 
-<div
-  id="main"
-  transition:fade={{ duration: 100 }}
-  bind:this={menu}
-  style="top: {pos.y}px; left: {pos.x}px;"
->
-  <div class="elem text-gray-50" on:click={() => push(`/users/${id}`)}>
-    View profile
-  </div>
-  <div class="elem text-red-600" on:click={() => blockUser(id)}>
-    Block {displayname}
-  </div>
+{#if $id !== uid}
+  {#await getUserPermissions(uid) then { block, admin, friend }}
+    <ul
+      transition:fade={{ duration: 100 }}
+      bind:this={menu}
+      style="top: {pos.y}px; left: {pos.x}px;"
+      class="menu p-2 shadow bg-base-100 rounded-box w-52 absolute grid z-50"
+    >
+      {#if !friend}
+        <li>
+          <button on:click={() => addFriend(userLogin)}>Add friend</button>
+        </li>{:else}
+        <li>
+          <button on:click={() => delFriend(userLogin)}>Remove friend</button>
+        </li>
+      {/if}
 
-  {#if admin}
-    <li class="elem text-red-600" on:click={() => banUser(userLogin)}>
-      Ban {displayname}
-    </li>
-    <li class="elem text-red-600" on:click={() => muteUser(userLogin)}>
-      Mute {displayname}
-    </li>
-  {/if}
-</div>
+      {#if !block}
+        <li class="text-red-600">
+          <button on:click={() => blockUser(uid)}>Block {displayname}</button>
+        </li>{:else}
+        <li class="text-red-600">
+          <button on:click={() => unblockUser(uid)}
+            >Unblock {displayname}</button
+          >
+        </li>
+      {/if}
 
-<style>
-  div#main {
-    position: absolute;
-    display: grid;
-    border: 1px solid #0003;
-    box-shadow: 2px 2px 5px 0px #0002;
-    background: white;
-  }
-
-  div.elem {
-    padding: 4px 15px;
-    cursor: default;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    grid-gap: 5px;
-  }
-  div.elem:hover {
-    background: #0002;
-  }
-</style>
+      {#if admin}
+        <li class="text-red-600">
+          <button on:click={() => banUser(userLogin)}>Ban {displayname}</button>
+        </li>
+        <li class="text-red-600">
+          <button on:click={() => muteUser(userLogin)}
+            >Mute {displayname}</button
+          >
+        </li>
+      {/if}
+    </ul>
+  {/await}
+{/if}

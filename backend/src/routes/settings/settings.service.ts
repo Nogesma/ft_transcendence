@@ -213,6 +213,15 @@ export class SettingsService {
     await this.friendService.addFriend(uid, fid).catch(console.error);
   };
 
+  delFriend = async (uid: number, fid: number) => {
+    const isFriend = Boolean(await this.friendService.isFriend(uid, fid));
+
+    if (!isFriend)
+      throw new HttpException("User is not a friend.", HttpStatus.BAD_REQUEST);
+
+    await this.friendService.delFriend(uid, fid).catch(console.error);
+  };
+
   block = this.blockService.blockUser;
   unblock = this.blockService.unblockUser;
 }

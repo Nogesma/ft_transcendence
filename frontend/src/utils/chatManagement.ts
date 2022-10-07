@@ -90,6 +90,24 @@ const isBanned = curry((channel: string, name: string) =>
     .catch(console.error)
 );
 
+const blockUser = (id: number) =>
+  axios
+    .post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/user/block/${id}`,
+      {},
+      { withCredentials: true }
+    )
+    .catch(console.error);
+
+const unblockUser = (id: number) =>
+  axios
+    .post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/user/unblock/${id}`,
+      {},
+      { withCredentials: true }
+    )
+    .catch(console.error);
+
 export {
   banUser,
   unbanUser,
@@ -100,4 +118,6 @@ export {
   isBanned,
   isMuted,
   isAdmin,
+  blockUser,
+  unblockUser,
 };
