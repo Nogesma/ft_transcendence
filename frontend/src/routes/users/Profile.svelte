@@ -5,6 +5,12 @@
   import { getUserInfo, getUserStats } from "../../utils/info.js";
   import Settings from "../../lib/Settings.svelte";
   import { isEmpty } from "ramda";
+  import { addFriend, delFriend } from "../../utils/friend.js";
+  import {
+    blockUser,
+    getUserPermissions,
+    unblockUser,
+  } from "../../utils/chatManagement.js";
 
   export let params: { id: number };
 
@@ -66,6 +72,31 @@
             on:click={() => push(`/game/${gameId}`)}
             >Spectate
           </button>
+        {/if}
+        {#if uid !== $id}
+          {#await getUserPermissions(uid, channel) then { block, admin, friend }}
+            {#if !friend}
+              <button
+                class="btn btn-secondary"
+                on:click={() => addFriend(login)}>Add friend</button
+              >
+            {:else}
+              <button
+                class="btn btn-secondary"
+                on:click={() => delFriend(login)}>Remove friend</button
+              >
+            {/if}
+            {#if !block}
+              <button class="btn btn-secondary" on:click={() => blockUser(uid)}
+                >Block</button
+              >
+            {:else}
+              <button
+                class="btn btn-secondary"
+                on:click={() => unblockUser(uid)}>Unblock</button
+              >
+            {/if}
+          {/await}
         {/if}
         <button
           class="btn btn-primary"
