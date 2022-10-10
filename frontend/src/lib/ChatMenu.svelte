@@ -34,7 +34,7 @@
   const getUserPermissions = (uid: number) =>
     axios
       .get(
-        `${import.meta.env.VITE_BACKEND_URI}/api/chat/perms/${channel}/${uid}`,
+        `${import.meta.env.VITE_BACKEND_URI}/api/chat/perms/${uid}/${channel}`,
         { withCredentials: true }
       )
       .then(({ data }) => data)

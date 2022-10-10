@@ -233,21 +233,19 @@ export class ChatService {
     let block = false;
 
     const channel = await this.channelService.getChannelByName(chan);
-    if (!channel)
-      throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
-
-    if (id === channel.ownerId) {
-      admin = true;
+    if (channel) {
+      if (id === channel.ownerId) {
+        admin = true;
+      }
+      const admins = await channel.$get("admin");
+      if (
+        !admin &&
+        admins.find((u) => u.id === id) &&
+        !admins.find((u) => u.id === uid)
+      )
+        admin = true;
     }
-    const admins = await channel.$get("admin");
-    if (
-      !admin &&
-      admins.find((u) => u.id === id) &&
-      !admins.find((u) => u.id === uid)
-    )
-      admin = true;
 
-    console.log(id);
     const user = await this.userService.getUser(id);
     if (!user)
       throw new HttpException(
