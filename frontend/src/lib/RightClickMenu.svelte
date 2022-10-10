@@ -2,9 +2,12 @@
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
   import { id } from "../stores/settings";
-  import axios from "axios";
   import { addFriend, delFriend } from "../utils/friend.js";
-  import { blockUser, unblockUser } from "../utils/chatManagement.js";
+  import {
+    blockUser,
+    getUserPermissions,
+    unblockUser,
+  } from "../utils/chatManagement.js";
 
   export let pos = { x: 0, y: 0 };
   export let uid = 0;
@@ -19,7 +22,7 @@
 
   let menu: HTMLElement;
   const onPageClick = (e: MouseEvent) => {
-    if (e.target === menu || menu.contains(e.target as Node)) return;
+    if (!menu || e.target === menu || menu.contains(e.target as Node)) return;
     dispatch("clickoutside");
   };
 
@@ -30,21 +33,12 @@
     pos.x = Math.min(window.innerWidth - rect.width, pos.x);
     if (pos.y > window.innerHeight - rect.height) pos.y -= rect.height;
   };
-
-  const getUserPermissions = (uid: number) =>
-    axios
-      .get(
-        `${import.meta.env.VITE_BACKEND_URI}/api/chat/perms/${uid}/${channel}`,
-        { withCredentials: true }
-      )
-      .then(({ data }) => data)
-      .catch(console.error);
 </script>
 
 <svelte:body on:click={onPageClick} />
 
 {#if $id !== uid}
-  {#await getUserPermissions(uid) then { block, admin, friend }}
+  {#await getUserPermissions(uid, channel) then { block, admin, friend }}
     <ul
       transition:fade={{ duration: 100 }}
       bind:this={menu}

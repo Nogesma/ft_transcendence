@@ -3,7 +3,7 @@
   import { login } from "../stores/settings";
   import { pfp } from "../stores/settings.js";
   import { always, cond, equals, T } from "ramda";
-  import fallbackProfilePicture from "../assets/rick.jpg";
+  import fallbackProfilePicture from "/rickroll.gif";
 
   export let attributes: string;
   // todo: maybe protect from xss in username?

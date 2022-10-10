@@ -108,6 +108,15 @@ const unblockUser = (id: number) =>
     )
     .catch(console.error);
 
+const getUserPermissions = (uid: number, chan?: string) =>
+  axios
+    .get(
+      `${import.meta.env.VITE_BACKEND_URI}/api/chat/perms/${uid}/${chan ?? ""}`,
+      { withCredentials: true }
+    )
+    .then(({ data }) => data)
+    .catch(console.error);
+
 export {
   banUser,
   unbanUser,
@@ -120,4 +129,5 @@ export {
   isAdmin,
   blockUser,
   unblockUser,
+  getUserPermissions,
 };
