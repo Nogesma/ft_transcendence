@@ -6,11 +6,11 @@
   import { getUserInfo, getUserStats } from "../utils/info.js";
   import ProfilePic from "../lib/ProfilePic.svelte";
   import Matchmaking from "../lib/Matchmaking.svelte";
-  import { isEmpty, startsWith } from "ramda";
+  import { isEmpty, pick, startsWith } from "ramda";
   import { params, replace } from "svelte-spa-router";
   import ChatDrawer from "../lib/ChatDrawer.svelte";
   // import { calculateState } from "../utils/game";
-  import UserCard from "../lib/UserCard.svelte";
+  import LeftClickMenu from "../lib/LeftClickMenu.svelte";
 
   let ball: Ball, p1: Player, p2: Player;
 
@@ -206,6 +206,14 @@
       player.bar.direction = 0;
     }
   };
+
+  let showMenu = -1;
+  let pos = { x: 0, y: 0 };
+
+  const openMenu = (e: MouseEvent, i: number) => {
+    pos = pick(["x", "y"])(e);
+    showMenu = i;
+  };
 </script>
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
@@ -221,21 +229,24 @@
         {#if id1}
           <div class="flex-col">
             {#await getUserInfo(id1) then { login, displayname: name }}
-              <div class="dropdown">
-                <div tabindex="0">
-                  <ProfilePic
-                    user={login}
-                    attributes="h-10 w-10 rounded-full"
-                  />
-                  {name}
-                  {#await getUserStats(id1) then { elo }}
-                    {elo}
-                  {/await}
-                </div>
-                <div tabindex="0" class="dropdown-content menu w-80">
-                  <UserCard id={id1} />
-                </div>
+              <div
+                on:click|preventDefault={(e) => openMenu(e, id1)}
+                class="btn btn-ghost btn-circle avatar"
+              >
+                <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
+                {name}
+                {#await getUserStats(id1) then { elo }}
+                  {elo}
+                {/await}
               </div>
+              {#if showMenu === id1}
+                <LeftClickMenu
+                  on:click={() => (showMenu = -1)}
+                  on:clickoutside={() => (showMenu = -1)}
+                  uid={id1}
+                  {pos}
+                />
+              {/if}
             {/await}
           </div>
         {/if}
@@ -245,21 +256,24 @@
         {#if id2}
           <div class="flex-col">
             {#await getUserInfo(id2) then { login, displayname: name }}
-              <div class="dropdown dropdown-end">
-                <div tabindex="0">
-                  <ProfilePic
-                    user={login}
-                    attributes="h-10 w-10 rounded-full"
-                  />
-                  {name}
-                  {#await getUserStats(id2) then { elo }}
-                    {elo}
-                  {/await}
-                </div>
-                <div tabindex="0" class="dropdown-content menu w-80">
-                  <UserCard id={id2} />
-                </div>
+              <div
+                on:click|preventDefault={(e) => openMenu(e, id2)}
+                class="btn btn-ghost btn-circle avatar"
+              >
+                <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
+                {name}
+                {#await getUserStats(id2) then { elo }}
+                  {elo}
+                {/await}
               </div>
+              {#if showMenu === id2}
+                <LeftClickMenu
+                  on:clickoutside={() => (showMenu = -1)}
+                  uid={id2}
+                  {pos}
+                  dir={false}
+                />
+              {/if}
             {/await}
           </div>
         {/if}
@@ -268,8 +282,20 @@
         Spectators :
         {#each [...spectatorList] as spec}
           {#await getUserInfo(spec) then { login, displayname: name }}
-            <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
-            {name}
+            <div
+              on:click|preventDefault={(e) => openMenu(e, spec)}
+              class="btn btn-ghost btn-circle avatar"
+            >
+              <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
+              {name}
+            </div>
+            {#if showMenu === spec}
+              <LeftClickMenu
+                on:clickoutside={() => (showMenu = -1)}
+                uid={spec}
+                {pos}
+              />
+            {/if}
           {/await}
         {/each}
       </div>
