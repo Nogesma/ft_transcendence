@@ -1,8 +1,8 @@
-http://transcendence.manosgr.me {
+{$VITE_REDIRECT_URI} {
 	encode gzip
 	file_server {
 		precompressed br gzip
 	}
-	reverse_proxy /api/* nestjs:3000
-	reverse_proxy /socket.io/* nestjs:3000
+	reverse_proxy /api/* {$BACKEND_INTERNAL_URI} 
+	reverse_proxy /socket.io/* {$BACKEND_INTERNAL_URI} 
 }

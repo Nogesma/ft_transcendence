@@ -11,11 +11,11 @@ export default defineConfig({
   plugins: [
     svelte(),
     viteCompression({
-      filter: /\.(js|mjs|json|css|html|wasm|svg)$/i,
+      filter: /\.(js|mjs|json|css|html|wasm|svg|map)$/i,
       algorithm: "brotliCompress",
     }),
     viteCompression({
-      filter: /\.(js|mjs|json|css|html|wasm|svg)$/i,
+      filter: /\.(js|mjs|json|css|html|wasm|svg|map)$/i,
       algorithm: "gzip",
     }),
   ],

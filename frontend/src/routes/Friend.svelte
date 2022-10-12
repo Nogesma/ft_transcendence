@@ -8,11 +8,21 @@
   import { pendingFriends } from "../stores/settings.js";
   import ProfilePic from "../lib/ProfilePic.svelte";
   import { getUserInfo } from "../utils/info.js";
+  import { replace } from "svelte-spa-router";
+  import LeftClickMenu from "../lib/LeftClickMenu.svelte";
+  import { pick } from "ramda";
 
   let friendName = "";
   let status = -1;
 
   let message = "";
+  let showMenu = -1;
+  let pos = { x: 0, y: 0 };
+
+  const openMenu = (e: MouseEvent, i: number) => {
+    pos = pick(["x", "y"])(e);
+    showMenu = i;
+  };
 </script>
 
 {#if status !== -1}
@@ -100,11 +110,14 @@
           <td>
             <button
               class="btn btn-accent"
-              on:click={() => acceptFriendRequest(id)}>accept</button
+              on:click={() => acceptFriendRequest(id) && replace(`/friends`)}
+              >accept</button
             >
           </td>
           <td>
-            <button class="btn btn-error" on:click={() => denyFriendRequest(id)}
+            <button
+              class="btn btn-error"
+              on:click={() => denyFriendRequest(id) && replace(`/friends`)}
               >deny</button
             >
           </td>
@@ -126,10 +139,26 @@
         {#await getUserInfo(id) then { login, displayname, status }}
           <tr>
             <td>
-              <div class="flex content-center place-items-center space-x-5">
-                <div class="avatar w-10 h-10">
-                  <ProfilePic attributes="rounded-full" user={login} {status} />
+              <div
+                class="flex flex-row content-center place-items-center space-x-5"
+              >
+                <div
+                  on:click|preventDefault={(e) => openMenu(e, id)}
+                  class="btn btn-ghost btn-circle avatar"
+                >
+                  <ProfilePic
+                    attributes="h-10 w-10 rounded-full"
+                    user={login}
+                    {status}
+                  />
                 </div>
+                {#if showMenu === id}
+                  <LeftClickMenu
+                    on:clickoutside={() => (showMenu = -1)}
+                    uid={id}
+                    {pos}
+                  />
+                {/if}
                 <div class="italic">
                   {login}
                 </div>
@@ -140,9 +169,6 @@
                 {displayname}
               </div>
             </td>
-            {#if status === 1}
-              <td> Challenge </td>
-            {/if}
           </tr>
         {/await}
       {/each}
