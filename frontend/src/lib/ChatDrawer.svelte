@@ -23,11 +23,7 @@
 </script>
 
 <div class="flex flex-col flex-shrink-0 {showChat ? 'w-96' : ''} rounded">
-  <div
-    tabindex="0"
-    class="btn btn-ghost btn-circle"
-    on:click={() => (showChat = !showChat)}
-  >
+  <div class="btn btn-ghost btn-circle" on:click={() => (showChat = !showChat)}>
     <div class="indicator">
       {#if showChat}
         <Icon data={faX} />

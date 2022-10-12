@@ -43,7 +43,7 @@
       transition:fade={{ duration: 100 }}
       bind:this={menu}
       style="top: {pos.y}px; left: {pos.x}px;"
-      class="menu p-2 shadow bg-base-100 rounded-box w-52 absolute grid z-50"
+      class="menu p-2 shadow bg-base-100 rounded-box w-52 absolute grid z-40"
     >
       {#if !friend}
         <li>

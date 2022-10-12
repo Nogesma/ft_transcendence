@@ -42,7 +42,7 @@
     style="top: {pos.y}px; {dir
       ? `left: ${pos.x}px;`
       : `right: ${window.innerWidth - pos.x}px`}"
-    class="card card-side bg-base-100 shadow absolute z-50"
+    class="card card-side bg-base-100 shadow absolute z-40"
     transition:fade={{ duration: 100 }}
   >
     {#await getUserInfo(uid) then { login, displayname, status }}

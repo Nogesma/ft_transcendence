@@ -74,16 +74,16 @@
           </button>
         {/if}
         {#if uid !== $id}
-          {#await getUserPermissions(uid, channel) then { block, admin, friend }}
+          {#await getUserPermissions(uid) then { block, friend }}
             {#if !friend}
               <button
                 class="btn btn-secondary"
-                on:click={() => addFriend(login)}>Add friend</button
+                on:click={() => addFriend(lname)}>Add friend</button
               >
             {:else}
               <button
                 class="btn btn-secondary"
-                on:click={() => delFriend(login)}>Remove friend</button
+                on:click={() => delFriend(lname)}>Remove friend</button
               >
             {/if}
             {#if !block}

@@ -6,9 +6,10 @@ services:
     build:
       context: frontend
       args:
-        VITE_CLIENT_ID: --
-        VITE_REDIRECT_URI: --
-        VITE_BACKEND_URI: --
+        VITE_CLIENT_ID: ba3d391399909e1abe4166962a096cbc7c4f8bb9c55a66e764d63fac14521ffc
+        VITE_REDIRECT_URI: https://localhost 
+        VITE_BACKEND_URI: https://localhost
+        BACKEND_INTERNAL_URI: nestjs:3000
     restart: always
     networks:
       - web
@@ -31,7 +32,7 @@ services:
     env_file:
       - .env.postgres
 
-  nestjs:
+  backend:
     depends_on:
       - db
     container_name: nestjs
