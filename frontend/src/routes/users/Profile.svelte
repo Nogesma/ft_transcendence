@@ -98,6 +98,9 @@
             {/if}
           {/await}
         {/if}
+        <button class="btn btn-primary" on:click={() => push(`/pm/${uid}`)}
+          >Private Message
+        </button>
         <button
           class="btn btn-primary"
           on:click={() => push(`/users/${uid}/history`)}
