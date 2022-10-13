@@ -1,7 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
-  import { id } from "../stores/settings";
 
   import { getUserInfo } from "../utils/info.js";
   import ProfilePic from "./ProfilePic.svelte";
@@ -24,14 +23,6 @@
     if (e.target === menu || menu.contains(e.target as Node)) return;
     dispatch("clickoutside");
   };
-
-  $: () => {
-    if (!menu) return;
-
-    const rect = menu.getBoundingClientRect();
-    pos.x = Math.min(window.innerWidth - rect.width, pos.x);
-    if (pos.y > window.innerHeight - rect.height) pos.y -= rect.height;
-  };
 </script>
 
 <svelte:body on:click={onPageClick} />
@@ -51,7 +42,7 @@
         <h2 class="card-title">{displayname}</h2>
         <p class="italic">{login}</p>
         <div class="card-actions justify-end">
-          <button class="btn btn-primary" on:click={() => push(`/users/${id}`)}
+          <button class="btn btn-primary" on:click={() => push(`/users/${uid}`)}
             >View Profile</button
           >
         </div>

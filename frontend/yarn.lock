@@ -1649,7 +1649,7 @@ __metadata:
     eslint-config-prettier: ^8.5.0
     eslint-plugin-svelte3: ^4.0.0
     nanoid: ^4.0.0
-    postcss: ^8.4.17
+    postcss: ^8.4.18
     prettier: ^2.7.1
     prettier-plugin-svelte: ^2.8.0
     qrcode: ^1.5.1
@@ -1663,7 +1663,7 @@ __metadata:
     tailwindcss: ^3.1.8
     tslib: ^2.4.0
     typescript: ^4.8.4
-    vite: ^3.1.7
+    vite: ^3.1.8
     vite-plugin-compression: ^0.5.1
   languageName: unknown
   linkType: soft
@@ -2685,14 +2685,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.4.17":
-  version: 8.4.17
-  resolution: "postcss@npm:8.4.17"
+"postcss@npm:^8.4.18":
+  version: 8.4.18
+  resolution: "postcss@npm:8.4.18"
   dependencies:
     nanoid: ^3.3.4
     picocolors: ^1.0.0
     source-map-js: ^1.0.2
-  checksum: a6d9096dd711e17f7b1d18ff5dcb4fdedf3941d5a3dc8b0e4ea873b8f31972d57f73d6da9a8aed7ff389eb52190ed34f6a94f299a7f5ddc68b08a24a48f77eb9
+  checksum: 9349fd99849b2e3d2e134ff949b7770ecb12375f352723ce2bcc06167eba3850ea7844c1b191a85cd915d6a396b4e8ee9a5267e6cc5d8d003d0cbc7a97555d39
   languageName: node
   linkType: hard
 
@@ -3501,9 +3501,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^3.1.7":
-  version: 3.1.7
-  resolution: "vite@npm:3.1.7"
+"vite@npm:^3.1.8":
+  version: 3.1.8
+  resolution: "vite@npm:3.1.8"
   dependencies:
     esbuild: ^0.15.9
     fsevents: ~2.3.2
@@ -3529,7 +3529,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: cd0a0bb11777d9006f408a67ef1063c1771baaf091f9e4f102f0fdaec77559784b76788e80a398ac8fe2fc90027e83712ae860ed51510b81c4153d8c5ca5fb37
+  checksum: 982696ad134577dd9915c4c3548ad36ddcf5dc6d341058548a670a13d860e4cdaaf2b320a59221f178018df089d148b9980e9a344316bef12b698a1c1abc7390
   languageName: node
   linkType: hard
 
