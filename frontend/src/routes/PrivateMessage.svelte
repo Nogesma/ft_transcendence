@@ -45,6 +45,7 @@
 
     if (selectedPmId !== -1 && !currentPm) {
       $privateMessages.set(selectedPmId, []);
+      currentPm = $privateMessages.get(selectedPmId);
       $privateMessages = $privateMessages;
     }
   }

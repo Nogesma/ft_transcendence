@@ -1,16 +1,18 @@
 <script lang="ts">
   import ProfilePic from "../../lib/ProfilePic.svelte";
   import { params, push } from "svelte-spa-router";
-  import { displayname, id, login } from "../../stores/settings.js";
+  import {
+    blocks,
+    displayname,
+    friends,
+    id,
+    login,
+  } from "../../stores/settings.js";
   import { getUserInfo, getUserStats } from "../../utils/info.js";
   import Settings from "../../lib/Settings.svelte";
   import { isEmpty } from "ramda";
   import { addFriend, delFriend } from "../../utils/friend.js";
-  import {
-    blockUser,
-    getUserPermissions,
-    unblockUser,
-  } from "../../utils/chatManagement.js";
+  import { blockUser, unblockUser } from "../../utils/chatManagement.js";
 
   $: uid = Number($params?.id) ?? $id;
 </script>
@@ -72,29 +74,24 @@
           </button>
         {/if}
         {#if uid !== $id}
-          {#await getUserPermissions(uid) then { block, friend }}
-            {#if !friend}
-              <button
-                class="btn btn-secondary"
-                on:click={() => addFriend(lname)}>Add friend</button
-              >
-            {:else}
-              <button
-                class="btn btn-secondary"
-                on:click={() => delFriend(lname)}>Remove friend</button
-              >
-            {/if}
-            {#if !block}
-              <button class="btn btn-secondary" on:click={() => blockUser(uid)}
-                >Block</button
-              >
-            {:else}
-              <button
-                class="btn btn-secondary"
-                on:click={() => unblockUser(uid)}>Unblock</button
-              >
-            {/if}
-          {/await}
+          {#if $friends.has(uid)}
+            <button class="btn btn-secondary" on:click={() => delFriend(uid)}
+              >Remove friend</button
+            >
+          {:else}
+            <button class="btn btn-secondary" on:click={() => addFriend(lname)}
+              >Add friend</button
+            >
+          {/if}
+          {#if $blocks.has(uid)}
+            <button class="btn btn-secondary" on:click={() => unblockUser(uid)}
+              >Unblock</button
+            >
+          {:else}
+            <button class="btn btn-secondary" on:click={() => blockUser(uid)}
+              >Block</button
+            >
+          {/if}
         {/if}
         <button class="btn btn-primary" on:click={() => push(`/pm/${uid}`)}
           >Private Message

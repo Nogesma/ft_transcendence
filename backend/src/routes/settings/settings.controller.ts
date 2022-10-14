@@ -124,20 +124,9 @@ export class SettingsController {
     await this.settingsService.addFriend(req.session.userId, friend.id);
   }
 
-  @Post("friend/del/:name")
-  async delFriend(
-    @Req() req: AuthenticatedRequest,
-    @Param("name") name: string
-  ) {
-    const friend = await this.userService.getUserByLogin(name);
-
-    if (!friend)
-      throw new HttpException(
-        "This user does not exists",
-        HttpStatus.BAD_REQUEST
-      );
-
-    await this.settingsService.delFriend(req.session.userId, friend.id);
+  @Post("friend/del/:id")
+  async delFriend(@Req() req: AuthenticatedRequest, @Param("id") id: number) {
+    await this.settingsService.delFriend(req.session.userId, id);
   }
 
   @Post("friend/requests/accept/:id")
@@ -164,5 +153,10 @@ export class SettingsController {
   @Post("unblock/:id")
   async unblockUser(@Req() req: AuthenticatedRequest, @Param("id") id: number) {
     await this.settingsService.unblock(req.session.userId, id);
+  }
+
+  @Get("blocks")
+  async getBlockList(@Req() req: AuthenticatedRequest) {
+    return this.settingsService.getBlockList(req.session.userId);
   }
 }

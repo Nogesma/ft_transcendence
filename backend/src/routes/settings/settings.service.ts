@@ -224,4 +224,9 @@ export class SettingsService {
 
   block = this.blockService.blockUser;
   unblock = this.blockService.unblockUser;
+
+  getBlockList = pipe(
+    this.blockService.getBlocked,
+    andThen(map(prop("block")))
+  );
 }

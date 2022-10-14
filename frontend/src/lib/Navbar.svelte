@@ -10,7 +10,7 @@
     pendingPM,
   } from "../stores/settings.js";
   import axios from "axios";
-  import { isEmpty, isNil } from "ramda";
+  import { isNil } from "ramda";
   import { push } from "svelte-spa-router";
 
   const logout = () => {
@@ -57,9 +57,9 @@
         >
           <div class="indicator">
             <Icon data={faUserGroup} scale={1.8} />
-            {#if !isNil($pendingFriends) && !isEmpty($pendingFriends)}
+            {#if !isNil($pendingFriends) && $pendingFriends.size !== 0}
               <span class="badge badge-sm indicator-item badge-error"
-                >{$pendingFriends.length}</span
+                >{$pendingFriends.size}</span
               >
             {/if}
           </div>

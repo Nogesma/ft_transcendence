@@ -1,8 +1,12 @@
-import { derived, readable, writable } from "svelte/store";
+import { derived, readable, type Writable, writable } from "svelte/store";
 import axios from "axios";
 import { isEmpty, not } from "ramda";
 import { getChatSocket, getPmSocket } from "../utils/socket";
-import { getPendingFriendRequests } from "../utils/friend";
+import {
+  getBlocks,
+  getFriendList,
+  getPendingFriendRequests,
+} from "../utils/friend";
 
 const isLoggedIn = writable(false);
 
@@ -16,7 +20,9 @@ const gameId = writable("");
 
 const updatepfp = writable(0);
 
-const pendingFriends = writable(await getPendingFriendRequests());
+const pendingFriends = writable(
+  new Set<number>(await getPendingFriendRequests())
+);
 
 const pfp = derived([login, updatepfp], ([$login, $updatepfp], set) => {
   if (not(isEmpty($login)))
@@ -38,6 +44,14 @@ const pendingPM = writable(0);
 
 const chatSocket = readable(getChatSocket());
 
+const friends: Writable<Set<number>> = writable(
+  new Set<number>(await getFriendList())
+);
+
+const blocks: Writable<Set<number>> = writable(
+  new Set<number>(await getBlocks())
+);
+
 export {
   isLoggedIn,
   displayname,
@@ -52,4 +66,6 @@ export {
   chatSocket,
   pendingPM,
   privateMessages,
+  friends,
+  blocks,
 };

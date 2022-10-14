@@ -4,12 +4,11 @@
     addFriend,
     delFriend,
     denyFriendRequest,
-    getFriendList,
   } from "../utils/friend.js";
-  import { pendingFriends } from "../stores/settings.js";
+  import { friends, pendingFriends } from "../stores/settings.js";
   import ProfilePic from "../lib/ProfilePic.svelte";
   import { getUserInfo } from "../utils/info.js";
-  import { push, replace } from "svelte-spa-router";
+  import { push } from "svelte-spa-router";
   import LeftClickMenu from "../lib/LeftClickMenu.svelte";
   import { pick } from "ramda";
 
@@ -93,7 +92,7 @@
     </button>
   </label>
 
-  {#if $pendingFriends.length !== 0}
+  {#if $pendingFriends.size !== 0}
     <table class="table table-zebra w-full">
       <thead>
         <tr>
@@ -101,7 +100,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each $pendingFriends as id}
+        {#each [...$pendingFriends] as id}
           {#await getUserInfo(id) then { login, displayname }}
             <tr>
               <td>
@@ -122,19 +121,13 @@
               <td>
                 <button
                   class="btn btn-accent"
-                  on:click={() => {
-                    acceptFriendRequest(id);
-                    replace(`/friends`);
-                  }}>accept</button
+                  on:click={() => acceptFriendRequest(id)}>accept</button
                 >
               </td>
               <td>
                 <button
                   class="btn btn-error"
-                  on:click={() => {
-                    denyFriendRequest(id);
-                    replace(`/friends`);
-                  }}>deny</button
+                  on:click={() => denyFriendRequest(id)}>deny</button
                 >
               </td>
             </tr>
@@ -151,65 +144,60 @@
       </tr>
     </thead>
     <tbody>
-      {#await getFriendList() then friendList}
-        {#each friendList as id}
-          {#await getUserInfo(id) then { login, displayname }}
-            <tr>
-              <td>
-                <div
-                  class="flex flex-row content-center place-items-center space-x-5"
-                >
-                  <button
-                    on:click|preventDefault={(e) => openMenu(e, id)}
-                    class="btn btn-ghost btn-circle avatar"
-                  >
-                    <ProfilePic
-                      attributes="h-10 w-10 rounded-full"
-                      user={login}
-                    />
-                  </button>
-                  {#if showMenu === id}
-                    <LeftClickMenu
-                      on:clickoutside={() => (showMenu = -1)}
-                      uid={id}
-                      {pos}
-                    />
-                  {/if}
-                </div>
-              </td>
-              <td>
-                <div class="italic">
-                  {login}
-                </div>
-              </td>
-              <td>
-                <div class="flex place-items-center">
-                  {displayname}
-                </div>
-              </td>
-              <td>
+      {#each [...$friends] as id}
+        {#await getUserInfo(id) then { login, displayname }}
+          <tr>
+            <td>
+              <div
+                class="flex flex-row content-center place-items-center space-x-5"
+              >
                 <button
-                  class="btn btn-primary"
-                  on:click={() => push(`/pm/${id}`)}
-                  >Private Message
+                  on:click|preventDefault={(e) => openMenu(e, id)}
+                  class="btn btn-ghost btn-circle avatar"
+                >
+                  <ProfilePic
+                    attributes="h-10 w-10 rounded-full"
+                    user={login}
+                  />
                 </button>
-              </td>
-              <td>
-                <button
-                  class="btn btn-primary"
-                  on:click={() => push(`/users/${id}`)}>View Profile</button
-                >
-              </td>
-              <td>
-                <button
-                  class="btn btn-secondary"
-                  on:click={() => delFriend(login)}>Remove friend</button
-                >
-              </td>
-            </tr>
-          {/await}
-        {/each}
-      {/await}
+                {#if showMenu === id}
+                  <LeftClickMenu
+                    on:clickoutside={() => (showMenu = -1)}
+                    uid={id}
+                    {pos}
+                  />
+                {/if}
+              </div>
+            </td>
+            <td>
+              <div class="italic">
+                {login}
+              </div>
+            </td>
+            <td>
+              <div class="flex place-items-center">
+                {displayname}
+              </div>
+            </td>
+            <td>
+              <button class="btn btn-primary" on:click={() => push(`/pm/${id}`)}
+                >Private Message
+              </button>
+            </td>
+            <td>
+              <button
+                class="btn btn-primary"
+                on:click={() => push(`/users/${id}`)}>View Profile</button
+              >
+            </td>
+            <td>
+              <button class="btn btn-secondary" on:click={() => delFriend(id)}
+                >Remove friend</button
+              >
+            </td>
+          </tr>
+        {/await}
+      {/each}
     </tbody>
   </table>
 </div>

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { friends, pendingFriends } from "../stores/settings";
 
 const addFriend = (friendName: string) =>
   axios
@@ -16,21 +17,21 @@ const addFriend = (friendName: string) =>
       status: 1,
     }));
 
-const delFriend = (friendName: string) =>
+const delFriend = (id: number) => {
   axios
     .post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/user/friend/del/${friendName}`,
+      `${import.meta.env.VITE_BACKEND_URI}/api/user/friend/del/${id}`,
       {},
       { withCredentials: true }
     )
-    .then(() => ({
-      message: `Friend request sent to ${friendName} !`,
-      status: 0,
-    }))
-    .catch(({ response }) => ({
-      message: response.data.message,
-      status: 1,
-    }));
+    .then(() => {
+      friends.update((f) => {
+        f.delete(id);
+        return f;
+      });
+    })
+    .catch(console.error);
+};
 
 const getPendingFriendRequests = (): Promise<number[]> =>
   axios
@@ -51,7 +52,17 @@ const acceptFriendRequest = (friendId: number) =>
         withCredentials: true,
       }
     )
-    .then(({ data }) => data)
+    .then(({ data }) => {
+      pendingFriends.update((f) => {
+        f.delete(friendId);
+        return f;
+      });
+      friends.update((f) => {
+        f.add(friendId);
+        return f;
+      });
+      return data;
+    })
     .catch(console.error);
 
 const denyFriendRequest = (friendId: number) =>
@@ -65,12 +76,26 @@ const denyFriendRequest = (friendId: number) =>
         withCredentials: true,
       }
     )
-    .then(({ data }) => data)
+    .then(({ data }) => {
+      pendingFriends.update((f) => {
+        f.delete(friendId);
+        return f;
+      });
+      return data;
+    })
     .catch(console.error);
 
 const getFriendList = () =>
   axios
     .get(`${import.meta.env.VITE_BACKEND_URI}/api/user/friends`, {
+      withCredentials: true,
+    })
+    .then(({ data }) => data)
+    .catch(console.error);
+
+const getBlocks = () =>
+  axios
+    .get(`${import.meta.env.VITE_BACKEND_URI}/api/user/blocks`, {
       withCredentials: true,
     })
     .then(({ data }) => data)
@@ -83,4 +108,5 @@ export {
   acceptFriendRequest,
   denyFriendRequest,
   getFriendList,
+  getBlocks,
 };

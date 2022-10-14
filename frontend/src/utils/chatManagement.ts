@@ -1,6 +1,7 @@
 import type { Socket } from "socket.io-client";
 import { curry } from "ramda";
 import axios from "axios";
+import { blocks } from "../stores/settings";
 
 const muteUser = curry(
   (socket: Socket, channel: string, username: string, expires?: Date) =>
@@ -97,6 +98,12 @@ const blockUser = (id: number) =>
       {},
       { withCredentials: true }
     )
+    .then(() => {
+      blocks.update((b) => {
+        b.add(id);
+        return b;
+      });
+    })
     .catch(console.error);
 
 const unblockUser = (id: number) =>
@@ -106,14 +113,19 @@ const unblockUser = (id: number) =>
       {},
       { withCredentials: true }
     )
+    .then(() => {
+      blocks.update((b) => {
+        b.delete(id);
+        return b;
+      });
+    })
     .catch(console.error);
 
-const getUserPermissions = (uid: number, chan?: string) =>
+const hasAdminRights = (uid: number, chan: string) =>
   axios
-    .get(
-      `${import.meta.env.VITE_BACKEND_URI}/api/chat/perms/${uid}/${chan ?? ""}`,
-      { withCredentials: true }
-    )
+    .get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/perms/${uid}/${chan}`, {
+      withCredentials: true,
+    })
     .then(({ data }) => data)
     .catch(console.error);
 
@@ -129,5 +141,5 @@ export {
   isAdmin,
   blockUser,
   unblockUser,
-  getUserPermissions,
+  hasAdminRights,
 };
