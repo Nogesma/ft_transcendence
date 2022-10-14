@@ -55,6 +55,10 @@
                 on:click={() => {
                   channelName = name;
                   joinChannel();
+                }}
+                on:keypress={() => {
+                  channelName = name;
+                  joinChannel();
                 }}>{name}</label
               >
             {/each}
@@ -90,7 +94,8 @@
             <label
               for="join-modal"
               class="btn btn-active btn-primary"
-              on:click={joinChannel}>Join</label
+              on:click={joinChannel}
+              on:keypress={joinChannel}>Join</label
             >
           </div>
         </div>

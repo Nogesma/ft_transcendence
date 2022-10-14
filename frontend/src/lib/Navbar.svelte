@@ -33,9 +33,10 @@
     <div class="flex-none space-x-4">
       <div class="dropdown dropdown-end">
         <div
-          tabindex="0"
+          tabindex="-1"
           class="btn btn-ghost btn-circle"
           on:click={() => push("/pm")}
+          on:keypress={() => push("/pm")}
         >
           <div class="indicator">
             <Icon data={faMessage} scale={1.5} />
@@ -49,9 +50,10 @@
       </div>
       <div class="dropdown dropdown-end">
         <div
-          tabindex="0"
+          tabindex="-1"
           class="btn btn-ghost btn-circle"
           on:click={() => push("/friends")}
+          on:keypress={() => push("/friends")}
         >
           <div class="indicator">
             <Icon data={faUserGroup} scale={1.8} />
@@ -64,11 +66,11 @@
         </div>
       </div>
       <div class="dropdown dropdown-end">
-        <div tabindex="0" class="btn btn-ghost btn-circle avatar">
+        <div tabindex="-1" class="btn btn-ghost btn-circle avatar">
           <ProfilePic user={$login} attributes="h-10 w-10 rounded-full" />
         </div>
         <ul
-          tabindex="0"
+          tabindex="-1"
           class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
         >
           <li>

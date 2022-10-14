@@ -28,6 +28,7 @@
       for="toggle-2fa"
       class="btn btn-primary modal-button"
       on:click={() => request2FA(tfa_enabled, elem)}
+      on:keypress={() => request2FA(tfa_enabled, elem)}
       >{tfa_enabled ? "Disable" : "Enable"} 2FA</label
     >
   </div>
@@ -50,7 +51,8 @@
           <label
             for="change-displayname"
             class="btn btn-active btn-primary"
-            on:click={() => updateUserName(name)}>Modify</label
+            on:click={() => updateUserName(name)}
+            on:keypress={() => updateUserName(name)}>Modify</label
           >
         </div>
       </div>
@@ -73,14 +75,16 @@
           <label
             for="change-avatar"
             class="btn btn-active btn-primary"
-            on:click={() => resetAvatar(updatepfp)}>Reset avatar</label
+            on:click={() => resetAvatar(updatepfp)}
+            on:keypress={() => resetAvatar(updatepfp)}>Reset avatar</label
           >
         </div>
         <div class="modal-action">
           <label
             for="change-avatar"
             class="btn btn-active btn-primary"
-            on:click={() => uploadAvatar(file, updatepfp)}>Upload</label
+            on:click={() => uploadAvatar(file, updatepfp)}
+            on:keypress={() => uploadAvatar(file, updatepfp)}>Upload</label
           >
         </div>
       </div>

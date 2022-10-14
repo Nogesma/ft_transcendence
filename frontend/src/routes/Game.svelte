@@ -229,7 +229,7 @@
         {#if id1}
           <div class="flex-col">
             {#await getUserInfo(id1) then { login, displayname: name }}
-              <div
+              <button
                 on:click|preventDefault={(e) => openMenu(e, id1)}
                 class="btn btn-ghost btn-circle avatar"
               >
@@ -238,7 +238,7 @@
                 {#await getUserStats(id1) then { elo }}
                   {elo}
                 {/await}
-              </div>
+              </button>
               {#if showMenu === id1}
                 <LeftClickMenu
                   on:click={() => (showMenu = -1)}
@@ -256,7 +256,7 @@
         {#if id2}
           <div class="flex-col">
             {#await getUserInfo(id2) then { login, displayname: name }}
-              <div
+              <button
                 on:click|preventDefault={(e) => openMenu(e, id2)}
                 class="btn btn-ghost btn-circle avatar"
               >
@@ -265,7 +265,7 @@
                 {#await getUserStats(id2) then { elo }}
                   {elo}
                 {/await}
-              </div>
+              </button>
               {#if showMenu === id2}
                 <LeftClickMenu
                   on:clickoutside={() => (showMenu = -1)}
@@ -282,13 +282,13 @@
         Spectators :
         {#each [...spectatorList] as spec}
           {#await getUserInfo(spec) then { login, displayname: name }}
-            <div
+            <button
               on:click|preventDefault={(e) => openMenu(e, spec)}
               class="btn btn-ghost btn-circle avatar"
             >
               <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
               {name}
-            </div>
+            </button>
             {#if showMenu === spec}
               <LeftClickMenu
                 on:clickoutside={() => (showMenu = -1)}

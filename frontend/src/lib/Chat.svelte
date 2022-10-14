@@ -149,13 +149,13 @@
             ? 'justify-end'
             : 'justify-start'} space-x-3 h-fit p-1 static"
         >
-          <div
+          <button
             class="{$id === uid ? 'text-right' : 'text-left'} hover:underline"
             on:contextmenu|preventDefault={(e) => openMenu(e, i)}
             on:click|preventDefault={(e) => openMenu(e, i)}
           >
             {displayname}
-          </div>
+          </button>
 
           {#if i === cardIndex}
             <LeftClickMenu

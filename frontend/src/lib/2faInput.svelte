@@ -103,6 +103,6 @@
   {#if success}
     <label for={modalId} class="btn btn-active btn-primary">OK</label>
   {:else}
-    <div class="btn btn-active btn-primary" on:click={post2FA}>Send</div>
+    <button class="btn btn-active btn-primary" on:click={post2FA}>Send</button>
   {/if}
 </div>

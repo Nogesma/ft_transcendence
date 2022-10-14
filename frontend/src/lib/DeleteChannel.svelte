@@ -38,7 +38,8 @@
             <label
               for="delete-modal"
               class="btn flex-auto mb-4 ml-4"
-              on:click={() => deleteChannel(name)}>{name}</label
+              on:click={() => deleteChannel(name)}
+              on:keypress={() => deleteChannel(name)}>{name}</label
             >
           {/each}
         </div>

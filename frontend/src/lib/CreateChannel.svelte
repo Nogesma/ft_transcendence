@@ -71,7 +71,8 @@
         <label
           for="create-modal"
           class="btn btn-active btn-primary"
-          on:click={createChannel}>Create</label
+          on:click={createChannel}
+          on:keypress={createChannel}>Create</label
         >
       </div>
     </div>

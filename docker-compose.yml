@@ -6,10 +6,10 @@ services:
     build:
       context: frontend
       args:
-        VITE_CLIENT_ID: ba3d391399909e1abe4166962a096cbc7c4f8bb9c55a66e764d63fac14521ffc
-        VITE_REDIRECT_URI: https://localhost 
-        VITE_BACKEND_URI: https://localhost
-        BACKEND_INTERNAL_URI: nestjs:3000
+        VITE_CLIENT_ID: --
+        VITE_REDIRECT_URI: --
+        VITE_BACKEND_URI: --
+        BACKEND_INTERNAL_URI: --
     restart: always
     networks:
       - web

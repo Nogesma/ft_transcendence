@@ -1,5 +1,6 @@
 import { wrap } from "svelte-spa-router/wrap";
 import Home from "./routes/Home.svelte";
+import NotFound from "./routes/404.svelte";
 
 export default {
   "/": Home,
@@ -24,10 +25,8 @@ export default {
   "/chat/:id?": wrap({
     asyncComponent: () => import("./routes/FSChat.svelte"),
   }),
-  "/pm": wrap({
+  "/pm/:id?": wrap({
     asyncComponent: () => import("./routes/PrivateMessage.svelte"),
   }),
-  "*": wrap({
-    asyncComponent: () => import("./routes/404.svelte"),
-  }),
+  "*": NotFound,
 };

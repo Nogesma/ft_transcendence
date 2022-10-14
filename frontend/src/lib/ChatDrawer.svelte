@@ -23,7 +23,10 @@
 </script>
 
 <div class="flex flex-col flex-shrink-0 {showChat ? 'w-96' : ''} rounded">
-  <div class="btn btn-ghost btn-circle" on:click={() => (showChat = !showChat)}>
+  <button
+    class="btn btn-ghost btn-circle"
+    on:click={() => (showChat = !showChat)}
+  >
     <div class="indicator">
       {#if showChat}
         <Icon data={faX} />
@@ -31,7 +34,7 @@
         <Icon data={faArrowRightFromBracket} />
       {/if}
     </div>
-  </div>
+  </button>
 
   {#if showChat}
     <ChannelManager bind:channel bind:messagesList p={false} />
