@@ -12,6 +12,7 @@ import { TFASecretService } from "../../models/TFASecret/TFASecret.service.js";
 import type { User } from "../../models/user/user.model.js";
 import { FriendService } from "../../models/friend/friend.service.js";
 import { BlockService } from "../../models/block/block.service.js";
+import { PmGateway } from "../pm/pm.gateway.js";
 
 @Injectable()
 export class SettingsService {
@@ -20,7 +21,8 @@ export class SettingsService {
     private readonly userService: UserService,
     private readonly tfaSecretService: TFASecretService,
     private readonly friendService: FriendService,
-    private readonly blockService: BlockService
+    private readonly blockService: BlockService,
+    private readonly pmGateway: PmGateway
   ) {}
 
   getUserData = async (user: User) => {
@@ -197,7 +199,10 @@ export class SettingsService {
     }
   };
 
-  acceptFriendRequest = this.friendService.acceptFriendRequest;
+  acceptFriendRequest = (id: number, fid: number) =>
+    this.friendService
+      .acceptFriendRequest(id, fid)
+      .then(() => this.pmGateway.newFriend(fid, id));
 
   denyFriendRequest = this.friendService.delFriend;
 
@@ -210,7 +215,10 @@ export class SettingsService {
         HttpStatus.BAD_REQUEST
       );
 
-    await this.friendService.addFriend(uid, fid).catch(console.error);
+    await this.friendService
+      .addFriend(uid, fid)
+      .then(() => this.pmGateway.newPendingFriendRequest(fid, uid))
+      .catch(console.error);
   };
 
   delFriend = async (uid: number, fid: number) => {
@@ -219,7 +227,10 @@ export class SettingsService {
     if (!isFriend)
       throw new HttpException("User is not a friend.", HttpStatus.BAD_REQUEST);
 
-    await this.friendService.delFriend(uid, fid).catch(console.error);
+    await this.friendService
+      .delFriend(uid, fid)
+      .then(() => this.pmGateway.delFriend(fid, uid))
+      .catch(console.error);
   };
 
   block = this.blockService.blockUser;

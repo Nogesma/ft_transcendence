@@ -6,6 +6,7 @@ import { TFASecretModule } from "../../models/TFASecret/TFASecret.module.js";
 import { ChannelModule } from "../../models/channel/channel.module.js";
 import { FriendModule } from "../../models/friend/friend.module.js";
 import { BlockModule } from "../../models/block/block.module.js";
+import { PmModule } from "../pm/pm.module.js";
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { BlockModule } from "../../models/block/block.module.js";
     ChannelModule,
     FriendModule,
     BlockModule,
+    PmModule,
   ],
   controllers: [SettingsController],
   providers: [SettingsService],

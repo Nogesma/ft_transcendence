@@ -143,4 +143,16 @@ export class PmGateway
       id: handshake.user.id,
     });
   }
+
+  newPendingFriendRequest(id: number, fid: number) {
+    this.server.to(String(id)).emit("newPendingFriendRequest", fid);
+  }
+
+  newFriend(id: number, fid: number) {
+    this.server.to(String(id)).emit("newFriend", fid);
+  }
+
+  delFriend(id: number, fid: number) {
+    this.server.to(String(id)).emit("delFriend", fid);
+  }
 }

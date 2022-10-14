@@ -21,5 +21,6 @@ import { ChannelBanModule } from "../../models/channelBan/channelBan.module.js";
     ChannelBanModule,
   ],
   providers: [PmGateway],
+  exports: [PmGateway],
 })
 export class PmModule {}
