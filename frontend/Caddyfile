@@ -1,8 +1,8 @@
-{$VITE_REDIRECT_URI} {
+{$CADDY_URL} {
 	encode gzip
 	file_server {
 		precompressed br gzip
 	}
-	reverse_proxy /api/* {$BACKEND_INTERNAL_URI} 
-	reverse_proxy /socket.io/* {$BACKEND_INTERNAL_URI} 
+	reverse_proxy /api/* {$BACKEND_INTERNAL_URI}
+	reverse_proxy /socket.io/* {$BACKEND_INTERNAL_URI}
 }

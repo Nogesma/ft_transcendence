@@ -44,4 +44,5 @@ jobs:
             VITE_REDIRECT_URI=${{ secrets.REDIRECT_URI }}
             VITE_CLIENT_ID=${{ secrets.CIENT_ID }}
             VITE_BACKEND_URI=${{ secrets.BACKEND_URI }}
-            BACKEND_INTERNAL_URI=nestjs:3000
+            BACKEND_INTERNAL_URI=${{ secrets.BACKEND_INTERNAL_URI }}
+            CADDY_URL=${{ secrets.CADDY_URL }}

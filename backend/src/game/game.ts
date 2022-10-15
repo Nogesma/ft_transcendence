@@ -12,6 +12,14 @@ type Bar = {
   direction: number;
 };
 
+type Powerup = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  type: number;
+};
+
 type Ball = {
   x: number;
   y: number;
@@ -51,6 +59,8 @@ export class Game {
 
   private currentBallSpeed = this.BALL_SPEED;
   private ball: Ball;
+
+  private powerup?: Powerup;
 
   private readonly gameService: GameService;
 
@@ -208,6 +218,9 @@ export class Game {
       if (this.ball.x < 0) this.p2.score++;
       else this.p1.score++;
 
+      if (this.type) this.powerup = undefined;
+      server.to(this.gameId).emit("powerup", undefined);
+
       server
         .to(this.gameId)
         .emit("updateScore", [this.p1.score, this.p2.score]);
@@ -220,11 +233,24 @@ export class Game {
       // Reset ball and bars to default
       this.resetGameState(this.ball.x < 0);
     }
-    this.handleBarCollision();
+    this.handleBarCollision(server);
+    if (this.type) this.handlePowerupCollision(server);
     this.normalizeSpeed();
   };
 
-  private handleBarCollision = () => {
+  private handlePowerupCollision(server: Server) {
+    if (!this.powerup || this.powerup.x < 0) return;
+    if (this.checkCollision(this.ball, this.powerup)) {
+      const bar = this.ball.dx > 0 ? this.p1.bar : this.p2.bar;
+      if (this.powerup.type === 1) bar.h += 50;
+      else if (this.powerup.type === 2) bar.speed += 100;
+
+      this.powerup.x = -50;
+      server.to(this.gameId).emit("powerup", undefined);
+    }
+  }
+
+  private handleBarCollision = (server: Server) => {
     // Check collision with paddles
     if (this.checkCollision(this.ball, this.p1.bar)) {
       // if dx is positive, we already ran this branch in the last game loop iteration, exit.
@@ -233,6 +259,8 @@ export class Game {
         this.currentBallSpeed += 50;
         this.ball.dx = -this.currentBallSpeed;
       }
+
+      if (this.type && !this.powerup) this.initPowerup(server);
 
       this.ball.dx = -this.ball.dx;
 
@@ -248,6 +276,9 @@ export class Game {
         this.currentBallSpeed += 50;
         this.ball.dx = this.currentBallSpeed;
       }
+
+      if (this.type && !this.powerup) this.initPowerup(server);
+
       this.ball.dx = -this.ball.dx;
       this.ball.dy =
         this.BALL_SPEED *
@@ -256,6 +287,19 @@ export class Game {
         1.7;
     }
   };
+
+  private initPowerup(server: Server) {
+    this.powerup = {
+      x: this.WIDTH / 2,
+      y: this.getRandomSpeed(this.HEIGHT / 2) + this.HEIGHT / 2,
+      w: this.BALL_W,
+      h: this.BALL_H,
+      type: Math.floor(Math.random() * 2 + 1),
+    };
+
+    console.log(this.powerup);
+    server.to(this.gameId).emit("powerup", this.powerup);
+  }
 
   private startGame = (server: Server) => {
     let timestamp = null;
@@ -298,7 +342,7 @@ export class Game {
     this.isFinished = true;
   };
 
-  private checkCollision = (a: Ball, b: Bar) => {
+  private checkCollision = (a: Ball, b: Bar | Powerup) => {
     // left a, right b
     if (a.x > b.x + b.w) return 0;
     // right a, left b

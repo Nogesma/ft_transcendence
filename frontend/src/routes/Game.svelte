@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Ball, Bar, Player } from "../game";
+  import type { Ball, Bar, Player, Powerup } from "../game";
   import { getGameSocket } from "../utils/socket";
   import type { Socket } from "socket.io-client";
   import { id, status, gameId } from "../stores/settings";
@@ -13,6 +13,7 @@
   import LeftClickMenu from "../lib/LeftClickMenu.svelte";
 
   let ball: Ball, p1: Player, p2: Player;
+  let powerup: Powerup | undefined;
 
   let WIDTH = 0,
     HEIGHT = 0;
@@ -89,6 +90,12 @@
     ctx.fillRect(p1.bar.x, p1.bar.y, p1.bar.w, p1.bar.h);
     ctx.fillRect(p2.bar.x, p2.bar.y, p2.bar.w, p2.bar.h);
     ctx.fillRect(ball.x, ball.y, ball.w, ball.h);
+    if (powerup) {
+      if (powerup.type === 1) ctx.fillStyle = "#f00";
+      else if (powerup.type === 2) ctx.fillStyle = "#0f0";
+
+      ctx.fillRect(powerup.x, powerup.y, powerup.w, powerup.h);
+    }
   };
 
   const registerListenners = (s: Socket) => {
@@ -144,6 +151,8 @@
         window.requestAnimationFrame(first);
 
         s.on("gameCountdown", (c: number) => (countdown = c));
+
+        s.on("powerup", (p?: Powerup) => (powerup = p));
 
         s.on("updateScore", (s: [number, number]) => {
           p1.score = s[0];

@@ -22,3 +22,11 @@ export type Player = {
   bar: Bar;
   score: number;
 };
+
+export type Powerup = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  type: number;
+};
