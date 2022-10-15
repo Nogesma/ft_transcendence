@@ -10,6 +10,7 @@ services:
         VITE_REDIRECT_URI: --
         VITE_BACKEND_URI: --
         BACKEND_INTERNAL_URI: --
+        CADDY_URL: --
     restart: always
     networks:
       - web

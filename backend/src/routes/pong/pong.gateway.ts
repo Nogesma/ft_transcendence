@@ -24,7 +24,6 @@ import type { UserHandshake } from "../../types/socket.js";
 export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
-  // we might want to user <elo, {uid, sid}> to do elo based matchmaking?
   // userId, socketId.
   classicQueue = new Map<number, string>();
   modifiedQueue = new Map<number, string>();
@@ -193,13 +192,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
 
     client.leave(gameId);
 
-    if (!game.isPlayer(id)) {
-      game.removeSpectator(client, id);
-    } else {
-      //todo: player chose to leave the game, forfeit immediatly.
-      // unwanted disconnections where the player will have a chance to join again
-      // will be handled in the handleDisconnection function
-    }
+    if (!game.isPlayer(id)) game.removeSpectator(client, id);
   }
 
   @SubscribeMessage("move")
