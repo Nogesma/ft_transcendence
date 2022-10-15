@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getUserData } from "./auth";
 import QRCode from "qrcode";
-import { F, inc } from "ramda";
+import { F, inc, memoizeWith } from "ramda";
 import type { Writable } from "svelte/store";
 
 const resetAvatar = (updatepfp: Writable<number>) =>
@@ -69,4 +69,18 @@ const getTFAStatus = () =>
     .then(({ data }) => data)
     .catch(F);
 
-export { resetAvatar, uploadAvatar, updateUserName, request2FA, getTFAStatus };
+const getProfilePicture = memoizeWith(String, async (u: string) =>
+  axios
+    .head(`/imgs/${u}.jpg`)
+    .then(() => `/imgs/${u}.jpg`)
+    .catch(() => `https://cdn.intra.42.fr/users/${u}.jpg`)
+);
+
+export {
+  resetAvatar,
+  uploadAvatar,
+  updateUserName,
+  request2FA,
+  getTFAStatus,
+  getProfilePicture,
+};

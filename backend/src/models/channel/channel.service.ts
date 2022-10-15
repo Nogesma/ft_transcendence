@@ -30,7 +30,7 @@ export class ChannelService {
   getChannelById = (id: number) => this.channelModel.findByPk(id);
 
   getChannelByName = (name: string) =>
-    this.channelModel.findOne({ where: { name } });
+    this.channelModel.findOne({ where: { name } }).catch(console.error);
 
   getPublicChannels = () =>
     this.channelModel.findAll({ where: { public: true } });

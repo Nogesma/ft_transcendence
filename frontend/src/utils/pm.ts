@@ -1,5 +1,10 @@
 import type { Socket } from "socket.io-client";
-import { pendingPM, privateMessages } from "../stores/settings";
+import {
+  friends,
+  pendingFriends,
+  pendingPM,
+  privateMessages,
+} from "../stores/settings";
 
 const initPM = (socket: Socket) => {
   socket.on("newPM", ({ id, message }) => {
@@ -10,6 +15,27 @@ const initPM = (socket: Socket) => {
       else pm.set(id, [{ message, me: false }]);
 
       return pm;
+    });
+  });
+
+  socket.on("newPendingFriendRequest", (id) => {
+    pendingFriends.update((p) => {
+      p.add(id);
+      return p;
+    });
+  });
+
+  socket.on("newFriend", (id) => {
+    friends.update((f) => {
+      f.add(id);
+      return f;
+    });
+  });
+
+  socket.on("delFriend", (id) => {
+    friends.update((f) => {
+      f.delete(id);
+      return f;
     });
   });
 };

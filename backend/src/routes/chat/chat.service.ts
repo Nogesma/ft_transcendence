@@ -228,36 +228,16 @@ export class ChatService {
   };
 
   getPerms = async (id: number, chan: string, uid: number) => {
-    let admin = false;
-    let friend = false;
-    let block = false;
-
     const channel = await this.channelService.getChannelByName(chan);
-    if (!channel)
-      throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
+    if (channel) {
+      if (id === channel.ownerId) return true;
 
-    if (id === channel.ownerId) {
-      admin = true;
+      const admins = await channel.$get("admin");
+
+      if (admins.find((u) => u.id === id) && !admins.find((u) => u.id === uid))
+        return true;
     }
-    const admins = await channel.$get("admin");
-    if (
-      !admin &&
-      admins.find((u) => u.id === id) &&
-      !admins.find((u) => u.id === uid)
-    )
-      admin = true;
 
-    console.log(id);
-    const user = await this.userService.getUser(id);
-    if (!user)
-      throw new HttpException(
-        "User not found",
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-
-    if ((await user.$get("block")).find((u) => u.id === uid)) block = true;
-    if (await this.friendService.isFriend(id, uid)) friend = true;
-
-    return { admin, friend, block };
+    return false;
   };
 }

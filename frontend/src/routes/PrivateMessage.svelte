@@ -8,7 +8,9 @@
   import { isEmpty } from "ramda";
   import Promise from "bluebird";
 
-  let selectedPmId = 0;
+  import { params, push } from "svelte-spa-router";
+
+  $: selectedPmId = Number($params?.id ?? -1);
 
   let newPmType = "";
   let newPmName = "";
@@ -37,7 +39,16 @@
 
   $: if ($pendingPM > 0) $pendingPM = 0;
 
-  $: currentPm = $privateMessages.get(selectedPmId);
+  let currentPm: { message: string; me: boolean }[] | undefined;
+  $: {
+    currentPm = $privateMessages.get(selectedPmId);
+
+    if (selectedPmId !== -1 && !currentPm) {
+      $privateMessages.set(selectedPmId, []);
+      currentPm = $privateMessages.get(selectedPmId);
+      $privateMessages = $privateMessages;
+    }
+  }
 
   let userInfo = new Map<number, { login: string; displayname: string }>();
 
@@ -71,10 +82,12 @@
       </li>
       {#each [...userInfo] as [id, { login, displayname }]}
         <li class="rounded {id === selectedPmId ? 'bordered' : ''}">
-          <div on:click={() => (selectedPmId = id)}>
-            <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
+          <button on:click={() => push(`/pm/${id}`)}>
+            <div class="avatar h-10 w-10">
+              <ProfilePic user={login} attributes="rounded-full" />
+            </div>
             {displayname}
-          </div>
+          </button>
         </li>
       {/each}
     </ul>
@@ -153,6 +166,11 @@
                     if ($privateMessages.has(id)) return;
                     $privateMessages.set(id, []);
                     $privateMessages = $privateMessages;
+                  }}
+                  on:keypress={() => {
+                    if ($privateMessages.has(id)) return;
+                    $privateMessages.set(id, []);
+                    $privateMessages = $privateMessages;
                   }}>{name}</label
                 >
               {/await}
@@ -198,6 +216,14 @@
               for="join-modal"
               class="btn btn-active btn-primary"
               on:click={async () => {
+                const id = await getUserId(newPmName);
+
+                if (id !== -1) {
+                  $privateMessages.set(id, []);
+                  $privateMessages = $privateMessages;
+                }
+              }}
+              on:keypress={async () => {
                 const id = await getUserId(newPmName);
 
                 if (id !== -1) {

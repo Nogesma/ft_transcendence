@@ -6,9 +6,9 @@
   import { banUser, muteUser } from "../utils/chatManagement.js";
   import { chatSocket } from "../stores/settings.js";
   import { getUserInfo } from "../utils/info.js";
-  import UserCard from "./UserCard.svelte";
-  import ChatMenu from "./ChatMenu.svelte";
+  import RightClickMenu from "./RightClickMenu.svelte";
   import { pick } from "ramda";
+  import LeftClickMenu from "./LeftClickMenu.svelte";
 
   export let channel: string;
   export let p = false;
@@ -108,8 +108,13 @@
 
   const openMenu = (e: MouseEvent, i: number) => {
     pos = pick(["x", "y"])(e);
-    menuIndex = i;
-    cardIndex = -1;
+    if (e.button === 2) {
+      cardIndex = -1;
+      menuIndex = i;
+    } else {
+      menuIndex = -1;
+      cardIndex = i;
+    }
   };
 </script>
 
@@ -138,51 +143,40 @@
     class="mt-6 flex-1 px-4 sm:px-6 bg-gray-600 border border-blue-400 basis-5/6 flex-grow-0"
   >
     {#each messagesList as { displayname, message, login: userLogin, id: uid }, i}
-      <!--            <label tabindex="0" class="" for="unused">{ina + 1}: {displayname}</label>: {message}-->
       <ul class="space-y-2">
-        <!--              TODO -> when others send message justify start-->
-        <!--              <li class="flex justify-start">-->
-        <!--                <div class="relative max-w-xl px-4 py-2 text-gray-700 rounded shadow">-->
-        <!--                  <span class="block">{message}</span>-->
-        <!--                </div>-->
-        <!--              </li>-->
-
         <li
           class="flex {$id === uid
             ? 'justify-end'
             : 'justify-start'} space-x-3 h-fit p-1 static"
         >
-          <div
-            class="dropdown {$id === uid ? 'dropdown-end' : 'dropdown-left'}"
+          <button
+            class="{$id === uid ? 'text-right' : 'text-left'} hover:underline"
+            on:contextmenu|preventDefault={(e) => openMenu(e, i)}
+            on:click|preventDefault={(e) => openMenu(e, i)}
           >
-            <div
-              tabindex="0"
-              class="{$id === uid ? 'text-right' : 'text-left'} hover:underline"
-              on:contextmenu|preventDefault={(e) => openMenu(e, i)}
-              on:click={() => (cardIndex = i)}
-            >
-              {displayname}
-            </div>
+            {displayname}
+          </button>
 
-            <div tabindex="0" class="dropdown-content menu w-80">
-              {#if i === cardIndex}
-                <UserCard id={uid} />
-              {/if}
-            </div>
-            <div
-              class="max-w-xl px-4 py-1 text-gray-700 bg-gray-100 rounded shadow static"
-            >
-              <span class="block inline-block text-center justify-end">
-                {message}
-              </span>
-            </div>
+          {#if i === cardIndex}
+            <LeftClickMenu
+              on:clickoutside={() => (cardIndex = -1)}
+              {uid}
+              {pos}
+              dir={!(p && $id === uid)}
+            />
+          {/if}
+          <div
+            class="max-w-xl px-4 py-1 text-gray-700 bg-gray-100 rounded shadow static"
+          >
+            <span class="block inline-block text-center justify-end">
+              {message}
+            </span>
           </div>
         </li>
       </ul>
 
       {#if i === menuIndex}
-        <ChatMenu
-          on:click={() => (menuIndex = -1)}
+        <RightClickMenu
           on:clickoutside={() => (menuIndex = -1)}
           {pos}
           {uid}

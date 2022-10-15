@@ -55,6 +55,7 @@
           for="username"
           class="btn btn-active btn-primary"
           on:click={() => banUser(channelName, userName)}
+          on:keypress={() => banUser(channelName, userName)}
           >Create
         </label>
       </div>

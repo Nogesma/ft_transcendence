@@ -35,5 +35,11 @@ RUN yarn run build
 
 FROM caddy:2-alpine
 
+ARG VITE_REDIRECT_URI
+ARG BACKEND_INTERNAL_URI 
+
+ENV VITE_REDIRECT_URI=$VITE_REDIRECT_URI
+ENV BACKEND_INTERNAL_URI=$BACKEND_INTERNAL_URI
+
 COPY Caddyfile /etc/caddy/Caddyfile
 COPY --from=builder /build/dist /srv

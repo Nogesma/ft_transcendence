@@ -9,6 +9,7 @@ services:
         VITE_CLIENT_ID: --
         VITE_REDIRECT_URI: --
         VITE_BACKEND_URI: --
+        BACKEND_INTERNAL_URI: --
     restart: always
     networks:
       - web
@@ -31,7 +32,7 @@ services:
     env_file:
       - .env.postgres
 
-  nestjs:
+  backend:
     depends_on:
       - db
     container_name: nestjs

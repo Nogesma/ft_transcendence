@@ -141,7 +141,7 @@ export class ChatController {
     return this.chatService.removeAdmin(req.session.userId, chan, user);
   }
 
-  @Get("perms/:chan/:id")
+  @Get("perms/:id/:chan")
   async getPerms(
     @Req() req: AuthenticatedRequest,
     @Param("chan") chan: string,

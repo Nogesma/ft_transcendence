@@ -1,20 +1,14 @@
 <script lang="ts">
-  import axios from "axios";
   import { login } from "../stores/settings";
   import { pfp } from "../stores/settings.js";
   import { always, cond, equals, T } from "ramda";
-  import fallbackProfilePicture from "../assets/rick.jpg";
+  import fallbackProfilePicture from "/rickroll.gif";
+  import { getProfilePicture } from "../utils/settings";
 
   export let attributes: string;
   // todo: maybe protect from xss in username?
   export let user: string;
   export let status = -1;
-
-  const getProfilePicture = async (u: string) =>
-    axios
-      .head(`/imgs/${u}.jpg`)
-      .then(() => `/imgs/${u}.jpg`)
-      .catch(() => `https://cdn.intra.42.fr/users/${u}.jpg`);
 
   let img: string | Promise<string>;
   // typescript hack because it can't find the type of pfp and img src needs to be a string
