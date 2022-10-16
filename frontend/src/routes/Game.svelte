@@ -177,7 +177,7 @@
 
   const socket = getGameSocket();
 
-  $: $gameId = $params?.id ?? "";
+  $: $gameId = $params?.gameId ?? "";
 
   $: if (!isEmpty($gameId) && !startsWith("custom", $gameId)) {
     registerListenners(socket);

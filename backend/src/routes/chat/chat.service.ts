@@ -3,6 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import * as bcrypt from "bcrypt";
 import { UserService } from "../../models/user/user.service.js";
 import {
+  andThen,
   either,
   ifElse,
   isEmpty,
@@ -159,15 +160,47 @@ export class ChatService {
       );
   };
 
-  is_admin = async (name: string, chan: string) => {
+  is_admin = async (id: number, chan: string) => {
     const channel = await this.channelService.getChannelByName(chan);
-    const user = await this.userService.getUserByLogin(name);
-    if (!user) return;
     if (!channel)
       throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
-    return Boolean(
-      await this.channelAdminService.getAdmin(channel.id, user.id)
+    if (channel.ownerId === id) return 2;
+    return Number(
+      Boolean(await this.channelAdminService.getAdmin(channel.id, id))
     );
+  };
+
+  getAdmins = async (id: number, chan: string) => {
+    const channel = await this.channelService.getChannelByName(chan);
+    if (!channel)
+      throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
+
+    return pipe(
+      () => channel.$get("admin"),
+      andThen(map((x) => prop("id", x.toJSON())))
+    )();
+  };
+
+  getMuted = async (id: number, chan: string) => {
+    const channel = await this.channelService.getChannelByName(chan);
+    if (!channel)
+      throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
+
+    const channelMute = await this.channelBanService.getAllMuted(channel.id);
+    if (!channelMute) return [];
+
+    return map((x) => pick(["user", "expires"], x.toJSON()), channelMute);
+  };
+
+  getBans = async (id: number, chan: string) => {
+    const channel = await this.channelService.getChannelByName(chan);
+    if (!channel)
+      throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
+
+    const channelBans = await this.channelBanService.getAllBanned(channel.id);
+    if (!channelBans) return [];
+
+    return map((x) => pick(["user", "expires"], x.toJSON()), channelBans);
   };
 
   ismuted = async (name: string, chan: string) => {

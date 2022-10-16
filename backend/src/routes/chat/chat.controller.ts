@@ -11,6 +11,7 @@ import {
 import { ChatService } from "./chat.service.js";
 import { MessageBody } from "@nestjs/websockets";
 import type { AuthenticatedRequest } from "../../types/http.js";
+import { isNil } from "ramda";
 
 @Controller("chat")
 export class ChatController {
@@ -33,9 +34,39 @@ export class ChatController {
     return this.chatService.getPublicChannels();
   }
 
-  @Post("isAdmin/:name")
-  async isadmin(@Param("name") name: string, @Body("chan") chan: string) {
-    return this.chatService.is_admin(name, chan);
+  @Get("isAdmin/:chan")
+  async isadmin(@Req() req: AuthenticatedRequest, @Param("chan") chan: string) {
+    if (isNil(chan))
+      throw new HttpException("channel is nil", HttpStatus.BAD_REQUEST);
+
+    return this.chatService.is_admin(req.session.userId, chan);
+  }
+
+  @Get("admins/:chan")
+  async getAdmins(
+    @Req() req: AuthenticatedRequest,
+    @Param("chan") chan: string
+  ) {
+    if (isNil(chan))
+      throw new HttpException("channel is nil", HttpStatus.BAD_REQUEST);
+    return this.chatService.getAdmins(req.session.userId, chan);
+  }
+
+  @Get("muted/:chan")
+  async getMuted(
+    @Req() req: AuthenticatedRequest,
+    @Param("chan") chan: string
+  ) {
+    if (isNil(chan))
+      throw new HttpException("channel is nil", HttpStatus.BAD_REQUEST);
+    return this.chatService.getMuted(req.session.userId, chan);
+  }
+
+  @Get("bans/:chan")
+  async getBans(@Req() req: AuthenticatedRequest, @Param("chan") chan: string) {
+    if (isNil(chan))
+      throw new HttpException("channel is nil", HttpStatus.BAD_REQUEST);
+    return this.chatService.getBans(req.session.userId, chan);
   }
 
   @Post("isMuted/:name")

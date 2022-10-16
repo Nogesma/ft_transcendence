@@ -65,17 +65,11 @@ const isMuted = curry((channel: string, name: string) =>
     .catch(console.error)
 );
 
-const isAdmin = curry((channel: string, name: string) =>
+const isAdmin = curry((channel: string) =>
   axios
-    .post(
-      `${import.meta.env.VITE_BACKEND_URI}/api/chat/isAdmin/${name}`,
-      {
-        chan: channel,
-      },
-      {
-        withCredentials: true,
-      }
-    )
+    .get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/isAdmin/${channel}`, {
+      withCredentials: true,
+    })
     .then(({ data }) => data)
     .catch(console.error)
 );
@@ -132,6 +126,30 @@ const hasAdminRights = (uid: number, chan: string) =>
     .then(({ data }) => data)
     .catch(console.error);
 
+const getAdminList = (chan: string) =>
+  axios
+    .get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/admins/${chan}`, {
+      withCredentials: true,
+    })
+    .then(({ data }) => data)
+    .catch(console.error);
+
+const getMuteList = (chan: string) =>
+  axios
+    .get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/muted/${chan}`, {
+      withCredentials: true,
+    })
+    .then(({ data }) => data)
+    .catch(console.error);
+
+const getBanList = (chan: string) =>
+  axios
+    .get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/muted/${chan}`, {
+      withCredentials: true,
+    })
+    .then(({ data }) => data)
+    .catch(console.error);
+
 export {
   banUser,
   unbanUser,
@@ -145,4 +163,7 @@ export {
   blockUser,
   unblockUser,
   hasAdminRights,
+  getAdminList,
+  getMuteList,
+  getBanList,
 };

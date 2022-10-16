@@ -1,6 +1,5 @@
 <script lang="ts" xmlns="http://www.w3.org/1999/html">
   import { createEventDispatcher } from "svelte";
-  import { fade } from "svelte/transition";
   import { id } from "../stores/settings";
   import { addFriend, delFriend } from "../utils/friend.js";
   import {
@@ -56,7 +55,6 @@
 <svelte:body on:click={onPageClick} />
 {#if $id !== uid}
   <ul
-    transition:fade={{ duration: 100 }}
     bind:this={menu}
     style="top: {pos.y}px; left: {pos.x}px;"
     class="menu p-2 shadow bg-base-100 rounded-box w-52 absolute grid z-40"

@@ -215,7 +215,7 @@
     <button class="btn w-24 m-1" on:click={() => sendInviteC(false)}>
       classic</button
     >
-    {#await isAdmin(channel, $login) then bool}
+    {#await isAdmin(channel) then bool}
       {#if bool}
         <button
           class="btn w-24 m-1"
