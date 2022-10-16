@@ -1567,10 +1567,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^18.8.5":
-  version: 18.8.5
-  resolution: "@types/node@npm:18.8.5"
-  checksum: f7d896f54743178e64c534c6da16f582505acf18904ecd0ee8541cb4bc1d429ba514e7ecfd5145221b71adbd6ae1ff72df082f667e56d056fcd1a719df948e08
+"@types/node@npm:^18.11.0":
+  version: 18.11.0
+  resolution: "@types/node@npm:18.11.0"
+  checksum: f27f899ab428e5732f04fadadc9203f44bdf3abf56474540ee27da90e4f2ba133faf87263cada4d2271955f92ee6a142bd50683c86290fe5070c19aac44fd654
   languageName: node
   linkType: hard
 
@@ -1675,10 +1675,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/validator@npm:^13.7.7":
-  version: 13.7.7
-  resolution: "@types/validator@npm:13.7.7"
-  checksum: e32d2bc3b86317da2dff7565e371a2bd0108cdbd7c0b426070c9b9fab30cf07572eea4fb193cb7420261b2eb99b2fc112bf021d48f98eee181844a47533f817a
+"@types/validator@npm:^13.7.8":
+  version: 13.7.8
+  resolution: "@types/validator@npm:13.7.8"
+  checksum: 69be66c1ec29ef19635d704699622c6745451a109cf73fa536c445e1b172db4b20d1bcc09c4b21f199aa2c37634067150057a1c6371228c5674e50ad82b89e62
   languageName: node
   linkType: hard
 
@@ -2259,14 +2259,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.1.2":
-  version: 1.1.2
-  resolution: "axios@npm:1.1.2"
+"axios@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "axios@npm:1.1.3"
   dependencies:
     follow-redirects: ^1.15.0
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
-  checksum: 136c25a5031aa2845fdbda3006c36888bbe351b11d1195f1f898a23c5df1430febbdb1ad034a61f27967e83762d5b5a3e851fff8a363cb4badeb883f8ff21461
+  checksum: cab3b17bf6092c9387f7023d699db093cfa23650b56c4422cd474d124b78b2e3b5a520f932c330664a58ab85b867b1c25a95cace475ef72d236888c852b84e6d
   languageName: node
   linkType: hard
 
@@ -2367,15 +2367,15 @@ __metadata:
     "@types/express": ^4.17.14
     "@types/jest": 29.1.2
     "@types/joi": ^17.2.3
-    "@types/node": ^18.8.5
+    "@types/node": ^18.11.0
     "@types/ramda": ^0.28.16
     "@types/sequelize": ^4.28.14
     "@types/speakeasy": ^2.0.7
     "@types/supertest": ^2.0.12
-    "@types/validator": ^13.7.7
+    "@types/validator": ^13.7.8
     "@typescript-eslint/eslint-plugin": ^5.40.0
     "@typescript-eslint/parser": ^5.40.0
-    axios: ^1.1.2
+    axios: ^1.1.3
     bcrypt: ^5.1.0
     busboy: ^1.6.0
     cookie-parser: ^1.4.6
@@ -2392,10 +2392,10 @@ __metadata:
     ramda: ^0.28.0
     reflect-metadata: ^0.1.13
     rxjs: ^7.5.7
-    sequelize: ^6.25.1
+    sequelize: ^6.25.2
     sequelize-cli: ^6.5.1
-    sequelize-typescript: ^2.1.3
-    socket.io: ^4.5.2
+    sequelize-typescript: ^2.1.4
+    socket.io: ^4.5.3
     source-map-support: ^0.5.21
     speakeasy: ^2.0.0
     supertest: ^6.3.0
@@ -4202,17 +4202,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:7.2.0":
-  version: 7.2.0
-  resolution: "glob@npm:7.2.0"
+"glob@npm:8.0.3, glob@npm:^8.0.1, glob@npm:^8.0.3":
+  version: 8.0.3
+  resolution: "glob@npm:8.0.3"
   dependencies:
     fs.realpath: ^1.0.0
     inflight: ^1.0.4
     inherits: 2
-    minimatch: ^3.0.4
+    minimatch: ^5.0.1
     once: ^1.3.0
-    path-is-absolute: ^1.0.0
-  checksum: 78a8ea942331f08ed2e055cb5b9e40fe6f46f579d7fd3d694f3412fe5db23223d29b7fee1575440202e9a7ff9a72ab106a39fee39934c7bedafe5e5f8ae20134
+  checksum: 50bcdea19d8e79d8de5f460b1939ffc2b3299eac28deb502093fdca22a78efebc03e66bf54f0abc3d3d07d8134d19a32850288b7440d77e072aa55f9d33b18c5
   languageName: node
   linkType: hard
 
@@ -4227,19 +4226,6 @@ __metadata:
     once: ^1.3.0
     path-is-absolute: ^1.0.0
   checksum: 29452e97b38fa704dabb1d1045350fb2467cf0277e155aa9ff7077e90ad81d1ea9d53d3ee63bd37c05b09a065e90f16aec4a65f5b8de401d1dac40bc5605d133
-  languageName: node
-  linkType: hard
-
-"glob@npm:^8.0.1, glob@npm:^8.0.3":
-  version: 8.0.3
-  resolution: "glob@npm:8.0.3"
-  dependencies:
-    fs.realpath: ^1.0.0
-    inflight: ^1.0.4
-    inherits: 2
-    minimatch: ^5.0.1
-    once: ^1.3.0
-  checksum: 50bcdea19d8e79d8de5f460b1939ffc2b3299eac28deb502093fdca22a78efebc03e66bf54f0abc3d3d07d8134d19a32850288b7440d77e072aa55f9d33b18c5
   languageName: node
   linkType: hard
 
@@ -6964,23 +6950,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sequelize-typescript@npm:^2.1.3":
-  version: 2.1.3
-  resolution: "sequelize-typescript@npm:2.1.3"
+"sequelize-typescript@npm:^2.1.4":
+  version: 2.1.4
+  resolution: "sequelize-typescript@npm:2.1.4"
   dependencies:
-    glob: 7.2.0
+    glob: 8.0.3
   peerDependencies:
     "@types/node": "*"
     "@types/validator": "*"
     reflect-metadata: "*"
-    sequelize: ">=6.8.0"
-  checksum: e6e275760054d432689d6e5003abe86dd6828a0693d567b2516e4cc7f81e0d240f60b49412327b7fffc5af099cb04381cabe8db54ce9f29bde8c748439a4e45e
+    sequelize: ">=6.20.1"
+  checksum: 6852fd513f77e67e51062fef50c1d9e268f2db463fd76a1862fe09d28d3fc4509aea7580054f450aa721e735be62e187a25d8b2044378eacaed52219875ae70b
   languageName: node
   linkType: hard
 
-"sequelize@npm:^6.25.1":
-  version: 6.25.1
-  resolution: "sequelize@npm:6.25.1"
+"sequelize@npm:^6.25.2":
+  version: 6.25.2
+  resolution: "sequelize@npm:6.25.2"
   dependencies:
     "@types/debug": ^4.1.7
     "@types/validator": ^13.7.1
@@ -7017,7 +7003,7 @@ __metadata:
       optional: true
     tedious:
       optional: true
-  checksum: bb44bf6f89e55bdc2ff51f0020207d9ef53d3aea19a0fff9486961be6198e7dc7c47a7e1bd130876434a3c1c67807f698f9f63dedf933cd45d9838f27fd8a86d
+  checksum: 27c7d7c93b70a9566f730a6245fcc912dc381a87fcf735954e962ebc8443b8602a875820f967e875c75cc73638428b7d95b6c5916d0d82099f329d7546e5441f
   languageName: node
   linkType: hard
 
@@ -7148,7 +7134,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"socket.io@npm:4.5.2, socket.io@npm:^4.5.2":
+"socket.io@npm:4.5.2":
   version: 4.5.2
   resolution: "socket.io@npm:4.5.2"
   dependencies:
@@ -7159,6 +7145,20 @@ __metadata:
     socket.io-adapter: ~2.4.0
     socket.io-parser: ~4.2.0
   checksum: 8527dd78fa3cf483a2cf0f09f64c4591186931b6765e5d8456dd3022b8786407952e3b931a83a86513c9f56852442e12f3497c761a113113e32b0c867c5ad5a7
+  languageName: node
+  linkType: hard
+
+"socket.io@npm:^4.5.3":
+  version: 4.5.3
+  resolution: "socket.io@npm:4.5.3"
+  dependencies:
+    accepts: ~1.3.4
+    base64id: ~2.0.0
+    debug: ~4.3.2
+    engine.io: ~6.2.0
+    socket.io-adapter: ~2.4.0
+    socket.io-parser: ~4.2.0
+  checksum: 2a7e4c64bbebb444d211bc66fb8356c14dd0fd4138d31e1781db03fa5a731a3abb7b305fa32cb6c7b57e5ac788601583aad14bea6ff9b8c4ca7b74118ba55f66
   languageName: node
   linkType: hard
 
@@ -7822,21 +7822,21 @@ __metadata:
 
 "typescript@patch:typescript@4.8.3#~builtin<compat/typescript>":
   version: 4.8.3
-  resolution: "typescript@patch:typescript@npm%3A4.8.3#~builtin<compat/typescript>::version=4.8.3&hash=7ad353"
+  resolution: "typescript@patch:typescript@npm%3A4.8.3#~builtin<compat/typescript>::version=4.8.3&hash=701156"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 0404a09c625df01934ef774b45ce1ca57ccae41cd625fcdbb82056715320d9329e70d9d75c2c732ec6ef947444ca978c189a332b71fa21f5c1437d5a83e24906
+  checksum: 2222d2382fb3146089b1d27ce2b55e9d1f99cc64118f1aba75809b693b856c5d3c324f052f60c75b577947fc538bc1c27bad0eb76cbdba9a63a253489504ba7e
   languageName: node
   linkType: hard
 
 "typescript@patch:typescript@^4.8.4#~builtin<compat/typescript>":
   version: 4.8.4
-  resolution: "typescript@patch:typescript@npm%3A4.8.4#~builtin<compat/typescript>::version=4.8.4&hash=7ad353"
+  resolution: "typescript@patch:typescript@npm%3A4.8.4#~builtin<compat/typescript>::version=4.8.4&hash=701156"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 563a0ef47abae6df27a9a3ab38f75fc681f633ccf1a3502b1108e252e187787893de689220f4544aaf95a371a4eb3141e4a337deb9895de5ac3c1ca76430e5f0
+  checksum: 301459fc3eb3b1a38fe91bf96d98eb55da88a9cb17b4ef80b4d105d620f4d547ba776cc27b44cc2ef58b66eda23fe0a74142feb5e79a6fb99f54fc018a696afa
   languageName: node
   linkType: hard
 

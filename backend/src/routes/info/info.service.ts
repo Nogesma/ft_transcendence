@@ -8,6 +8,7 @@ import {
   omit,
   pick,
   pipe,
+  prop,
   when,
 } from "ramda";
 import { ConfigService } from "@nestjs/config";
@@ -58,7 +59,7 @@ export class InfoService {
         () => {
           throw new HttpException("User not found", HttpStatus.NOT_FOUND);
         },
-        (x) => pick(["id"], x.toJSON())
+        (x) => prop("id", x.toJSON())
       )
     )
   );

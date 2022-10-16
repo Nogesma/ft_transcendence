@@ -4,10 +4,10 @@ import NotFound from "./routes/404.svelte";
 
 export default {
   "/": Home,
-  "/users/:id": wrap({
+  "/users/:profileId": wrap({
     asyncComponent: () => import("./routes/users/Profile.svelte"),
   }),
-  "/users/:id/history": wrap({
+  "/users/:historyId/history": wrap({
     asyncComponent: () => import("./routes/users/MatchHistory.svelte"),
   }),
   "/friends": wrap({
@@ -19,14 +19,20 @@ export default {
   "/auth/oauth2callback": wrap({
     asyncComponent: () => import("./routes/auth/Callback.svelte"),
   }),
-  "/game/:id?": wrap({
+  "/game/:gameId?": wrap({
     asyncComponent: () => import("./routes/Game.svelte"),
   }),
-  "/chat/:id?": wrap({
+  "/chat/:channelName?": wrap({
     asyncComponent: () => import("./routes/FSChat.svelte"),
   }),
-  "/pm/:id?": wrap({
+  "/pm/:pmId?": wrap({
     asyncComponent: () => import("./routes/PrivateMessage.svelte"),
   }),
+  "/admin/chat/:adminChannel?": wrap({
+    asyncComponent: () => import("./routes/admin/Channel.svelte"),
+  }),
+  // "/admin/block": wrap({
+  //   asyncComponent: () => import("./routes/.svelte"),
+  // }),
   "*": NotFound,
 };

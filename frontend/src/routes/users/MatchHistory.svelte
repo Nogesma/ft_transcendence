@@ -2,17 +2,17 @@
   import axios from "axios";
   import dayjs from "dayjs";
   import relativeTime from "dayjs/plugin/relativeTime";
-
-  dayjs.extend(relativeTime);
   import ProfilePic from "../../lib/ProfilePic.svelte";
   import { displayname, id, login } from "../../stores/settings.js";
   import { getUserInfo } from "../../utils/info";
   import { pick } from "ramda";
   import LeftClickMenu from "../../lib/LeftClickMenu.svelte";
 
-  export let params: { id: number };
+  dayjs.extend(relativeTime);
 
-  const uid: number = params?.id ?? $id;
+  export let params: { historyId: number };
+
+  const uid: number = params?.historyId ?? $id;
 
   const getUserMatchHistory = () =>
     axios
