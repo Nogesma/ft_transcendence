@@ -38,10 +38,10 @@
   let muteTable: Element;
   let banTable: Element;
   let adminTable: Element;
-  const openMenu = (e: MouseEvent, i: number) => {
+
+  const openMenu = (e: MouseEvent, i: number, table?: Element) => {
     pos = pick(["x", "y"])(e);
 
-    const table = adminTable;
     if (table) {
       const bounds = table.getBoundingClientRect();
       pos.y -= bounds.y;
@@ -76,7 +76,8 @@
                     class="flex flex-row content-center place-items-center space-x-5"
                   >
                     <button
-                      on:click|preventDefault={(e) => openMenu(e, uid)}
+                      on:click|preventDefault={(e) =>
+                        openMenu(e, uid, muteTable)}
                       class="btn btn-ghost btn-circle avatar"
                     >
                       <ProfilePic
@@ -88,7 +89,7 @@
                   {#if showMenu === uid}
                     <LeftClickMenu
                       on:clickoutside={() => (showMenu = -1)}
-                      uid={id}
+                      {uid}
                       {pos}
                     />
                   {/if}
@@ -152,7 +153,8 @@
                     class="flex flex-row content-center place-items-center space-x-5"
                   >
                     <button
-                      on:click|preventDefault={(e) => openMenu(e, uid)}
+                      on:click|preventDefault={(e) =>
+                        openMenu(e, uid, banTable)}
                       class="btn btn-ghost btn-circle avatar"
                     >
                       <ProfilePic
@@ -164,7 +166,7 @@
                   {#if showMenu === uid}
                     <LeftClickMenu
                       on:clickoutside={() => (showMenu = -1)}
-                      uid={id}
+                      {uid}
                       {pos}
                     />
                   {/if}
@@ -232,7 +234,8 @@
                         class="flex flex-row content-center place-items-center space-x-5"
                       >
                         <button
-                          on:click|preventDefault={(e) => openMenu(e, uid)}
+                          on:click|preventDefault={(e) =>
+                            openMenu(e, uid, adminTable)}
                           class="btn btn-ghost btn-circle avatar"
                         >
                           <ProfilePic
@@ -244,7 +247,7 @@
                       {#if showMenu === uid}
                         <LeftClickMenu
                           on:clickoutside={() => (showMenu = -1)}
-                          uid={id}
+                          {uid}
                           {pos}
                         />
                       {/if}
