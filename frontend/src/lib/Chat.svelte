@@ -9,6 +9,7 @@
   import RightClickMenu from "./RightClickMenu.svelte";
   import { pick } from "ramda";
   import LeftClickMenu from "./LeftClickMenu.svelte";
+  import Modal from "./Modal.svelte";
 
   export let channel: string;
   export let p = false;
@@ -22,7 +23,6 @@
     displayname: string;
     id: number;
   }> = [];
-
   const registerListeners = (socket: Socket) => {
     socket.on("newInvite", (event) => (invite = event));
 

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts" xmlns="http://www.w3.org/1999/html">
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
   import { id } from "../stores/settings";
@@ -9,6 +9,8 @@
     unblockUser,
   } from "../utils/chatManagement.js";
   import { blocks, friends } from "../stores/settings.js";
+  import Modal from "./Modal.svelte";
+  import { times } from "svelte-awesome/icons";
 
   export let pos = { x: 0, y: 0 };
   export let uid = 0;
@@ -16,15 +18,17 @@
   export let userLogin = "";
   export let channel = "";
 
-  export let banUser: (userLogin: string) => void;
-  export let muteUser: (userLogin: string) => void;
+  export let banUser: (userLogin: string, time?: Date) => void;
+  export let muteUser: (userLogin: string, time?: Date) => void;
 
   const dispatch = createEventDispatcher();
 
   let menu: HTMLElement;
+  let time: Date | undefined;
+
   const onPageClick = (e: MouseEvent) => {
     if (!menu || e.target === menu || menu.contains(e.target as Node)) return;
-    dispatch("clickoutside");
+    // dispatch("clickoutside");
   };
 
   $: () => {
@@ -37,7 +41,6 @@
 </script>
 
 <svelte:body on:click={onPageClick} />
-
 {#if $id !== uid}
   <ul
     transition:fade={{ duration: 100 }}
@@ -68,14 +71,50 @@
     {#await hasAdminRights(uid, channel) then admin}
       {#if admin}
         <li class="text-red-600">
-          <button on:click={() => banUser(userLogin)}>Ban {displayname}</button>
+          <label for="ban-modal" class="modal-button">Ban {displayname}</label>
+          <!--          <button on:click={() => banUser(userLogin)}>Ban {displayname}</button>-->
         </li>
         <li class="text-red-600">
-          <button on:click={() => muteUser(userLogin)}
-            >Mute {displayname}</button
+          <label for="mute-modal" class="modal-button">Mute {displayname}</label
           >
         </li>
       {/if}
     {/await}
   </ul>
 {/if}
+<Modal id="ban-modal">
+  <svelte:fragment slot="content">
+    <div class="flex flex-col">
+      <h3 class="text-lg font-bold pb-4">End of Ban</h3>
+      <input
+        bind:value={time}
+        type="datetime-local"
+        class="select select-bordered"
+      />
+      <button
+        on:click={() => {
+          banUser(userLogin, time);
+          time = undefined;
+        }}>Confirm {displayname}</button
+      >
+    </div>
+  </svelte:fragment>
+</Modal>
+<Modal id="mute-modal">
+  <svelte:fragment slot="content">
+    <div class="flex flex-col">
+      <h3 class="text-lg font-bold pb-4">End of Mute</h3>
+      <input
+        bind:value={time}
+        type="datetime-local"
+        class="select select-bordered"
+      />
+      <button
+        on:click={() => {
+          muteUser(userLogin, time);
+          time = undefined;
+        }}>Confirm {displayname}</button
+      >
+    </div>
+  </svelte:fragment>
+</Modal>
