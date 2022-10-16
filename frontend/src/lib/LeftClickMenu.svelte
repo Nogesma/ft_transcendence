@@ -1,10 +1,10 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-
+  import { blocks } from "../stores/settings";
   import { getUserInfo } from "../utils/info.js";
   import ProfilePic from "./ProfilePic.svelte";
   import { push } from "svelte-spa-router";
-
+  import { id } from "../stores/settings";
   export let pos = { x: 0, y: 0 };
   export let uid = 0;
   export let dir = true;
@@ -43,6 +43,11 @@
           <button class="btn btn-primary" on:click={() => push(`/users/${uid}`)}
             >View Profile</button
           >
+          {#if !$blocks.has($id)}
+            <button class="btn btn-primary" on:click={() => push(`/pm/${uid}`)}
+              >Send a Private Message</button
+            >
+          {/if}
         </div>
       </div>
     {/await}

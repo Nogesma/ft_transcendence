@@ -229,7 +229,12 @@
 
 <div class="flex flex-row h-full w-full">
   <ChatDrawer />
-
+  {#if player && player.score >= 10}
+    <h2>Victory !</h2>
+  {/if}
+  {#if (player !== p1 && p1.score >= 10) || (player !== p2 && p2.score >= 10)}
+    <h2>Defeat !</h2>
+  {/if}
   {#if isEmpty($gameId) || startsWith("custom", $gameId)}
     <Matchmaking {socket} />
   {:else}

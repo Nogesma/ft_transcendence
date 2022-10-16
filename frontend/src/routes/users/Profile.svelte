@@ -86,18 +86,21 @@
               >
             {/if}
             {#if $blocks.has(uid)}
-              <button class="btn btn-error" on:click={() => unblockUser(uid)}
-                >Unblock</button
+              <button
+                class="btn btn-secondary"
+                on:click={() => unblockUser(uid)}>Unblock</button
               >
             {:else}
-              <button class="btn btn-error" on:click={() => blockUser(uid)}
+              <button class="btn btn-secondary" on:click={() => blockUser(uid)}
                 >Block</button
               >
             {/if}
           {/if}
-          <button class="btn btn-primary" on:click={() => push(`/pm/${uid}`)}
-            >Private Message
-          </button>
+          {#if !$blocks.has($id)}
+            <button class="btn btn-primary" on:click={() => push(`/pm/${uid}`)}
+              >Private Message
+            </button>
+          {/if}
           <button
             class="btn btn-primary"
             on:click={() => push(`/users/${uid}/history`)}

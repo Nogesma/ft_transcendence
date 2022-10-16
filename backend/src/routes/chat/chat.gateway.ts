@@ -227,7 +227,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
       (await this.channelAdminService.getAdmin(channel.id, id));
     if (!isAdmin) return;
 
-    const date = expires ? dayjs(expires, "'YYYY-MM-DD'") : dayjs(0);
+    const date = expires ? dayjs(expires) : dayjs(0);
     const user = await this.userService.getUserByLogin(username);
     if (!user) return;
 
@@ -285,7 +285,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
       (await this.channelAdminService.getAdmin(channel.id, id));
     if (!isAdmin) return;
 
-    const date = expires ? dayjs(expires, "'YYYY-MM-DD'") : dayjs(0);
+    const date = expires ? dayjs(expires) : dayjs(0);
     const user = await this.userService.getUserByLogin(username);
     if (!user) return;
 
