@@ -10,7 +10,7 @@
 
   import { params, push } from "svelte-spa-router";
 
-  $: selectedPmId = Number($params?.id ?? -1);
+  $: selectedPmId = Number($params?.pmId ?? -1);
 
   let newPmType = "";
   let newPmName = "";

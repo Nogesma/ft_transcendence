@@ -5,6 +5,7 @@ import {
   Model,
   PrimaryKey,
   Table,
+  Unique,
 } from "sequelize-typescript";
 import { User } from "../user/user.model.js";
 
@@ -16,10 +17,12 @@ export class Friend extends Model {
   id: number;
 
   @ForeignKey(() => User)
+  @Unique(false)
   @Column
   user: number;
 
   @ForeignKey(() => User)
+  @Unique(false)
   @Column
   friend: number;
 

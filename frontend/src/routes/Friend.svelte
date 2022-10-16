@@ -19,13 +19,14 @@
   let showMenu = -1;
   let pos = { x: 0, y: 0 };
   let table: Element;
+  let pendingTable: Element;
 
   const openMenu = (e: MouseEvent, i: number) => {
     pos = pick(["x", "y"])(e);
 
-    if (table) {
-      const bounds = table.getBoundingClientRect();
-      console.log(bounds);
+    const t = $pendingFriends.has(i) ? pendingTable : table;
+    if (t) {
+      const bounds = t.getBoundingClientRect();
       pos.y -= bounds.y;
       pos.x -= bounds.x;
     }
@@ -94,9 +95,9 @@
 
   {#if $pendingFriends.size !== 0}
     <table class="table table-zebra w-full">
-      <thead>
+      <thead bind:this={pendingTable}>
         <tr>
-          <th colspan="4" class="text-center">Pending friend requests</th>
+          <th colspan="5" class="text-center">Pending friend requests</th>
         </tr>
       </thead>
       <tbody>
@@ -104,13 +105,30 @@
           {#await getUserInfo(id) then { login, displayname }}
             <tr>
               <td>
-                <div class="flex content-center place-items-center space-x-5">
-                  <div class="avatar w-10 h-10">
-                    <ProfilePic attributes="rounded-full" user={login} />
-                  </div>
-                  <div class="italic">
-                    {login}
-                  </div>
+                <div
+                  class="flex flex-row content-center place-items-center space-x-5"
+                >
+                  <button
+                    on:click|preventDefault={(e) => openMenu(e, id)}
+                    class="btn btn-ghost btn-circle avatar"
+                  >
+                    <ProfilePic
+                      attributes="h-10 w-10 rounded-full"
+                      user={login}
+                    />
+                  </button>
+                </div>
+                {#if showMenu === id}
+                  <LeftClickMenu
+                    on:clickoutside={() => (showMenu = -1)}
+                    uid={id}
+                    {pos}
+                  />
+                {/if}
+              </td>
+              <td>
+                <div class="italic">
+                  {login}
                 </div>
               </td>
               <td>
@@ -127,7 +145,7 @@
               <td>
                 <button
                   class="btn btn-error"
-                  on:click={() => denyFriendRequest(id)}>deny</button
+                  on:click={() => denyFriendRequest(id)}>ignore</button
                 >
               </td>
             </tr>
@@ -160,14 +178,14 @@
                     user={login}
                   />
                 </button>
-                {#if showMenu === id}
-                  <LeftClickMenu
-                    on:clickoutside={() => (showMenu = -1)}
-                    uid={id}
-                    {pos}
-                  />
-                {/if}
               </div>
+              {#if showMenu === id}
+                <LeftClickMenu
+                  on:clickoutside={() => (showMenu = -1)}
+                  uid={id}
+                  {pos}
+                />
+              {/if}
             </td>
             <td>
               <div class="italic">
@@ -191,7 +209,7 @@
               >
             </td>
             <td>
-              <button class="btn btn-secondary" on:click={() => delFriend(id)}
+              <button class="btn btn-error" on:click={() => delFriend(id)}
                 >Remove friend</button
               >
             </td>

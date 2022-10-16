@@ -1,6 +1,5 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import { fade } from "svelte/transition";
 
   import { getUserInfo } from "../utils/info.js";
   import ProfilePic from "./ProfilePic.svelte";
@@ -34,7 +33,6 @@
       ? `left: ${pos.x}px;`
       : `right: ${window.innerWidth - pos.x}px`}"
     class="card card-side bg-base-100 shadow absolute z-40"
-    transition:fade={{ duration: 100 }}
   >
     {#await getUserInfo(uid) then { login, displayname, status }}
       <ProfilePic attributes="max-h-56" user={login} {status} />
