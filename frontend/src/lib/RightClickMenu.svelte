@@ -4,15 +4,13 @@
   import { id } from "../stores/settings";
   import { addFriend, delFriend } from "../utils/friend.js";
   import {
-    addAdmin,
     blockUser,
     hasAdminRights,
     unblockUser,
   } from "../utils/chatManagement.js";
   import { blocks, friends } from "../stores/settings.js";
   import Modal from "./Modal.svelte";
-  import { times } from "svelte-awesome/icons";
-
+  import { push } from "svelte-spa-router";
   export let pos = { x: 0, y: 0 };
   export let uid = 0;
   export let displayname = "";
@@ -68,7 +66,6 @@
         <button on:click={() => blockUser(uid)}>Block {displayname}</button>
       </li>
     {/if}
-
     {#await hasAdminRights(uid, channel) then admin}
       {#if admin}
         <li class="text-red-600">
@@ -87,7 +84,12 @@
       {/if}
     {/await}
   </ul>
+{:else}
+  <li class="text-white">
+    <button on:click={() => push("/admin/block")}>Manage Blocks</button>
+  </li>
 {/if}
+
 <Modal id="ban-modal">
   <svelte:fragment slot="content">
     <div class="flex flex-col">

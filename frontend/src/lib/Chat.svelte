@@ -3,13 +3,17 @@
   import { push } from "svelte-spa-router";
   import type { Socket } from "socket.io-client";
   import { acceptInvite, sendInvite } from "../utils/gameInvite.js";
-  import { addAdmin, banUser, muteUser } from "../utils/chatManagement.js";
+  import {
+    addAdmin,
+    banUser,
+    isAdmin,
+    muteUser,
+  } from "../utils/chatManagement.js";
   import { blocks, chatSocket } from "../stores/settings.js";
   import { getUserInfo } from "../utils/info.js";
   import RightClickMenu from "./RightClickMenu.svelte";
   import { pick } from "ramda";
   import LeftClickMenu from "./LeftClickMenu.svelte";
-  import Modal from "./Modal.svelte";
 
   export let channel: string;
   export let p = false;
@@ -211,6 +215,14 @@
     <button class="btn w-24 m-1" on:click={() => sendInviteC(false)}>
       classic</button
     >
+    {#if isAdmin(channel, $login)}
+      <button
+        class="btn w-24 m-1"
+        on:click={() => push(`/admin/chat/${channel}}`)}
+      >
+        Manage channel</button
+      >
+    {/if}
     <button class="btn w-24 m-1" on:click={() => sendInviteC(true)}>
       modified</button
     >
