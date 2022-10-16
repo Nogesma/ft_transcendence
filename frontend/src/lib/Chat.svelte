@@ -4,7 +4,7 @@
   import type { Socket } from "socket.io-client";
   import { acceptInvite, sendInvite } from "../utils/gameInvite.js";
   import { banUser, muteUser } from "../utils/chatManagement.js";
-  import { chatSocket } from "../stores/settings.js";
+  import { blocks, chatSocket } from "../stores/settings.js";
   import { getUserInfo } from "../utils/info.js";
   import RightClickMenu from "./RightClickMenu.svelte";
   import { pick } from "ramda";
@@ -143,38 +143,39 @@
     class="mt-6 flex-1 px-4 sm:px-6 bg-gray-600 border border-blue-400 basis-5/6 flex-grow-0"
   >
     {#each messagesList as { displayname, message, login: userLogin, id: uid }, i}
-      <ul class="space-y-2">
-        <li
-          class="flex {$id === uid
-            ? 'justify-end'
-            : 'justify-start'} space-x-3 h-fit p-1 static"
-        >
-          <button
-            class="{$id === uid ? 'text-right' : 'text-left'} hover:underline"
-            on:contextmenu|preventDefault={(e) => openMenu(e, i)}
-            on:click|preventDefault={(e) => openMenu(e, i)}
+      {#if $blocks.has(uid) === false || $id === uid}
+        <ul class="space-y-2">
+          <li
+            class="flex {$id === uid
+              ? 'justify-end'
+              : 'justify-start'} space-x-3 h-fit p-1 static"
           >
-            {displayname}
-          </button>
+            <button
+              class="{$id === uid ? 'text-right' : 'text-left'} hover:underline"
+              on:contextmenu|preventDefault={(e) => openMenu(e, i)}
+              on:click|preventDefault={(e) => openMenu(e, i)}
+            >
+              {displayname}
+            </button>
 
-          {#if i === cardIndex}
-            <LeftClickMenu
-              on:clickoutside={() => (cardIndex = -1)}
-              {uid}
-              {pos}
-              dir={!(p && $id === uid)}
-            />
-          {/if}
-          <div
-            class="max-w-xl px-4 py-1 text-gray-700 bg-gray-100 rounded shadow static"
-          >
-            <span class="block inline-block text-center justify-end">
-              {message}
-            </span>
-          </div>
-        </li>
-      </ul>
-
+            {#if i === cardIndex}
+              <LeftClickMenu
+                on:clickoutside={() => (cardIndex = -1)}
+                {uid}
+                {pos}
+                dir={!(p && $id === uid)}
+              />
+            {/if}
+            <div
+              class="max-w-xl px-4 py-1 text-gray-700 bg-gray-100 rounded shadow static"
+            >
+              <span class="block inline-block text-center justify-end">
+                {message}
+              </span>
+            </div>
+          </li>
+        </ul>
+      {/if}
       {#if i === menuIndex}
         <RightClickMenu
           on:clickoutside={() => (menuIndex = -1)}
