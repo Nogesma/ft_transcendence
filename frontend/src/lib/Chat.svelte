@@ -175,21 +175,21 @@
             </div>
           </li>
         </ul>
-      {/if}
-      {#if i === menuIndex}
-        <RightClickMenu
-          on:clickoutside={() => (menuIndex = -1)}
-          {pos}
-          {uid}
-          {displayname}
-          {userLogin}
-          {channel}
-          banUser={banUserC}
-          muteUser={muteUserC}
-        />
+        {#if i === menuIndex}
+          <RightClickMenu
+            on:clickoutside={() => (menuIndex = -1)}
+            {pos}
+            {uid}
+            {displayname}
+            {userLogin}
+            {channel}
+            banUser={banUserC}
+            muteUser={muteUserC}
+          />
+        {/if}
       {/if}
     {/each}
-    {#if invite}
+    {#if invite && !$blocks.has(invite.id)}
       <div>
         {invite.displayname} invited you for a {invite.type
           ? "modified"
