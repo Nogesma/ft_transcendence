@@ -3,7 +3,7 @@
   import { push } from "svelte-spa-router";
   import type { Socket } from "socket.io-client";
   import { acceptInvite, sendInvite } from "../utils/gameInvite.js";
-  import { banUser, muteUser } from "../utils/chatManagement.js";
+  import { addAdmin, banUser, muteUser } from "../utils/chatManagement.js";
   import { blocks, chatSocket } from "../stores/settings.js";
   import { getUserInfo } from "../utils/info.js";
   import RightClickMenu from "./RightClickMenu.svelte";
@@ -92,6 +92,7 @@
     msg = "";
   };
 
+  $: addAdminc = addAdmin(channel);
   $: banUserC = banUser($chatSocket, channel);
   $: muteUserC = muteUser($chatSocket, channel);
 
@@ -185,6 +186,7 @@
             {channel}
             banUser={banUserC}
             muteUser={muteUserC}
+            Addadmin={addAdminc}
           />
         {/if}
       {/if}

@@ -4,6 +4,7 @@
   import { id } from "../stores/settings";
   import { addFriend, delFriend } from "../utils/friend.js";
   import {
+    addAdmin,
     blockUser,
     hasAdminRights,
     unblockUser,
@@ -20,7 +21,7 @@
 
   export let banUser: (userLogin: string, time?: Date) => void;
   export let muteUser: (userLogin: string, time?: Date) => void;
-
+  export let Addadmin: (userLogin: string) => void;
   const dispatch = createEventDispatcher();
 
   let menu: HTMLElement;
@@ -78,6 +79,11 @@
           <label for="mute-modal" class="modal-button">Mute {displayname}</label
           >
         </li>
+        <li class="text-white">
+          <button on:click={() => Addadmin(userLogin)}
+            >Add {displayname} as Admin</button
+          >
+        </li>
       {/if}
     {/await}
   </ul>
@@ -85,6 +91,7 @@
 <Modal id="ban-modal">
   <svelte:fragment slot="content">
     <div class="flex flex-col">
+      g
       <h3 class="text-lg font-bold pb-4">End of Ban</h3>
       <input
         bind:value={time}
