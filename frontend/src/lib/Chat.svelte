@@ -96,7 +96,7 @@
     msg = "";
   };
 
-  $: addAdminc = addAdmin(channel);
+  $: addAdminC = addAdmin(channel);
   $: banUserC = banUser($chatSocket, channel);
   $: muteUserC = muteUser($chatSocket, channel);
 
@@ -190,7 +190,7 @@
             {channel}
             banUser={banUserC}
             muteUser={muteUserC}
-            Addadmin={addAdminc}
+            addAdmin={addAdminC}
           />
         {/if}
       {/if}
@@ -215,14 +215,16 @@
     <button class="btn w-24 m-1" on:click={() => sendInviteC(false)}>
       classic</button
     >
-    {#if isAdmin(channel, $login)}
-      <button
-        class="btn w-24 m-1"
-        on:click={() => push(`/admin/chat/${channel}}`)}
-      >
-        Manage channel</button
-      >
-    {/if}
+    {#await isAdmin(channel, $login) then bool}
+      {#if bool}
+        <button
+          class="btn w-24 m-1"
+          on:click={() => push(`/admin/chat/${channel}}`)}
+        >
+          Manage channel</button
+        >
+      {/if}
+    {/await}
     <button class="btn w-24 m-1" on:click={() => sendInviteC(true)}>
       modified</button
     >

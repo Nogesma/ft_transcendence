@@ -4,8 +4,9 @@ import axios from "axios";
 import { blocks } from "../stores/settings";
 
 const muteUser = curry(
-  (socket: Socket, channel: string, username: string, expires?: Date) =>
-    socket.emit("muteUser", { channel, username, expires })
+  (socket: Socket, channel: string, username: string, expires: Date) => {
+    socket.emit("muteUser", { channel, username, expires });
+  }
 );
 
 const unmuteUser = curry((socket: Socket, channel: string, username: string) =>
@@ -13,8 +14,9 @@ const unmuteUser = curry((socket: Socket, channel: string, username: string) =>
 );
 
 const banUser = curry(
-  (socket: Socket, channel: string, username: string, expires?: Date) =>
-    socket.emit("banUser", { channel, username, expires })
+  (socket: Socket, channel: string, username: string, expires: Date) => {
+    socket.emit("banUser", { channel, username, expires });
+  }
 );
 
 const unbanUser = curry((socket: Socket, channel: string, username: string) =>
@@ -74,6 +76,7 @@ const isAdmin = curry((channel: string, name: string) =>
         withCredentials: true,
       }
     )
+    .then(({ data }) => data)
     .catch(console.error)
 );
 

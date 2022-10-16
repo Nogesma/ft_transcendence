@@ -165,7 +165,9 @@ export class ChatService {
     if (!user) return;
     if (!channel)
       throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
-    return await this.channelAdminService.getAdmin(channel.id, user.id);
+    return Boolean(
+      await this.channelAdminService.getAdmin(channel.id, user.id)
+    );
   };
 
   ismuted = async (name: string, chan: string) => {

@@ -10,32 +10,46 @@
   } from "../utils/chatManagement.js";
   import { blocks, friends } from "../stores/settings.js";
   import Modal from "./Modal.svelte";
-  import { push } from "svelte-spa-router";
+  import dayjs from "dayjs";
   export let pos = { x: 0, y: 0 };
   export let uid = 0;
   export let displayname = "";
   export let userLogin = "";
   export let channel = "";
 
-  export let banUser: (userLogin: string, time?: Date) => void;
-  export let muteUser: (userLogin: string, time?: Date) => void;
-  export let Addadmin: (userLogin: string) => void;
+  export let banUser: (username: string, expires: Date) => void;
+  export let muteUser: (username: string, expires: Date) => void;
+  export let addAdmin: (userLogin: string) => void;
+
   const dispatch = createEventDispatcher();
 
   let menu: HTMLElement;
-  let time: Date | undefined;
+  let muteModal: HTMLElement;
+  let banModal: HTMLElement;
+  let muteCheckbox: HTMLElement;
+  let banCheckbox: HTMLElement;
+
+  let time: Date;
+  let infinite = true;
 
   const onPageClick = (e: MouseEvent) => {
     if (!menu || e.target === menu || menu.contains(e.target as Node)) return;
-    // dispatch("clickoutside");
-  };
+    if (!muteCheckbox || e.target === muteCheckbox) return;
+    if (!banCheckbox || e.target === banCheckbox) return;
+    if (
+      !muteModal ||
+      e.target === muteModal ||
+      muteModal.contains(e.target as Node)
+    )
+      return;
+    if (
+      !banModal ||
+      e.target === banModal ||
+      banModal.contains(e.target as Node)
+    )
+      return;
 
-  $: () => {
-    if (!menu) return;
-
-    const rect = menu.getBoundingClientRect();
-    pos.x = Math.min(window.innerWidth - rect.width, pos.x);
-    if (pos.y > window.innerHeight - rect.height) pos.y -= rect.height;
+    dispatch("clickoutside");
   };
 </script>
 
@@ -58,71 +72,89 @@
     {/if}
 
     {#if $blocks.has(uid)}
-      <li class="text-red-600">
+      <li class="text-error">
         <button on:click={() => unblockUser(uid)}>Unblock {displayname}</button>
       </li>
     {:else}
-      <li class="text-red-600">
+      <li class="text-error">
         <button on:click={() => blockUser(uid)}>Block {displayname}</button>
       </li>
     {/if}
     {#await hasAdminRights(uid, channel) then admin}
       {#if admin}
-        <li class="text-red-600">
+        <li class="text-error">
           <label for="ban-modal" class="modal-button">Ban {displayname}</label>
           <!--          <button on:click={() => banUser(userLogin)}>Ban {displayname}</button>-->
         </li>
-        <li class="text-red-600">
+        <li class="text-error">
           <label for="mute-modal" class="modal-button">Mute {displayname}</label
           >
         </li>
-        <li class="text-white">
-          <button on:click={() => Addadmin(userLogin)}
+        <li>
+          <button on:click={() => addAdmin(userLogin)}
             >Add {displayname} as Admin</button
           >
         </li>
       {/if}
     {/await}
   </ul>
-{:else}
-  <li class="text-white">
-    <button on:click={() => push("/admin/block")}>Manage Blocks</button>
-  </li>
 {/if}
 
-<Modal id="ban-modal">
+<Modal
+  bind:inputElement={banCheckbox}
+  bind:modalElement={banModal}
+  id="ban-modal"
+>
   <svelte:fragment slot="content">
-    <div class="flex flex-col">
-      g
-      <h3 class="text-lg font-bold pb-4">End of Ban</h3>
-      <input
-        bind:value={time}
-        type="datetime-local"
-        class="select select-bordered"
-      />
+    <div class="flex flex-col gap-4">
+      <h3 class="text-lg font-bold">End of Ban</h3>
+      <label class="label cursor-pointer">
+        <span class="label-text">Infinite</span>
+        <input type="checkbox" bind:checked={infinite} class="checkbox" />
+      </label>
+      {#if !infinite}
+        <input
+          bind:value={time}
+          type="datetime-local"
+          class="select select-bordered"
+        />
+      {/if}
       <button
+        class="btn btn-error"
         on:click={() => {
-          banUser(userLogin, time);
-          time = undefined;
-        }}>Confirm {displayname}</button
+          banUser(userLogin, infinite ? time : dayjs(0).toDate());
+        }}>Ban {displayname}</button
       >
     </div>
   </svelte:fragment>
 </Modal>
-<Modal id="mute-modal">
+
+<Modal
+  bind:inputElement={muteCheckbox}
+  bind:modalElement={muteModal}
+  id="mute-modal"
+>
   <svelte:fragment slot="content">
-    <div class="flex flex-col">
-      <h3 class="text-lg font-bold pb-4">End of Mute</h3>
-      <input
-        bind:value={time}
-        type="datetime-local"
-        class="select select-bordered"
-      />
+    <div class="flex flex-col gap-4">
+      <h3 class="text-lg font-bold">End of Mute</h3>
+
+      <label class="label cursor-pointer">
+        <span class="label-text">Infinite</span>
+        <input type="checkbox" bind:checked={infinite} class="checkbox" />
+      </label>
+      {#if !infinite}
+        <input
+          bind:value={time}
+          type="datetime-local"
+          class="select select-bordered"
+        />
+      {/if}
+
       <button
+        class="btn-error btn"
         on:click={() => {
-          muteUser(userLogin, time);
-          time = undefined;
-        }}>Confirm {displayname}</button
+          muteUser(userLogin, infinite ? time : dayjs(0).toDate());
+        }}>Mute {displayname}</button
       >
     </div>
   </svelte:fragment>
