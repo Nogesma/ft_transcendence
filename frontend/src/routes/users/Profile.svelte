@@ -93,9 +93,11 @@
             >
           {/if}
         {/if}
-        <button class="btn btn-primary" on:click={() => push(`/pm/${uid}`)}
-          >Private Message
-        </button>
+        {#if !$blocks.has($id)}
+          <button class="btn btn-primary" on:click={() => push(`/pm/${uid}`)}
+            >Private Message
+          </button>
+        {/if}
         <button
           class="btn btn-primary"
           on:click={() => push(`/users/${uid}/history`)}
