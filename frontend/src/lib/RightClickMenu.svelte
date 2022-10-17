@@ -10,6 +10,7 @@
   import { blocks, friends } from "../stores/settings.js";
   import Modal from "./Modal.svelte";
   import dayjs from "dayjs";
+  import { push } from "svelte-spa-router";
   export let pos = { x: 0, y: 0 };
   export let uid = 0;
   export let displayname = "";
@@ -59,8 +60,13 @@
     style="top: {pos.y}px; left: {pos.x}px;"
     class="menu p-2 shadow bg-base-100 rounded-box w-52 absolute grid z-40"
   >
-    {#if $friends.has(uid)}
+    {#if !$blocks.has($id)}
       <li>
+        <button on:click={() => push(`/pm/${uid}`)}>Message</button>
+      </li>
+    {/if}
+    {#if $friends.has(uid)}
+      <li class="text-error">
         <button on:click={() => delFriend(uid)}>Remove friend</button>
       </li>
     {:else}
