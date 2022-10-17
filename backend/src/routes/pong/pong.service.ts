@@ -18,9 +18,9 @@ export class PongService {
   };
 
   disconnectClient = (client: Socket, id: number) =>
-    this.games.forEach((x) =>
-      x.isPlayer(id) ? x.playerDisconnect(id) : x.removeSpectator(client, id)
-    );
+    this.games.forEach((x) => {
+      if (!x.isPlayer(id)) x.removeSpectator(client, id);
+    });
 
   newGame = async (
     gameId: string,

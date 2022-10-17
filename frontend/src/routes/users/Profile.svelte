@@ -18,7 +18,7 @@
 </script>
 
 {#if uid}
-  {#await getUserInfo(uid) then { login: lname, displayname: dname, status, gameId }}
+  {#await getUserInfo(uid) then { login: lname, displayname: dname, status, currentGame: gameId }}
     <div class="hero h-full">
       <div class="hero-content flex-col lg:flex-row justify-evenly w-full">
         <ProfilePic
