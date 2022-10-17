@@ -219,7 +219,7 @@
       {#if bool}
         <button
           class="btn w-24 m-1"
-          on:click={() => push(`/admin/chat/${channel}}`)}
+          on:click={() => push(`/admin/chat/${channel}`)}
         >
           Manage channel</button
         >
