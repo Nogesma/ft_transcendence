@@ -44,7 +44,7 @@ export class Game {
   private interval: NodeJS.Timer | null;
 
   private readonly BAR_W = 10;
-  private readonly BAR_H = 50;
+  private readonly BAR_H = 70;
   private readonly BAR_SPEED = 400;
 
   private readonly BALL_W = 10;
@@ -119,11 +119,6 @@ export class Game {
   });
 
   isPlayer = (id: number) => id === this.p1.id || id === this.p2.id;
-
-  playerDisconnect = (id: number) => {
-    //todo: handle player disconnection, maybe allow him 10s to reconnect?
-    console.log("player disconnected: ", id);
-  };
 
   applyMove = (id: number, dir: number) => {
     if (dir !== -1 && dir !== 0 && dir !== 1) return;
@@ -242,8 +237,8 @@ export class Game {
     if (!this.powerup || this.powerup.x < 0) return;
     if (this.checkCollision(this.ball, this.powerup)) {
       const bar = this.ball.dx > 0 ? this.p1.bar : this.p2.bar;
-      if (this.powerup.type === 1) bar.h += 50;
-      else if (this.powerup.type === 2) bar.speed += 100;
+      if (this.powerup.type === 1) bar.h += 20;
+      else if (this.powerup.type === 2) bar.speed += 150;
 
       this.powerup.x = -50;
       server.to(this.gameId).emit("powerup", undefined);
@@ -290,14 +285,13 @@ export class Game {
 
   private initPowerup(server: Server) {
     this.powerup = {
-      x: this.WIDTH / 2,
+      x: this.WIDTH / 2 - 7,
       y: this.getRandomSpeed(this.HEIGHT / 2) + this.HEIGHT / 2,
-      w: this.BALL_W,
-      h: this.BALL_H,
+      w: this.BALL_W + 10,
+      h: this.BALL_H + 10,
       type: Math.floor(Math.random() * 2 + 1),
     };
 
-    console.log(this.powerup);
     server.to(this.gameId).emit("powerup", this.powerup);
   }
 

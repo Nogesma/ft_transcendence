@@ -157,6 +157,8 @@
         s.on("updateScore", (s: [number, number]) => {
           p1.score = s[0];
           p2.score = s[1];
+          $status = 1;
+          if (p1.score >= 10 || p2.score >= 10) replace("/game");
         });
 
         s.on("newSpectator", (id) => {
@@ -229,14 +231,75 @@
 
 <div class="flex flex-row h-full w-full">
   <ChatDrawer />
-  {#if player && player.score >= 10}
-    <h2>Victory !</h2>
-  {/if}
-  {#if (player !== p1 && p1.score >= 10) || (player !== p2 && p2.score >= 10)}
-    <h2>Defeat !</h2>
-  {/if}
   {#if isEmpty($gameId) || startsWith("custom", $gameId)}
-    <Matchmaking {socket} />
+    <div class="flex flex-col flex-auto">
+      {#if p1 && p2 && (p1.score >= 10 || p2.score >= 10)}
+        <div
+          class="flex flex-auto flex-row gap-8 basis-1/3 justify-center items-center"
+        >
+          {#if id1}
+            <div class="flex-col h-fit">
+              {#await getUserInfo(id1) then { login, displayname: name }}
+                <button
+                  on:click|preventDefault={(e) => openMenu(e, id1)}
+                  class="btn btn-ghost btn-circle avatar"
+                >
+                  <ProfilePic
+                    user={login}
+                    attributes="h-10 w-10 rounded-full"
+                  />
+                  {name}
+                  {#await getUserStats(id1) then { elo }}
+                    {elo}
+                  {/await}
+                </button>
+                {#if showMenu === id1}
+                  <LeftClickMenu
+                    on:click={() => (showMenu = -1)}
+                    on:clickoutside={() => (showMenu = -1)}
+                    uid={id1}
+                    {pos}
+                  />
+                {/if}
+              {/await}
+            </div>
+          {/if}
+          <div class="flex flex-col text-5xl font-bold h-fit text-center gap-5">
+            <div>{p1.score} - {p2.score}</div>
+            <div>{player && player.score >= 10 ? "Victory" : "Defeat"}</div>
+          </div>
+
+          {#if id2}
+            <div class="flex-col h-fit">
+              {#await getUserInfo(id2) then { login, displayname: name }}
+                <button
+                  on:click|preventDefault={(e) => openMenu(e, id2)}
+                  class="btn btn-ghost btn-circle avatar"
+                >
+                  <ProfilePic
+                    user={login}
+                    attributes="h-10 w-10 rounded-full"
+                  />
+                  {name}
+                  {#await getUserStats(id2) then { elo }}
+                    {elo}
+                  {/await}
+                </button>
+                {#if showMenu === id2}
+                  <LeftClickMenu
+                    on:clickoutside={() => (showMenu = -1)}
+                    uid={id2}
+                    {pos}
+                    dir={false}
+                  />
+                {/if}
+              {/await}
+            </div>
+          {/if}
+        </div>
+      {/if}
+      <Matchmaking {socket} />
+    </div>
   {:else}
     <div class="flex flex-auto flex-col" style="height: {HEIGHT}px">
       <div class="flex flex-row flex-auto justify-evenly flex-nowrap">
