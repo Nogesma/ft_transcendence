@@ -76,7 +76,7 @@
   }
 </script>
 
-<div class="hero">
+<div class="hero basis-full">
   <div class="hero-content text-center">
     <div>
       <h1 class="text-5xl font-bold pb-40">Start game !</h1>
