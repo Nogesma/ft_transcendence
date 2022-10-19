@@ -1,18 +1,32 @@
 import type { Socket } from "socket.io-client";
 import {
   friends,
+  id,
+  invite,
   pendingFriends,
   pendingPM,
   privateMessages,
 } from "../stores/settings";
+import type { Message } from "../chat";
+import { push } from "svelte-spa-router";
+import { get } from "svelte/store";
 
 const initPM = (socket: Socket) => {
-  socket.on("newPM", ({ id, message }) => {
+  friends.subscribe((f) => {
+    privateMessages.update((pm) => {
+      f.forEach((i) => {
+        if (!pm.has(i)) pm.set(i, []);
+      });
+      return pm;
+    });
+  });
+
+  socket.on("newPM", (e: Message) => {
     pendingPM.update((n) => n + 1);
     privateMessages.update((pm) => {
-      const m = pm.get(id);
-      if (m) m.push({ message, me: false });
-      else pm.set(id, [{ message, me: false }]);
+      const m = pm.get(e.id);
+      if (m) m.push(e);
+      else pm.set(e.id, [e]);
 
       return pm;
     });
@@ -37,6 +51,17 @@ const initPM = (socket: Socket) => {
       f.delete(id);
       return f;
     });
+  });
+
+  socket.on("newInvite", (event) => {
+    pendingPM.update((n) => n + 1);
+    invite.set(event);
+  });
+
+  socket.on("newCustomGame", ({ p1, p2, type }) => {
+    invite.set(undefined);
+    if (get(id) === p1) push(`#/game/custom.${type}.${p2}`);
+    if (get(id) === p2) push(`#/game/custom.${type}.${p1}`);
   });
 };
 

@@ -9,6 +9,7 @@
   } from "../utils/settings";
   import { displayname, updatepfp } from "../stores/settings.js";
   import TFAInput from "./2faInput.svelte";
+  import { push } from "svelte-spa-router";
 
   let elem: HTMLElement;
   let file: FileList;
@@ -30,6 +31,9 @@
       on:click={() => request2FA(tfa_enabled, elem)}
       on:keypress={() => request2FA(tfa_enabled, elem)}
       >{tfa_enabled ? "Disable" : "Enable"} 2FA</label
+    >
+    <button class="btn btn-primary" on:click={() => push("/admin/block")}
+      >Manage blocks</button
     >
   </div>
 

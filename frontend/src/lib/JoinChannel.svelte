@@ -1,6 +1,9 @@
 <script lang="ts">
   import axios from "axios";
   import Modal from "./Modal.svelte";
+  import { createEventDispatcher } from "svelte";
+
+  const dispatch = createEventDispatcher();
 
   const getPublicChannels = () =>
     axios
@@ -12,7 +15,7 @@
         return { data: [] };
       });
 
-  export const joinChannel = () =>
+  const joinChannel = () =>
     axios
       .post(
         `${import.meta.env.VITE_BACKEND_URI}/api/chat/join/${channelName}`,
@@ -24,7 +27,10 @@
           withCredentials: true,
         }
       )
-      .catch(console.error);
+      .then(() => dispatch("newChannel"))
+      .catch((e) => {
+        alert(e.response.data.message);
+      });
 
   let channelType: string;
   let channelName: string;
