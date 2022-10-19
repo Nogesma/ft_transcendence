@@ -225,9 +225,6 @@ export class ChatService {
   addAdmin = async (oid: number, chan: string, userName: string) => {
     const channel = await this.channelService.getChannelByName(chan);
     const user = await this.userService.getUserByLogin(userName);
-    if (await this.channelAdminService.getAdmin(channel?.id, oid)) {
-      throw new HttpException("User is already admin", HttpStatus.BAD_REQUEST);
-    }
     if (!channel || !user)
       throw new HttpException(
         "Channel or user not found",
@@ -235,10 +232,17 @@ export class ChatService {
       );
 
     if (oid === channel.ownerId) {
+      if (await this.channelAdminService.getAdmin(channel?.id, user.id)) {
+        throw new HttpException(
+          "User is already admin",
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
       await this.channelAdminService.addAdmin(channel.id, user.id);
     } else
       throw new HttpException(
-        "Member can only be banned by an admin",
+        "Member can only be made admin by the owner",
         HttpStatus.FORBIDDEN
       );
   };

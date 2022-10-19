@@ -93,7 +93,7 @@ const getFriendList = () =>
     .then(({ data }) => data)
     .catch(console.error);
 
-const getBlocks = () =>
+const getBlockList = () =>
   axios
     .get(`${import.meta.env.VITE_BACKEND_URI}/api/user/blocks`, {
       withCredentials: true,
@@ -108,5 +108,5 @@ export {
   acceptFriendRequest,
   denyFriendRequest,
   getFriendList,
-  getBlocks,
+  getBlockList,
 };

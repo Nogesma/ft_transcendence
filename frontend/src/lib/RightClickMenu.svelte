@@ -51,6 +51,8 @@
 
     dispatch("clickoutside");
   };
+
+  $: disabled = infinite || time;
 </script>
 
 <svelte:body on:click={onPageClick} />
@@ -123,11 +125,15 @@
           class="select select-bordered"
         />
       {/if}
-      <button
-        class="btn btn-error"
+      <label
+        for="ban-modal"
+        class="btn btn-error {disabled ? '' : 'btn-disabled'}"
         on:click={() => {
-          banUser(userLogin, infinite ? time : dayjs(0).toDate());
-        }}>Ban {displayname}</button
+          banUser(userLogin, infinite ? dayjs(0).toDate() : time);
+        }}
+        on:keypress={() => {
+          banUser(userLogin, infinite ? dayjs(0).toDate() : time);
+        }}>Ban {displayname}</label
       >
     </div>
   </svelte:fragment>
@@ -154,11 +160,15 @@
         />
       {/if}
 
-      <button
-        class="btn-error btn"
+      <label
+        for="mute-modal"
+        class="btn-error btn  {disabled ? '' : 'btn-disabled'}"
         on:click={() => {
-          muteUser(userLogin, infinite ? time : dayjs(0).toDate());
-        }}>Mute {displayname}</button
+          muteUser(userLogin, infinite ? dayjs(0).toDate() : time);
+        }}
+        on:keypress={() => {
+          muteUser(userLogin, infinite ? dayjs(0).toDate() : time);
+        }}>Mute {displayname}</label
       >
     </div>
   </svelte:fragment>

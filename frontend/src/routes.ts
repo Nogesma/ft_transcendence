@@ -31,8 +31,8 @@ export default {
   "/admin/chat/:adminChannel?": wrap({
     asyncComponent: () => import("./routes/admin/Channel.svelte"),
   }),
-  // "/admin/block": wrap({
-  //   asyncComponent: () => import("./routes/.svelte"),
-  // }),
+  "/admin/block": wrap({
+    asyncComponent: () => import("./routes/admin/Block.svelte"),
+  }),
   "*": NotFound,
 };

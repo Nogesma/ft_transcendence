@@ -1,6 +1,6 @@
 <script lang="ts">
   import { displayname, login, id } from "../stores/settings";
-  import { push } from "svelte-spa-router";
+  import { push, replace } from "svelte-spa-router";
   import type { Socket } from "socket.io-client";
   import { acceptInvite, sendInvite } from "../utils/gameInvite.js";
   import {
@@ -14,6 +14,7 @@
   import RightClickMenu from "./RightClickMenu.svelte";
   import { pick } from "ramda";
   import LeftClickMenu from "./LeftClickMenu.svelte";
+  import { onDestroy } from "svelte";
 
   export let channel: string;
   export let p = false;
@@ -74,10 +75,31 @@
       messagesList = messagesList;
       connectedMembers = connectedMembers;
     });
+
+    socket.on("muted", (chan) => {
+      if (channel === chan) {
+        messagesList.push({
+          message: `You have been muted.`,
+          login: "",
+          displayname: "",
+          id: 0,
+        });
+        messagesList = messagesList;
+      }
+    });
+
+    socket.on("banned", (chan) => {
+      if (channel === chan) {
+        alert("You have been banned.");
+        replace("/");
+      }
+    });
   };
 
+  const emitLeave = (socket: Socket) => socket.emit("leaveRooms");
+
   const leaveChat = (socket: Socket) => {
-    socket.emit("leaveRooms");
+    emitLeave(socket);
     p ? push("/chat") : (channel = "");
   };
 
@@ -121,6 +143,8 @@
       cardIndex = i;
     }
   };
+
+  onDestroy(() => emitLeave($chatSocket));
 </script>
 
 <div class="flex flex-col h-full bg-base-200 rounded-md">

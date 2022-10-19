@@ -135,15 +135,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
 
     const date = handshake.muted.get(channel.id);
     if (date) {
-      if (date < new Date()) {
+      const djs = dayjs(date);
+      if (!djs.isSame(dayjs(0)) && djs.isBefore(dayjs())) {
         handshake.muted.set(channel.id, null);
-        // todo: check that remove does what we want
         channel.$remove("ban", handshake.user.id);
       } else {
         client.emit("newMessage", {
           message: "You cannot talk because you are muted",
-          login: "ADMIN",
-          displayname: "ADMIN",
+          login: "",
+          displayname: "",
           id: 0,
         });
         return;
@@ -250,7 +250,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     } else
       await this.channelBanService.banUser(channel.id, user.id, date.toDate());
 
-    // todo: check that it works
     await channel.$remove("member", user);
     if (isUserAdmin)
       await this.channelAdminService.removeAdmin(channel.id, user.id);
@@ -261,6 +260,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     );
 
     if (!userSocket) return;
+    this.server.to(userSocket.id).emit("banned", channelName);
     userSocket.leave(channel.id);
   }
 
@@ -315,6 +315,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     )(sockets);
 
     if (!userSocket) return;
+
+    this.server.to(userSocket.id).emit("muted", channelName);
+
     (userSocket.handshake as ChannelHandshake).muted.set(
       channel.id,
       date.toDate()
