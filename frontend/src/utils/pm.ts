@@ -5,14 +5,24 @@ import {
   pendingPM,
   privateMessages,
 } from "../stores/settings";
+import type { Message } from "../chat";
 
 const initPM = (socket: Socket) => {
-  socket.on("newPM", ({ id, message }) => {
+  friends.subscribe((f) => {
+    privateMessages.update((pm) => {
+      f.forEach((i) => {
+        if (!pm.has(i)) pm.set(i, []);
+      });
+      return pm;
+    });
+  });
+
+  socket.on("newPM", (e: Message) => {
     pendingPM.update((n) => n + 1);
     privateMessages.update((pm) => {
-      const m = pm.get(id);
-      if (m) m.push({ message, me: false });
-      else pm.set(id, [{ message, me: false }]);
+      const m = pm.get(e.id);
+      if (m) m.push(e);
+      else pm.set(e.id, [e]);
 
       return pm;
     });

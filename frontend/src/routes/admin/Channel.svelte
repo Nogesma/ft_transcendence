@@ -2,6 +2,7 @@
   import { isAdmin } from "../../utils/chatManagement";
   import { push, replace } from "svelte-spa-router";
   import {
+    deleteChannel,
     getAdminList,
     getBanList,
     getMuteList,
@@ -17,6 +18,7 @@
   import dayjs from "dayjs";
   import { chatSocket } from "../../stores/settings";
   import { id } from "../../stores/settings.js";
+  import Modal from "../../lib/Modal.svelte";
 
   export let params: { adminChannel: string };
 
@@ -297,6 +299,29 @@
           {/await}
         </tbody>
       </table>
+      <label for="delete-modal" class="btn btn-error modal-button"
+        >Delete channel {name}</label
+      >
     {/if}
   {/if}
 </div>
+
+<Modal id="delete-modal">
+  <svelte:fragment slot="content">
+    <div class="flex flex-col gap-4">
+      <h3 class="text-lg font-bold">Permanentely delete {name}</h3>
+      <label
+        for="delete-modal"
+        class="btn btn-error"
+        on:click={() => {
+          deleteChannel($chatSocket, name);
+          push("/");
+        }}
+        on:keypress={() => {
+          deleteChannel($chatSocket, name);
+          push("/");
+        }}>Confirm</label
+      >
+    </div>
+  </svelte:fragment>
+</Modal>

@@ -24,6 +24,7 @@ import { ChannelAdminService } from "../../models/channelAdmin/channelAdmin.serv
 import type { ChannelHandshake } from "../../types/socket.js";
 import type { Channel } from "../../models/channel/channel.model.js";
 import customParseFormat from "dayjs/plugin/customParseFormat.js";
+import { ChannelService } from "../../models/channel/channel.service.js";
 
 dayjs.extend(customParseFormat);
 
@@ -44,7 +45,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     private readonly userService: UserService,
     private readonly configService: ConfigService<EnvironmentVariables, true>,
     private readonly sessionService: SessionService,
-    private readonly channelAdminService: ChannelAdminService
+    private readonly channelAdminService: ChannelAdminService,
+    private readonly channelService: ChannelService
   ) {}
 
   afterInit() {
@@ -69,19 +71,22 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   }
 
   @SubscribeMessage("joinRoom")
-  handleRoomJoin(
+  async handleRoomJoin(
     @ConnectedSocket() client: Socket,
     @MessageBody("channel") channelName: string
   ) {
     const handshake = client.handshake as ChannelHandshake;
-    const channel: Channel | undefined = find(
-      propEq("name", channelName),
-      handshake.channels as Channel[]
-    );
+
+    const channel = await this.channelService.getChannelByName(channelName);
     if (!channel) {
+      handshake.channels = handshake.channels.filter(
+        (c) => c.name !== channelName
+      );
       this.server.to(client.id).emit("channelInfo", { memberList: null });
       return;
     }
+    if (!find(propEq("name", channelName), handshake.channels as Channel[]))
+      handshake.channels.push(channel);
 
     const { displayname, id } = handshake.user;
 
@@ -384,5 +389,27 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
 
     if (!userSocket) return;
     (userSocket.handshake as ChannelHandshake).muted.set(channel.id, null);
+  }
+
+  @SubscribeMessage("deleteChannel")
+  async handleDelete(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("channel") channelName: string
+  ) {
+    const handshake = client.handshake as ChannelHandshake;
+    const channel: Channel | undefined = find(
+      propEq("name", channelName),
+      handshake.channels as Channel[]
+    );
+    if (!channel) return;
+
+    const id = handshake.user.id;
+
+    if (id !== channel.ownerId) return;
+
+    await this.channelService.deleteChannel(channelName);
+
+    console.log("delete chan");
+    this.server.to(channel.id).emit("channelDeleted");
   }
 }

@@ -1,7 +1,18 @@
 import type { Socket } from "socket.io-client";
-import { curry } from "ramda";
+import { curry, identity } from "ramda";
 import axios from "axios";
 import { blocks } from "../stores/settings";
+
+const getChannels = () =>
+  axios
+    .get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/channels`, {
+      withCredentials: true,
+    })
+    .then(({ data }) => data)
+    .catch((e) => {
+      console.error(e);
+      return [];
+    });
 
 const muteUser = curry(
   (socket: Socket, channel: string, username: string, expires: Date) =>
@@ -20,6 +31,9 @@ const banUser = curry(
 const unbanUser = curry((socket: Socket, channel: string, username: string) =>
   socket.emit("unbanUser", { channel, username })
 );
+
+const deleteChannel = (socket: Socket, channel: string) =>
+  socket.emit("deleteChannel", { channel });
 
 const addAdmin = curry((channel: string, name: string) =>
   axios
@@ -70,7 +84,7 @@ const isAdmin = curry((channel: string) =>
       withCredentials: true,
     })
     .then(({ data }) => data)
-    .catch(console.error)
+    .catch(identity)
 );
 
 const isBanned = curry((channel: string, name: string) =>
@@ -150,6 +164,7 @@ const getBanList = (chan: string) =>
     .catch(console.error);
 
 export {
+  getChannels,
   banUser,
   unbanUser,
   unmuteUser,
@@ -164,5 +179,6 @@ export {
   hasAdminRights,
   getAdminList,
   getMuteList,
+  deleteChannel,
   getBanList,
 };

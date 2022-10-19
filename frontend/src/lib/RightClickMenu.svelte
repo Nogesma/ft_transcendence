@@ -11,11 +11,12 @@
   import Modal from "./Modal.svelte";
   import dayjs from "dayjs";
   import { push } from "svelte-spa-router";
+
   export let pos = { x: 0, y: 0 };
   export let uid = 0;
   export let displayname = "";
   export let userLogin = "";
-  export let channel = "";
+  export let channel: string | undefined;
 
   export let banUser: (username: string, expires: Date) => void;
   export let muteUser: (username: string, expires: Date) => void;
@@ -62,7 +63,7 @@
     style="top: {pos.y}px; left: {pos.x}px;"
     class="menu p-2 shadow bg-base-100 rounded-box w-52 absolute grid z-40"
   >
-    {#if !$blocks.has($id)}
+    {#if channel}
       <li>
         <button on:click={() => push(`/pm/${uid}`)}>Message</button>
       </li>
@@ -77,6 +78,7 @@
       </li>
     {/if}
 
+    <!-- Will probably never happen as the user will not see any message from blocked users -->
     {#if $blocks.has(uid)}
       <li class="text-error">
         <button on:click={() => unblockUser(uid)}>Unblock {displayname}</button>
@@ -86,23 +88,27 @@
         <button on:click={() => blockUser(uid)}>Block {displayname}</button>
       </li>
     {/if}
-    {#await hasAdminRights(uid, channel) then admin}
-      {#if admin}
-        <li class="text-error">
-          <label for="ban-modal" class="modal-button">Ban {displayname}</label>
-          <!--          <button on:click={() => banUser(userLogin)}>Ban {displayname}</button>-->
-        </li>
-        <li class="text-error">
-          <label for="mute-modal" class="modal-button">Mute {displayname}</label
-          >
-        </li>
-        <li>
-          <button on:click={() => addAdmin(userLogin)}
-            >Add {displayname} as Admin</button
-          >
-        </li>
-      {/if}
-    {/await}
+    {#if channel}
+      {#await hasAdminRights(uid, channel) then admin}
+        {#if admin}
+          <li class="text-error">
+            <label for="ban-modal" class="modal-button">Ban {displayname}</label
+            >
+            <!--          <button on:click={() => banUser(userLogin)}>Ban {displayname}</button>-->
+          </li>
+          <li class="text-error">
+            <label for="mute-modal" class="modal-button"
+              >Mute {displayname}</label
+            >
+          </li>
+          <li>
+            <button on:click={() => addAdmin(userLogin)}
+              >Add {displayname} as Admin</button
+            >
+          </li>
+        {/if}
+      {/await}
+    {/if}
   </ul>
 {/if}
 

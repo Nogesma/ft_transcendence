@@ -7,6 +7,7 @@ import {
   getFriendList,
   getPendingFriendRequests,
 } from "../utils/friend";
+import type { MessageList } from "../chat";
 
 const isLoggedIn = writable(false);
 
@@ -36,9 +37,7 @@ const status = writable(1);
 
 const pmSocket = readable(getPmSocket());
 
-const privateMessages = writable(
-  new Map<number, { message: string; me: boolean }[]>()
-);
+const privateMessages = writable(new Map<number, MessageList>());
 
 const pendingPM = writable(0);
 

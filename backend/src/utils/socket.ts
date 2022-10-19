@@ -6,12 +6,11 @@ import { isExpired } from "./date.js";
 import type { SocketRequest } from "../types/http.js";
 import type {
   AuthenticatedHandshake,
-  BlockHandshake,
   ChannelHandshake,
   StatsHandshake,
   UserHandshake,
 } from "../types/socket.js";
-import { forEach, map, prop } from "ramda";
+import { forEach } from "ramda";
 import type { Channel } from "../models/channel/channel.model.js";
 import type { ChannelBanService } from "../models/channelBan/channelBan.service.js";
 
@@ -79,19 +78,6 @@ const addStats = async (
   next();
 };
 
-const addBlock = async (
-  socket: Socket,
-  next: (err?: ExtendedError) => void
-) => {
-  const handshake = socket.handshake as UserHandshake;
-
-  const block = await handshake.user?.$get("blocked_by");
-
-  if (!block) return next(new Error("User does not have block"));
-  (handshake as BlockHandshake).block = new Set(map(prop("id"), block));
-  next();
-};
-
 const socketCookieParser =
   (cookieSecret: string) =>
   (socket: Socket, next: (err?: ExtendedError) => void) =>
@@ -101,11 +87,4 @@ const socketCookieParser =
       next as NextFunction
     );
 
-export {
-  socketAuth,
-  socketCookieParser,
-  addUser,
-  addChannels,
-  addStats,
-  addBlock,
-};
+export { socketAuth, socketCookieParser, addUser, addChannels, addStats };

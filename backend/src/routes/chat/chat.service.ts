@@ -68,6 +68,12 @@ export class ChatService {
       if (!dec)
         throw new HttpException("Wrong password", HttpStatus.UNAUTHORIZED);
     }
+
+    if (await this.channelMemberService.getMember(channel.id, id))
+      throw new HttpException(
+        "You already joined this channel",
+        HttpStatus.BAD_REQUEST
+      );
     await this.channelMemberService.addMember(channel.id, id);
 
     return true;
@@ -78,6 +84,12 @@ export class ChatService {
 
     if (!channel)
       throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
+    if (channel.ownerId === id)
+      throw new HttpException(
+        "You cannot leave a channel you own.",
+        HttpStatus.BAD_REQUEST
+      );
+
     await this.channelMemberService.removeMember(channel.id, id);
 
     return true;
