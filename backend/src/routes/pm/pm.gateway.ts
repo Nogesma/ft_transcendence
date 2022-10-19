@@ -26,6 +26,7 @@ export class PmGateway
 {
   @WebSocketServer()
   server: Server;
+  invites = new Map<number, { id: number; type: boolean }>();
 
   constructor(
     private readonly channelBanService: ChannelBanService,
@@ -90,6 +91,47 @@ export class PmGateway
       displayname: handshake.user.displayname,
       id: handshake.user.id,
     });
+  }
+
+  @SubscribeMessage("sendInvite")
+  handleSendInvite(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("channel") id: number,
+    @MessageBody("type") type: boolean
+  ) {
+    const handshake = client.handshake as UserHandshake;
+    if (isNil(type) || !id || isNaN(id)) return;
+
+    this.invites.set(handshake.user.id, { id: Number(id), type });
+
+    this.server.to(String(id)).emit("newInvite", {
+      id: handshake.user.id,
+      displayname: handshake.user.id,
+      type,
+    });
+  }
+
+  @SubscribeMessage("acceptInvite")
+  handleAcceptInvite(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("id") id: number,
+    @MessageBody("type") type: boolean
+  ) {
+    const handshake = client.handshake as UserHandshake;
+    if (isNil(type) || !id || isNaN(id)) return;
+
+    const invite = this.invites.get(id);
+    if (!invite) return;
+
+    if (invite.id !== handshake.user.id) return;
+    if (invite.type !== type) return;
+
+    this.invites.delete(id);
+
+    this.server
+      .to(String(id))
+      .to(String(handshake.user.id))
+      .emit("newCustomGame", { p1: id, p2: handshake.user.id, type });
   }
 
   newPendingFriendRequest(id: number, fid: number) {

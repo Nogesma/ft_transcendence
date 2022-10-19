@@ -9,6 +9,7 @@
     login,
     displayname,
     id,
+    invite,
   } from "../stores/settings.js";
   import Modal from "../lib/Modal.svelte";
   import axios from "axios";
@@ -18,6 +19,7 @@
   import { params, push } from "svelte-spa-router";
   import type { MessageList } from "../chat";
   import Messages from "../lib/Messages.svelte";
+  import { acceptInvite, sendInvite } from "../utils/gameInvite";
 
   $: selectedPmId = Number($params?.pmId ?? -1);
 
@@ -80,9 +82,10 @@
 
   $: if ($blocks.has(selectedPmId)) push("/pm");
 
-  let invite;
-  let acceptInvite;
   let checkbox: HTMLInputElement;
+
+  $: acceptInviteC = acceptInvite($pmSocket, String(selectedPmId));
+  $: sendInviteC = sendInvite($pmSocket, String(selectedPmId));
 </script>
 
 <div class="flex h-full">
@@ -111,8 +114,9 @@
           messagesList={currentPm}
           p={true}
           sendMessage={sendPrivateMessage}
-          {invite}
-          {acceptInvite}
+          invite={$invite}
+          acceptInvite={acceptInviteC}
+          sendInvite={sendInviteC}
         />
       {:else}
         <div

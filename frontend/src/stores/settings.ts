@@ -37,6 +37,10 @@ const status = writable(1);
 
 const pmSocket = readable(getPmSocket());
 
+const invite: Writable<
+  { id: number; displayname: string; type: boolean } | undefined
+> = writable(undefined);
+
 const privateMessages = writable(new Map<number, MessageList>());
 
 const pendingPM = writable(0);
@@ -67,4 +71,5 @@ export {
   privateMessages,
   friends,
   blocks,
+  invite,
 };

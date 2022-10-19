@@ -163,12 +163,10 @@
     muteUser={muteUserC}
     addAdmin={addAdminC}
     acceptInvite={acceptInviteC}
+    sendInvite={sendInviteC}
   />
 
   <div class="flex max-h-full">
-    <button class="btn w-24 m-1" on:click={() => sendInviteC(false)}>
-      classic</button
-    >
     {#await isAdmin(channel) then bool}
       {#if bool}
         <button
@@ -179,9 +177,6 @@
         >
       {/if}
     {/await}
-    <button class="btn w-24 m-1" on:click={() => sendInviteC(true)}>
-      modified</button
-    >
     <button class="btn w-24 m-1" on:click={() => leaveChat($chatSocket)}>
       leave chat</button
     >

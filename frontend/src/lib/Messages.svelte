@@ -6,15 +6,16 @@
   import type { MessageList } from "../chat";
 
   export let messagesList: MessageList = [];
-  export let p = false;
+  export let p: boolean;
   export let invite:
     | { id: number; type: boolean; displayname: string }
-    | undefined;
-  export let channel: string | undefined;
+    | undefined = undefined;
+  export let channel: string | undefined = undefined;
   export let sendMessage: (message: string) => void;
   export let banUser: (username: string, expires: Date) => void = identity;
   export let muteUser: (username: string, expires: Date) => void = identity;
   export let addAdmin: (userLogin: string) => void = identity;
+  export let sendInvite: (type: boolean) => void;
   export let acceptInvite: ({
     id,
     type,
@@ -136,4 +137,10 @@
       </button>
     </label>
   </form>
+  <button class="btn w-24 m-1" on:click={() => sendInvite(false)}>
+    classic</button
+  >
+  <button class="btn w-24 m-1" on:click={() => sendInvite(true)}>
+    modified</button
+  >
 </div>
