@@ -5,4 +5,6 @@
   $: channel = $params?.channelName ?? "";
 </script>
 
-<ChannelManager {channel} p={true} />
+<div class="flex flex-col p-5 gap-2">
+  <ChannelManager {channel} p={true} />
+</div>

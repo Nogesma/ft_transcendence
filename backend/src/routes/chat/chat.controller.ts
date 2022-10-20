@@ -117,16 +117,16 @@ export class ChatController {
     @Req() req: AuthenticatedRequest,
     @Param("name") name: string,
     @MessageBody("password") password: string,
-    @MessageBody("public") pub: number
+    @MessageBody("type") type: number
   ) {
-    if (!name)
+    if (!name || isNaN(type))
       throw new HttpException(
         "Channel needs to have a name",
         HttpStatus.BAD_REQUEST
       );
     return this.chatService.createChannel(
       name,
-      pub,
+      type,
       password,
       req.session.userId
     );

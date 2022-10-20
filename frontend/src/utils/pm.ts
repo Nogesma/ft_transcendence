@@ -55,11 +55,18 @@ const initPM = (socket: Socket) => {
 
   socket.on("newInvite", (event) => {
     pendingPM.update((n) => n + 1);
-    invite.set(event);
+    invite.update((i) => {
+      i.set(event.id, event);
+      return i;
+    });
   });
 
   socket.on("newCustomGame", ({ p1, p2, type }) => {
-    invite.set(undefined);
+    invite.update((i) => {
+      i.delete(p1);
+      i.delete(p2);
+      return i;
+    });
     if (get(id) === p1) push(`#/game/custom.${type}.${p2}`);
     if (get(id) === p2) push(`#/game/custom.${type}.${p1}`);
   });

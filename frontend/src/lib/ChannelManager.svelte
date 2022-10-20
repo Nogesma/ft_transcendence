@@ -26,7 +26,7 @@
     {#await channelList then data}
       {#each data as { name }}
         <button
-          class="btn m-2"
+          class="btn btn-primary m-2"
           on:click={() => (p ? push(`/chat/${name}`) : (channel = name))}
           >{name}
         </button>
