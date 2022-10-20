@@ -2,8 +2,9 @@
   import axios from "axios";
   import Modal from "./Modal.svelte";
   import { createEventDispatcher } from "svelte";
+  import { isValidName } from "../utils/chatManagement.js";
 
-  let channelPublic = true;
+  let channelType: number;
   let channelName: string;
 
   const dispatch = createEventDispatcher();
@@ -14,7 +15,7 @@
         `${import.meta.env.VITE_BACKEND_URI}/api/chat/create/${channelName}`,
         {
           password: channelPassword,
-          public: channelPublic,
+          type: channelType,
         },
         {
           withCredentials: true,
@@ -24,7 +25,7 @@
       .catch((e) => alert(e.response.data.message));
 
   // Clear password when type changes
-  $: channelPassword = "" && channelPublic;
+  $: channelPassword = "" && channelType !== 1;
 </script>
 
 <label for="create-modal" class="modal-button btn-secondary btn m-2"
@@ -36,6 +37,12 @@
     <div class="flex flex-col space-y-4">
       <h3 class="text-lg font-bold">Create channel</h3>
       <div class="form-control">
+        <select bind:value={channelType} class="select select-bordered">
+          <option disabled selected>Choose channel type</option>
+          <option value={0}>Public</option>
+          <option value={1}>Private</option>
+          <option value={2}>Invite only</option>
+        </select>
         <label class="input-group">
           <span>Name</span>
           <input
@@ -45,19 +52,8 @@
             class="input input-bordered flex-auto"
           />
         </label>
-      </div>
-      <div class="form-control">
-        <label class="label cursor-pointer">
-          <span class="label-text">Public channel</span>
-          <input
-            type="checkbox"
-            bind:checked={channelPublic}
-            class="toggle toggle-primary"
-          />
-        </label>
-      </div>
-      {#if !channelPublic}
-        <div class="form-control">
+
+        {#if channelType === 1}
           <label class="input-group">
             <span>Password</span>
             <input
@@ -67,12 +63,14 @@
               class="input input-bordered flex-auto"
             />
           </label>
-        </div>
-      {/if}
+        {/if}
+      </div>
       <div class="modal-action">
         <label
           for="create-modal"
-          class="btn btn-active btn-primary"
+          class="btn btn-active btn-primary {isValidName(channelName)
+            ? ''
+            : 'btn-disabled'}"
           on:click={createChannel}
           on:keypress={createChannel}>Create</label
         >

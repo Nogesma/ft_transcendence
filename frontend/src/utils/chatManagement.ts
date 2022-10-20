@@ -1,5 +1,5 @@
 import type { Socket } from "socket.io-client";
-import { curry, identity } from "ramda";
+import { curry, identity, isEmpty, isNil, not } from "ramda";
 import axios from "axios";
 import { blocks } from "../stores/settings";
 
@@ -163,6 +163,13 @@ const getBanList = (chan: string) =>
     .then(({ data }) => data)
     .catch(console.error);
 
+const isValidName = (name?: string): boolean =>
+  not(
+    isNil(name) ||
+      isEmpty(name) ||
+      name.split("").some((c) => "?\\/#".includes(c))
+  );
+
 export {
   getChannels,
   banUser,
@@ -181,4 +188,5 @@ export {
   getMuteList,
   deleteChannel,
   getBanList,
+  isValidName,
 };

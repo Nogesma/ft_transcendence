@@ -64,6 +64,11 @@ export class ChatService {
     }
 
     if (!channel.public) {
+      if (isEmpty(channel.password))
+        throw new HttpException(
+          "Channel is invite only",
+          HttpStatus.UNAUTHORIZED
+        );
       const dec = await bcrypt.compare(password, channel.password);
       if (!dec)
         throw new HttpException("Wrong password", HttpStatus.UNAUTHORIZED);
@@ -131,20 +136,28 @@ export class ChatService {
 
   createChannel = async (
     name: string,
-    pub: boolean,
+    pub: number,
     password: string,
     id: number
   ) => {
-    if (isEmpty(name) || name.match(/^\d/))
+    if (isEmpty(name) || name.split("").some((c) => "?\\/#".includes(c)))
       throw new HttpException(
-        "Channel name can not start with a digit",
+        "Channel name can't be empty, or contain theses characters `?\\/#`",
         HttpStatus.BAD_REQUEST
       );
 
     if (await this.channelService.getChannelByName(name))
       throw new HttpException("Channel already exist", HttpStatus.BAD_REQUEST);
 
-    const channel = await this.newChannel({ name, pub, ownerId: id, password });
+    if (pub !== 1) password = "";
+    const isPub = pub === 0;
+
+    const channel = await this.newChannel({
+      name,
+      pub: isPub,
+      ownerId: id,
+      password,
+    });
 
     if (!channel) {
       throw new HttpException(
@@ -290,5 +303,84 @@ export class ChatService {
     }
 
     return false;
+  };
+
+  changeOwner = async (id: number, chan: string, owner: number) => {
+    const channel = await this.channelService.getChannelByName(chan);
+    const user = await this.userService.getUser(owner);
+
+    if (!channel || !user)
+      throw new HttpException(
+        "Channel or user not found",
+        HttpStatus.BAD_REQUEST
+      );
+
+    if (id !== channel.ownerId)
+      throw new HttpException(
+        "This action can only be performed by the owner of the channel",
+        HttpStatus.FORBIDDEN
+      );
+
+    channel.ownerId = owner;
+    await channel.save();
+  };
+
+  getType = async (chan: string) => {
+    const channel = await this.channelService.getChannelByName(chan);
+    if (!channel)
+      throw new HttpException(
+        "Channel or user not found",
+        HttpStatus.BAD_REQUEST
+      );
+    if (channel.public) return 0;
+    if (isEmpty(channel.password)) return 2;
+    return 1;
+  };
+
+  changeType = async (
+    id: number,
+    chan: string,
+    type: number,
+    password: string
+  ) => {
+    const channel = await this.channelService.getChannelByName(chan);
+    if (!channel)
+      throw new HttpException("Channel not found", HttpStatus.BAD_REQUEST);
+
+    if (channel.ownerId !== id)
+      throw new HttpException(
+        "This action can only be performed by the owner of the channel",
+        HttpStatus.FORBIDDEN
+      );
+
+    if (type !== 1) channel.password = "";
+    else channel.password = bcrypt.hashSync(password, 10);
+    channel.public = type === 0;
+
+    await channel.save();
+  };
+
+  addUser = async (id: number, chan: string, uid: number) => {
+    const channel = await this.channelService.getChannelByName(chan);
+    const user = await this.userService.getUser(uid);
+    if (!channel || !user)
+      throw new HttpException(
+        "Channel or user not found",
+        HttpStatus.BAD_REQUEST
+      );
+
+    if (channel.ownerId !== id)
+      throw new HttpException(
+        "This action can only be performed by the owner of the channel",
+        HttpStatus.FORBIDDEN
+      );
+
+    if (await this.channelMemberService.getMember(channel.id, uid))
+      throw new HttpException(
+        "User already in channel",
+        HttpStatus.BAD_REQUEST
+      );
+
+    await this.channelMemberService.addMember(channel.id, uid);
   };
 }
