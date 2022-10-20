@@ -22,7 +22,7 @@
   onDestroy(() => $chatSocket.emit("leaveRooms"));
 </script>
 
-<div class="flex w-fit flex-col flex-shrink-0 {showChat ? 'w-96 bg-secondary' : ''} rounded">
+<div class="flex w-max flex-col flex-shrink-0 {showChat ? 'w-96 bg-secondary' : ''} rounded">
   <button
     class="btn btn-ghost btn-circle"
     on:click={() => (showChat = !showChat)}

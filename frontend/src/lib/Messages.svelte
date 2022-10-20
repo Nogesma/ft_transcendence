@@ -110,6 +110,7 @@
 </div>
 
 <div class="flex rounded p-2">
+
   <form
     class="form-control"
     on:submit|preventDefault={() => {
@@ -137,9 +138,13 @@
       </button>
     </label>
   </form>
-<!--  <button class="btn w-24 m-1" on:click={() => sendInvite(false)}>-->
-<!--    classic</button-->
-<!--  >-->
-<!--  <button class="btn w-24 m-1" on:click={() => sendInvite(true)}>-->
-<!--    modified</button-->
+
 </div>
+
+<div class="flex">
+  <button class="btn w-24 m-1" on:click={() => sendInvite(false)}>
+    classic</button>
+  <button class="btn w-24 m-1" on:click={() => sendInvite(true)}>
+    modified</button>
+</div>
+

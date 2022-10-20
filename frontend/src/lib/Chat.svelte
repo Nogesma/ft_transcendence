@@ -166,7 +166,7 @@
     sendInvite={sendInviteC}
   />
 
-  <div class="flex max-h-full">
+  <div class="flex">
     {#await isAdmin(channel) then bool}
       {#if bool}
         <button
@@ -181,10 +181,5 @@
     <button class="btn w-24 m-1" on:click={() => leaveChat($chatSocket)}>
       leave chat</button
     >
-    <button class="btn w-24 m-1" on:click={() => sendInvite(false)}>
-      classic</button
-    >
-    <button class="btn w-24 m-1" on:click={() => sendInvite(true)}>
-      modified</button>
   </div>
 </div>
