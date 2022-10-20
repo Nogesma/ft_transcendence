@@ -32,7 +32,7 @@
   {#await getChannels() then { data }}
     {#each data as { name }}
       <button
-        class="btn m-2"
+        class="btn m-2 btn-primary"
         on:click={() => (p ? push(`/chat/${name}`) : (channel = name))}
         >{name}
       </button>

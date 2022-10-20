@@ -27,7 +27,7 @@
   $: channelPassword = "" && channelPublic;
 </script>
 
-<label for="create-modal" class="modal-button btn m-2">Create Channel</label>
+<label for="create-modal" class="modal-button btn-secondary btn m-2">Create Channel</label>
 
 <Modal id="create-modal">
   <svelte:fragment slot="content">

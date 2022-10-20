@@ -123,15 +123,15 @@
   };
 </script>
 
-<div class="flex flex-col h-full bg-base-200 rounded-md">
+<div class="flex flex-col h-80 base-100 rounded-md">
   <div class="px-4 sm:px-6">
-    <h2 class="text-lg font-medium text-gray-900" id="slide-over-title">
+    <h2 class="text-lg font-medium text-gray-400" id="slide-over-title">
       {channel}
     </h2>
   </div>
   <span>Active users:</span>
   <div
-    class="flex flex-auto justify-left origin-center h-6 border border-green-400"
+    class="flex flex-auto justify-left origin-center h-6 border border-primary"
   >
     {#each [...connectedMembers.values()] as spec}
       <li>
@@ -144,115 +144,162 @@
     {/each}
   </div>
 
-  <div
-    class="mt-6 flex-1 px-4 sm:px-6 bg-gray-600 border border-blue-400 basis-5/6 flex-grow-0"
-  >
-    {#each messagesList as { displayname, message, login: userLogin, id: uid }, i}
-      {#if $blocks.has(uid) === false || $id === uid}
-        <ul class="space-y-2">
-          <li
-            class="flex {$id === uid
+  <div class="overflow-scroll h-full">
+    <div
+            class="mt-6 flex-1 px-4 sm:px-6 base-100 border border-primary basis-5/6 flex-grow-0"
+    >
+      {#each messagesList as { displayname, message, login: userLogin, id: uid }, i}
+        {#if $blocks.has(uid) === false || $id === uid}
+          <ul class="space-y-2">
+            <li
+                    class="flex {$id === uid
               ? 'justify-end'
               : 'justify-start'} space-x-3 h-fit p-1 static"
-          >
-            <button
-              class="{$id === uid ? 'text-right' : 'text-left'} hover:underline"
-              on:contextmenu|preventDefault={(e) => openMenu(e, i)}
-              on:click|preventDefault={(e) => openMenu(e, i)}
             >
-              {displayname}
-            </button>
+              <button
+                      class="{$id === uid ? 'text-right' : 'text-left'} hover:underline"
+                      on:contextmenu|preventDefault={(e) => openMenu(e, i)}
+                      on:click|preventDefault={(e) => openMenu(e, i)}
+              >
+                {displayname}
+              </button>
 
-            {#if i === cardIndex}
-              <LeftClickMenu
-                on:clickoutside={() => (cardIndex = -1)}
-                {uid}
-                {pos}
-                dir={!(p && $id === uid)}
-              />
-            {/if}
-            <div
-              class="max-w-xl px-4 py-1 text-gray-700 bg-gray-100 rounded shadow static"
-            >
+              {#if i === cardIndex}
+                <LeftClickMenu
+                        on:clickoutside={() => (cardIndex = -1)}
+                        {uid}
+                        {pos}
+                        dir={!(p && $id === uid)}
+                />
+              {/if}
+              <div
+                      class="max-w-xl px-4 py-1 text-gray-700 bg-gray-100 rounded shadow static"
+              >
               <span class="block inline-block text-center justify-end">
                 {message}
               </span>
-            </div>
-          </li>
-        </ul>
-        {#if i === menuIndex}
-          <RightClickMenu
-            on:clickoutside={() => (menuIndex = -1)}
-            {pos}
-            {uid}
-            {displayname}
-            {userLogin}
-            {channel}
-            banUser={banUserC}
-            muteUser={muteUserC}
-            addAdmin={addAdminC}
-          />
+              </div>
+            </li>
+          </ul>
+          {#if i === menuIndex}
+            <RightClickMenu
+                    on:clickoutside={() => (menuIndex = -1)}
+                    {pos}
+                    {uid}
+                    {displayname}
+                    {userLogin}
+                    {channel}
+                    banUser={banUserC}
+                    muteUser={muteUserC}
+                    addAdmin={addAdminC}
+            />
+          {/if}
         {/if}
-      {/if}
-    {/each}
-    {#if invite && !$blocks.has(invite.id)}
-      <div>
-        {invite.displayname} invited you for a {invite.type
-          ? "modified"
-          : "classic"} pong game!
-        <button
-          class="btn {invite.id === $id ? 'btn-disabled' : ''}"
-          on:click={() => {
+      {/each}
+      {#if invite && !$blocks.has(invite.id)}
+        <div>
+          {invite.displayname} invited you for a {invite.type
+                ? "modified"
+                : "classic"} pong game!
+          <button
+                  class="btn {invite.id === $id ? 'btn-disabled' : ''}"
+                  on:click={() => {
             if (invite) acceptInviteC(invite);
           }}
-        >
-          Accept
-        </button>
-      </div>
-    {/if}
+          >
+            Accept
+          </button>
+        </div>
+      {/if}
+    </div>
+
   </div>
   <div class="flex">
-    <button class="btn w-24 m-1" on:click={() => sendInviteC(false)}>
+    <button class="btn-secondary rounded w-24 m-1" on:click={() => sendInviteC(false)}>
       classic</button
     >
     {#await isAdmin(channel) then bool}
       {#if bool}
         <button
-          class="btn w-24 m-1"
-          on:click={() => push(`/admin/chat/${channel}`)}
+                class="btn-secondary rounded w-24 m-1"
+                on:click={() => push(`/admin/chat/${channel}`)}
         >
           Manage channel</button
         >
       {/if}
     {/await}
-    <button class="btn w-24 m-1" on:click={() => sendInviteC(true)}>
+    <button class="btn-secondary rounded w-24 m-1" on:click={() => sendInviteC(true)}>
       modified</button
     >
-    <button class="btn w-24 m-1" on:click={() => leaveChat($chatSocket)}>
+    <button class="btn-secondary rounded w-24 m-1" on:click={() => leaveChat($chatSocket)}>
       leave chat</button
     >
   </div>
-  <div class="flex rounded bg-base-200 p-2">
-    <form class="form-control" on:submit|preventDefault={sendmsg}>
-      <label class="input-group">
-        <input
-          bind:value={msg}
-          type="text"
-          class="input bg-base-200 w-96 h-6"
-        />
-        <button type="submit">
-          <svg
-            class="w-5 h-5 text-gray-500 origin-center transform rotate-90"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"
-            />
-          </svg>
-        </button>
-      </label>
-    </form>
-  </div>
+    <div class="flex rounded base-100 p-2">
+      <form class="form-control" on:submit|preventDefault={sendmsg}>
+        <label class="input-group">
+          <input
+                  bind:value={msg}
+                  type="text"
+                  class="input border-primary rounded w-96 h-6"
+          />
+          <button type="submit">
+            <svg
+                    class="w-5 h-5 text-primary origin-center transform rotate-90"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+            >
+              <path
+                      d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"
+              />
+            </svg>
+          </button>
+        </label>
+      </form>
+    </div>
+
 </div>
+
+
+<!--*{-->
+<!--        margin: 0;-->
+<!--        padding: 0;-->
+<!--}-->
+<!--div{-->
+<!--        background-color: aquamarine;-->
+<!--        border: 1px solid black;-->
+<!--}-->
+<!--body{-->
+<!--        display: flex;-->
+<!--        flex-direction:column;-->
+<!--        gap: 2em;-->
+<!--}-->
+<!--body >div{-->
+<!--        flex:1;-->
+<!--}-->
+<!--.div3-->
+<!--{-->
+<!--        overflow:scroll;-->
+<!--}-->
+<!--body{-->
+<!--        height: 100vh;-->
+<!--}-->
+
+<!--<!DOCTYPE html>-->
+<!--<html>-->
+<!--<head>-->
+<!--  <link rel = "stylesheet" href="./style.css" type="text/css">-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="div1">-->
+
+<!--</div>-->
+<!--<div class="div2">-->
+
+<!--</div>-->
+<!--<div class="div3" contenteditable="true">-->
+
+<!--</div>-->
+<!--</body>-->
+<!--</html>-->
