@@ -3,10 +3,11 @@ import axios from "axios";
 import { isEmpty, not } from "ramda";
 import { getChatSocket, getPmSocket } from "../utils/socket";
 import {
-  getBlocks,
+  getBlockList,
   getFriendList,
   getPendingFriendRequests,
 } from "../utils/friend";
+import type { MessageList } from "../chat";
 
 const isLoggedIn = writable(false);
 
@@ -36,9 +37,11 @@ const status = writable(1);
 
 const pmSocket = readable(getPmSocket());
 
-const privateMessages = writable(
-  new Map<number, { message: string; me: boolean }[]>()
-);
+const invite: Writable<
+  { id: number; displayname: string; type: boolean } | undefined
+> = writable(undefined);
+
+const privateMessages = writable(new Map<number, MessageList>());
 
 const pendingPM = writable(0);
 
@@ -49,7 +52,7 @@ const friends: Writable<Set<number>> = writable(
 );
 
 const blocks: Writable<Set<number>> = writable(
-  new Set<number>(await getBlocks())
+  new Set<number>(await getBlockList())
 );
 
 export {
@@ -68,4 +71,5 @@ export {
   privateMessages,
   friends,
   blocks,
+  invite,
 };

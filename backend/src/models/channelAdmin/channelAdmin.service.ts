@@ -21,5 +21,5 @@ export class ChannelAdminService {
     this.channelAdminModel.findOne({ where: { chan, user } });
 
   getAllAdmin = (chan: number) =>
-    this.channelAdminModel.findAll({ where: { channel: chan } });
+    this.channelAdminModel.findAll({ where: { chan } });
 }

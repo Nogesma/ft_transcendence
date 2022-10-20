@@ -1,12 +1,22 @@
 import type { Socket } from "socket.io-client";
-import { curry } from "ramda";
+import { curry, identity } from "ramda";
 import axios from "axios";
 import { blocks } from "../stores/settings";
 
+const getChannels = () =>
+  axios
+    .get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/channels`, {
+      withCredentials: true,
+    })
+    .then(({ data }) => data)
+    .catch((e) => {
+      console.error(e);
+      return [];
+    });
+
 const muteUser = curry(
-  (socket: Socket, channel: string, username: string, expires: Date) => {
-    socket.emit("muteUser", { channel, username, expires });
-  }
+  (socket: Socket, channel: string, username: string, expires: Date) =>
+    socket.emit("muteUser", { channel, username, expires })
 );
 
 const unmuteUser = curry((socket: Socket, channel: string, username: string) =>
@@ -14,14 +24,16 @@ const unmuteUser = curry((socket: Socket, channel: string, username: string) =>
 );
 
 const banUser = curry(
-  (socket: Socket, channel: string, username: string, expires: Date) => {
-    socket.emit("banUser", { channel, username, expires });
-  }
+  (socket: Socket, channel: string, username: string, expires: Date) =>
+    socket.emit("banUser", { channel, username, expires })
 );
 
 const unbanUser = curry((socket: Socket, channel: string, username: string) =>
   socket.emit("unbanUser", { channel, username })
 );
+
+const deleteChannel = (socket: Socket, channel: string) =>
+  socket.emit("deleteChannel", { channel });
 
 const addAdmin = curry((channel: string, name: string) =>
   axios
@@ -34,10 +46,11 @@ const addAdmin = curry((channel: string, name: string) =>
         withCredentials: true,
       }
     )
+    .then(({ data }) => data)
     .catch(console.error)
 );
 
-const removeAdmin = curry((channel: string, name: string) =>
+const removeAdmin = (channel: string, name: string) =>
   axios
     .post(
       `${import.meta.env.VITE_BACKEND_URI}/api/chat/removeAdmin/${name}`,
@@ -48,8 +61,8 @@ const removeAdmin = curry((channel: string, name: string) =>
         withCredentials: true,
       }
     )
-    .catch(console.error)
-);
+    .then(({ data }) => data)
+    .catch(console.error);
 
 const isMuted = curry((channel: string, name: string) =>
   axios
@@ -71,7 +84,7 @@ const isAdmin = curry((channel: string) =>
       withCredentials: true,
     })
     .then(({ data }) => data)
-    .catch(console.error)
+    .catch(identity)
 );
 
 const isBanned = curry((channel: string, name: string) =>
@@ -144,13 +157,14 @@ const getMuteList = (chan: string) =>
 
 const getBanList = (chan: string) =>
   axios
-    .get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/muted/${chan}`, {
+    .get(`${import.meta.env.VITE_BACKEND_URI}/api/chat/bans/${chan}`, {
       withCredentials: true,
     })
     .then(({ data }) => data)
     .catch(console.error);
 
 export {
+  getChannels,
   banUser,
   unbanUser,
   unmuteUser,
@@ -165,5 +179,6 @@ export {
   hasAdminRights,
   getAdminList,
   getMuteList,
+  deleteChannel,
   getBanList,
 };

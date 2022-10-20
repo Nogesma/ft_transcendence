@@ -1,12 +1,15 @@
 <script lang="ts">
   import axios from "axios";
   import Modal from "./Modal.svelte";
+  import { createEventDispatcher } from "svelte";
 
   let channelPublic = true;
   let channelName: string;
 
-  const createChannel = async () => {
-    await axios
+  const dispatch = createEventDispatcher();
+
+  const createChannel = async () =>
+    axios
       .post(
         `${import.meta.env.VITE_BACKEND_URI}/api/chat/create/${channelName}`,
         {
@@ -17,11 +20,8 @@
           withCredentials: true,
         }
       )
-      .then(({ data }) => console.log(data))
-      .catch(console.error);
-    //todo: we should not reload to not lose user data
-    // window.location.reload();
-  };
+      .then(() => dispatch("newChannel"))
+      .catch((e) => alert(e.response.data.message));
 
   // Clear password when type changes
   $: channelPassword = "" && channelPublic;

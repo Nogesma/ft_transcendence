@@ -184,7 +184,7 @@ export class Game {
   private sendCountdown = (server: Server, time: number) =>
     server.to(this.gameId).emit("gameCountdown", time);
 
-  private calculateState = (server: Server, dt: number): void => {
+  private calculateState = async (server: Server, dt: number) => {
     // Apply player move
     this.p1.bar.y += this.p1.bar.direction * this.p1.bar.speed * dt;
     this.p2.bar.y += this.p2.bar.direction * this.p2.bar.speed * dt;
@@ -221,7 +221,7 @@ export class Game {
         .emit("updateScore", [this.p1.score, this.p2.score]);
 
       if (this.p1.score >= 10 || this.p2.score >= 10) {
-        this.endGame();
+        await this.endGame();
         return;
       }
 
@@ -311,9 +311,9 @@ export class Game {
       this.sendCountdown(server, -1);
 
       let prev = Date.now();
-      this.interval = setInterval(() => {
+      this.interval = setInterval(async () => {
         timestamp = Date.now();
-        this.calculateState(server, (timestamp - prev) * 0.001);
+        await this.calculateState(server, (timestamp - prev) * 0.001);
         prev = timestamp;
 
         this.sendState(server);

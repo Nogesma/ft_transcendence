@@ -8,20 +8,14 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from "@nestjs/websockets";
-import { BlockService } from "../../models/block/block.service.js";
 import { Server, Socket } from "socket.io";
 import { ConfigService } from "@nestjs/config";
-import {
-  addBlock,
-  addUser,
-  socketAuth,
-  socketCookieParser,
-} from "../../utils/socket.js";
+import { addUser, socketAuth, socketCookieParser } from "../../utils/socket.js";
 import { ChannelBanService } from "../../models/channelBan/channelBan.service.js";
 import { SessionService } from "../../models/session/session.service.js";
 import { UserService } from "../../models/user/user.service.js";
-import type { BlockHandshake } from "../../types/socket.js";
-import { find, isNil, pathEq } from "ramda";
+import type { UserHandshake } from "../../types/socket.js";
+import { isNil } from "ramda";
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080", credentials: true },
@@ -32,13 +26,13 @@ export class PmGateway
 {
   @WebSocketServer()
   server: Server;
+  invites = new Map<number, { id: number; type: boolean }>();
 
   constructor(
     private readonly channelBanService: ChannelBanService,
     private readonly userService: UserService,
     private readonly configService: ConfigService<EnvironmentVariables, true>,
-    private readonly sessionService: SessionService,
-    private readonly blockService: BlockService
+    private readonly sessionService: SessionService
   ) {}
 
   afterInit() {
@@ -47,11 +41,10 @@ export class PmGateway
     );
     this.server.use(socketAuth(this.sessionService));
     this.server.use(addUser);
-    this.server.use(addBlock);
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    const handshake = client.handshake as BlockHandshake;
+    const handshake = client.handshake as UserHandshake;
     client.join(handshake.user.id.toString());
 
     handshake.user.status = 1;
@@ -59,48 +52,10 @@ export class PmGateway
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    const handshake = client.handshake as BlockHandshake;
+    const handshake = client.handshake as UserHandshake;
 
     handshake.user.status = 0;
     await handshake.user.save();
-  }
-
-  @SubscribeMessage("ban")
-  async handleBan(
-    @ConnectedSocket() client: Socket,
-    @MessageBody("id") id: number
-  ) {
-    const handshake = client.handshake as BlockHandshake;
-
-    if (isNil(id) || isNaN(id)) return;
-    if (handshake.user.id === id) return;
-    if (handshake.block.has(id)) return;
-
-    await this.blockService.blockUser(handshake.user.id, id).catch();
-
-    const sockets = await this.server.fetchSockets();
-    const userSocket = find(pathEq(["handshake", "user", "id"], id))(sockets);
-    if (!userSocket) return;
-
-    userSocket.handshake.block.add(handshake.user.id);
-  }
-
-  @SubscribeMessage("unban")
-  async handleUnban(
-    @ConnectedSocket() client: Socket,
-    @MessageBody("id") id: number
-  ) {
-    if (isNil(id) || isNaN(id)) return;
-
-    const handshake = client.handshake as BlockHandshake;
-
-    await this.blockService.unblockUser(handshake.user.id, id).catch();
-
-    const sockets = await this.server.fetchSockets();
-    const userSocket = find(pathEq(["handshake", "user", "id"], id))(sockets);
-    if (!userSocket) return;
-
-    userSocket.handshake.block.delete(handshake.user.id);
   }
 
   @SubscribeMessage("status")
@@ -109,7 +64,7 @@ export class PmGateway
     @MessageBody("status") status: number,
     @MessageBody("gameId") gameId: string
   ) {
-    const handshake = client.handshake as BlockHandshake;
+    const handshake = client.handshake as UserHandshake;
 
     if (isNaN(status)) return;
 
@@ -126,22 +81,57 @@ export class PmGateway
     @MessageBody("id") id: number,
     @MessageBody("message") message: string
   ) {
-    const handshake = client.handshake as BlockHandshake;
-
-    if (handshake.block.has(id)) {
-      this.server.to(handshake.user.id).emit("newPM", {
-        message: "You cannot talk to that person",
-        id: 0,
-      });
-      return;
-    }
+    const handshake = client.handshake as UserHandshake;
 
     if (!message || !id || isNaN(id)) return;
 
     this.server.to(String(id)).emit("newPM", {
       message,
+      login: handshake.user.login,
+      displayname: handshake.user.displayname,
       id: handshake.user.id,
     });
+  }
+
+  @SubscribeMessage("sendInvite")
+  handleSendInvite(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("channel") id: number,
+    @MessageBody("type") type: boolean
+  ) {
+    const handshake = client.handshake as UserHandshake;
+    if (isNil(type) || !id || isNaN(id)) return;
+
+    this.invites.set(handshake.user.id, { id: Number(id), type });
+
+    this.server.to(String(id)).emit("newInvite", {
+      id: handshake.user.id,
+      displayname: handshake.user.id,
+      type,
+    });
+  }
+
+  @SubscribeMessage("acceptInvite")
+  handleAcceptInvite(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("id") id: number,
+    @MessageBody("type") type: boolean
+  ) {
+    const handshake = client.handshake as UserHandshake;
+    if (isNil(type) || !id || isNaN(id)) return;
+
+    const invite = this.invites.get(id);
+    if (!invite) return;
+
+    if (invite.id !== handshake.user.id) return;
+    if (invite.type !== type) return;
+
+    this.invites.delete(id);
+
+    this.server
+      .to(String(id))
+      .to(String(handshake.user.id))
+      .emit("newCustomGame", { p1: id, p2: handshake.user.id, type });
   }
 
   newPendingFriendRequest(id: number, fid: number) {
