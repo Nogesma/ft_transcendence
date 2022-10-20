@@ -170,8 +170,8 @@
     {#await isAdmin(channel) then bool}
       {#if bool}
         <button
-                class="btn rounded w-24 m-1"
-                on:click={() => push(`/admin/chat/${channel}`)}
+          class="btn rounded w-24 m-1"
+          on:click={() => push(`/admin/chat/${channel}`)}
         >
           Manage channel</button
         >

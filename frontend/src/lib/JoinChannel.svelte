@@ -39,7 +39,9 @@
   $: channelPassword = "" && channelType;
 </script>
 
-<label for="join-modal" class="modal-button btn-secondary btn m-2">Join Channel</label>
+<label for="join-modal" class="modal-button btn-secondary btn m-2"
+  >Join Channel</label
+>
 
 <Modal id="join-modal">
   <svelte:fragment slot="content">
