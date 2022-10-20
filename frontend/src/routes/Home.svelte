@@ -11,7 +11,7 @@
     <button class="btn btn-lg btn-primary" on:click={() => push("/game")}
       >Game</button
     >
-    <button class="btn btn-lg btn-secondary" on:click={() => push("/chat")}
+    <button class="btn btn-lg btn-primary" on:click={() => push("/chat")}
       >Chat</button
     >
   </div>

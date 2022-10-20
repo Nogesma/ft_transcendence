@@ -132,15 +132,15 @@
   onDestroy(() => emitLeave($chatSocket));
 </script>
 
-<div class="flex flex-col max-h-full h-full bg-base-200 rounded-md">
+<div class="flex flex-col h-full base-100 rounded-md overflow-auto">
   <div class="px-4 sm:px-6">
-    <h2 class="text-lg font-medium text-gray-900" id="slide-over-title">
+    <h2 class="text-lg font-medium text-gray-100" id="slide-over-title">
       {channel}
     </h2>
   </div>
-  <span>Active users:</span>
+  <span class="m-2">Active users:</span>
   <div
-    class="flex flex-auto justify-left origin-center h-6 border border-green-400"
+    class="flex flex-auto px-4 sm:px-6 mt-6 overflow-auto justify-left origin-center h-80 border border-primary m-2 p-2 bg-base-100"
   >
     {#each [...connectedMembers.values()] as spec}
       <li>
@@ -166,17 +166,18 @@
     sendInvite={sendInviteC}
   />
 
-  <div class="flex max-h-full">
+  <div class="flex">
     {#await isAdmin(channel) then bool}
       {#if bool}
         <button
-          class="btn w-24 m-1"
+          class="btn rounded w-24 m-1"
           on:click={() => push(`/admin/chat/${channel}`)}
         >
           Manage channel</button
         >
       {/if}
     {/await}
+
     <button class="btn w-24 m-1" on:click={() => leaveChat($chatSocket)}>
       leave chat</button
     >

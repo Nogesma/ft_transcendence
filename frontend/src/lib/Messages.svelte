@@ -42,7 +42,7 @@
 </script>
 
 <div
-  class="flex-1 px-4 sm:px-6 bg-gray-600 border border-blue-400 max-h-full basis-5/6 overflow-auto"
+  class="flex-1 px-4 bg-base-100 sm:px-6 overflow-auto border border-primary h-fit basis-5/6 justify-left overflow-auto m-2 p-1 h-96"
 >
   {#each messagesList as { displayname, message, login: userLogin, id: uid }, i}
     {#if !$blocks.has(uid)}
@@ -109,7 +109,7 @@
   {/if}
 </div>
 
-<div class="flex rounded bg-base-200 p-2">
+<div class="flex rounded p-2">
   <form
     class="form-control"
     on:submit|preventDefault={() => {
@@ -121,7 +121,7 @@
       <input
         bind:value={message}
         type="text"
-        class="input bg-base-200 w-96 h-6"
+        class="input border border-primary bg-base-200 w-96 h-6"
       />
       <button type="submit">
         <svg
@@ -137,6 +137,9 @@
       </button>
     </label>
   </form>
+</div>
+
+<div class="flex">
   <button class="btn w-24 m-1" on:click={() => sendInvite(false)}>
     classic</button
   >
