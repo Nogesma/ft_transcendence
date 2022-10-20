@@ -114,7 +114,7 @@
           messagesList={currentPm}
           p={true}
           sendMessage={sendPrivateMessage}
-          invite={$invite}
+          invite={$invite.get(selectedPmId)}
           acceptInvite={acceptInviteC}
           sendInvite={sendInviteC}
         />

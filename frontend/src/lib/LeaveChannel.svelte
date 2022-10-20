@@ -22,7 +22,9 @@
       });
 </script>
 
-<label for="leave-modal" class="modal-button btn m-2">Leave channel</label>
+<label for="leave-modal" class="modal-button btn-secondary btn m-2"
+  >Leave channel</label
+>
 
 <Modal id="leave-modal">
   <svelte:fragment slot="content">

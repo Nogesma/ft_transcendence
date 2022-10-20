@@ -14,7 +14,7 @@ import { addUser, socketAuth, socketCookieParser } from "../../utils/socket.js";
 import { SessionService } from "../../models/session/session.service.js";
 import { PongService } from "./pong.service.js";
 import { nanoid } from "nanoid";
-import { isNil } from "ramda";
+import { isEmpty, isNil } from "ramda";
 import type { UserHandshake } from "../../types/socket.js";
 
 @WebSocketGateway({
@@ -63,6 +63,14 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
     @MessageBody() type: boolean
   ) {
     const handshake = client.handshake as UserHandshake;
+
+    // if user is already in a game, send him to that game instead
+    const gameId = this.pongService.getUserGame(handshake.user.id);
+    if (!isEmpty(gameId)) {
+      this.server.to(client.id).emit("matchFound", gameId);
+      client.join(gameId);
+      return;
+    }
 
     if (isNil(type)) return;
 
@@ -113,8 +121,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayDisconnect {
   ) {
     const handshake = client.handshake as UserHandshake;
 
-    //todo: we need to make sure the user is not in another game, or at least
-    // that he isn't using the same socket (this applies for playing and spectating)
     const id = handshake.user.id;
 
     const game = this.pongService.getGame(gameId);

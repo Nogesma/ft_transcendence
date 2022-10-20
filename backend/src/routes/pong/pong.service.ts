@@ -22,6 +22,12 @@ export class PongService {
       if (!x.isPlayer(id)) x.removeSpectator(client, id);
     });
 
+  getUserGame = (id: number) => {
+    this.pruneGames();
+    for (const i of this.games.values()) if (i.isPlayer(id)) return i.gameId;
+    return "";
+  };
+
   newGame = async (
     gameId: string,
     player1: number,
@@ -31,6 +37,5 @@ export class PongService {
     const game = new Game(gameId, player1, player2, type, this.gameService);
 
     this.games.set(gameId, game);
-    this.pruneGames();
   };
 }

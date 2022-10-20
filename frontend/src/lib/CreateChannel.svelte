@@ -36,7 +36,7 @@
   <svelte:fragment slot="content">
     <div class="flex flex-col space-y-4">
       <h3 class="text-lg font-bold">Create channel</h3>
-      <div class="form-control">
+      <div class="form-control gap-4">
         <select bind:value={channelType} class="select select-bordered">
           <option disabled selected>Choose channel type</option>
           <option value={0}>Public</option>
@@ -68,7 +68,8 @@
       <div class="modal-action">
         <label
           for="create-modal"
-          class="btn btn-active btn-primary {isValidName(channelName)
+          class="btn btn-active btn-primary {isValidName(channelName) &&
+          !isNaN(channelType)
             ? ''
             : 'btn-disabled'}"
           on:click={createChannel}

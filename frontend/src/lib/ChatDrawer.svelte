@@ -24,7 +24,7 @@
 
 <div
   class="flex w-max flex-col flex-shrink-0 {showChat
-    ? 'w-96 bg-secondary'
+    ? 'w-96 bg-accent'
     : ''} rounded"
 >
   <button
@@ -41,6 +41,8 @@
   </button>
 
   {#if showChat}
-    <ChannelManager bind:channel bind:messagesList p={false} />
+    <div class="flex flex-col p-2 gap-2 overflow-auto h-fit flex-1">
+      <ChannelManager bind:channel bind:messagesList p={false} />
+    </div>
   {/if}
 </div>

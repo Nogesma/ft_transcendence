@@ -136,7 +136,7 @@ export class ChatService {
 
   createChannel = async (
     name: string,
-    pub: number,
+    type: number,
     password: string,
     id: number
   ) => {
@@ -149,12 +149,12 @@ export class ChatService {
     if (await this.channelService.getChannelByName(name))
       throw new HttpException("Channel already exist", HttpStatus.BAD_REQUEST);
 
-    if (pub !== 1) password = "";
-    const isPub = pub === 0;
+    if (type !== 1) password = "";
+    const pub = type === 0;
 
     const channel = await this.newChannel({
       name,
-      pub: isPub,
+      pub,
       ownerId: id,
       password,
     });

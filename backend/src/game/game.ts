@@ -66,6 +66,7 @@ export class Game {
 
   public readonly gameId: string;
   public isFinished = false;
+  private isStarted = false;
 
   constructor(
     gameId: string,
@@ -131,8 +132,10 @@ export class Game {
     if (this.p1.id === id) this.p1.ready = true;
     if (this.p2.id === id) this.p2.ready = true;
 
-    if (this.p1.ready && this.p2.ready && !this.interval)
+    if (this.p1.ready && this.p2.ready && !this.isStarted) {
+      this.isStarted = true;
       this.startGame(server);
+    }
   };
 
   private initBar = (r: boolean) =>
@@ -311,6 +314,7 @@ export class Game {
       this.sendCountdown(server, -1);
 
       let prev = Date.now();
+      if (this.interval) return;
       this.interval = setInterval(async () => {
         timestamp = Date.now();
         await this.calculateState(server, (timestamp - prev) * 0.001);

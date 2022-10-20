@@ -37,9 +37,9 @@ const status = writable(1);
 
 const pmSocket = readable(getPmSocket());
 
-const invite: Writable<
-  { id: number; displayname: string; type: boolean } | undefined
-> = writable(undefined);
+const invite = writable(
+  new Map<number, { id: number; displayname: string; type: boolean }>()
+);
 
 const privateMessages = writable(new Map<number, MessageList>());
 
