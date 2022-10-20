@@ -2,6 +2,7 @@
   import axios from "axios";
   import Modal from "./Modal.svelte";
   import { createEventDispatcher } from "svelte";
+  import { isValidName } from "../utils/chatManagement.js";
 
   const dispatch = createEventDispatcher();
 
@@ -101,7 +102,9 @@
           <div class="modal-action">
             <label
               for="join-modal"
-              class="btn btn-active btn-primary"
+              class="btn btn-active btn-primary {isValidName(channelName)
+                ? ''
+                : 'btn-disabled'}"
               on:click={joinChannel}
               on:keypress={joinChannel}>Join</label
             >

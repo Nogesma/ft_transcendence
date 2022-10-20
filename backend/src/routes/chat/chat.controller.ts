@@ -117,7 +117,7 @@ export class ChatController {
     @Req() req: AuthenticatedRequest,
     @Param("name") name: string,
     @MessageBody("password") password: string,
-    @MessageBody("public") pub: boolean
+    @MessageBody("public") pub: number
   ) {
     if (!name)
       throw new HttpException(
@@ -131,6 +131,7 @@ export class ChatController {
       req.session.userId
     );
   }
+
   @Post("delete/:name")
   async deleteChannel(
     @Req() req: AuthenticatedRequest,
@@ -181,5 +182,64 @@ export class ChatController {
     if (!id || isNaN(id))
       throw new HttpException("id is not valid", HttpStatus.BAD_REQUEST);
     return this.chatService.getPerms(req.session.userId, chan, id);
+  }
+
+  @Post("changeOwner/:chan/:newOwner")
+  async changeOwner(
+    @Req() req: AuthenticatedRequest,
+    @Param("chan") chan: string,
+    @Param("newOwner") newOwner: number
+  ) {
+    if (!chan || !newOwner || isNaN(newOwner))
+      throw new HttpException(
+        "can't have empty parameters",
+        HttpStatus.BAD_REQUEST
+      );
+    return this.chatService.changeOwner(req.session.userId, chan, newOwner);
+  }
+
+  @Get("type/:chan")
+  async getType(@Req() req: AuthenticatedRequest, @Param("chan") chan: string) {
+    if (!chan)
+      throw new HttpException(
+        "can't have empty parameters",
+        HttpStatus.BAD_REQUEST
+      );
+    return this.chatService.getType(chan);
+  }
+
+  @Post("type/:chan")
+  async changeType(
+    @Req() req: AuthenticatedRequest,
+    @Param("chan") chan: string,
+    @Body("type") type: number,
+    @Body("password") password: string
+  ) {
+    if (!chan || isNaN(type))
+      throw new HttpException(
+        "can't have empty parameters",
+        HttpStatus.BAD_REQUEST
+      );
+    return this.chatService.changeType(
+      req.session.userId,
+      chan,
+      type,
+      password
+    );
+  }
+
+  @Post("add/:chan/:id")
+  async addUser(
+    @Req() req: AuthenticatedRequest,
+    @Param("chan") chan: string,
+    @Param("id") id: number
+  ) {
+    if (!chan || isNaN(id))
+      throw new HttpException(
+        "can't have empty parameters",
+        HttpStatus.BAD_REQUEST
+      );
+
+    return this.chatService.addUser(req.session.userId, chan, id);
   }
 }
