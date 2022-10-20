@@ -22,19 +22,6 @@
 </script>
 
 {#if isEmpty(channel)}
-  {#await getChannels() then { data }}
-    {#each data as { name }}
-      <button
-        class="btn m-2 btn-primary"
-        on:click={() => (p ? push(`/chat/${name}`) : (channel = name))}
-        >{name}
-      </button>
-    {/each}
-    <JoinChannel />
-    <CreateChannel />
-  {:catch err}
-    <p>{err}</p>
-  {/await}
   {#if channelList}
     {#await channelList then data}
       {#each data as { name }}
