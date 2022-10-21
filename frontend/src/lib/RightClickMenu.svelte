@@ -60,7 +60,7 @@
 {#if $id !== uid}
   <ul
     style="top: {pos.y}px; left: {pos.x}px;"
-    class="menu p-2 shadow bg-base-100 rounded-box w-52 absolute grid z-40"
+    class="menu p-2 shadow bg-base-100 rounded-box w-52 absolute grid z-40 overflow-hidden"
   >
     {#if channel}
       <li>
@@ -84,7 +84,9 @@
       </li>
     {:else}
       <li class="text-error">
-        <button on:click={() => blockUser(uid)}>Block {displayname}</button>
+        <button class="text-left" on:click={() => blockUser(uid)}
+          >Block {displayname}</button
+        >
       </li>
     {/if}
     {#if channel}
@@ -103,13 +105,13 @@
           </li>
           {#if isuidadmin}
             <li>
-              <button on:click={() => removeAdmin(userLogin)}
+              <button class="text-left" on:click={() => removeAdmin(userLogin)}
                 >Remove {displayname} as Admin</button
               >
             </li>
           {:else}
             <li>
-              <button on:click={() => addAdmin(userLogin)}
+              <button class="text-left" on:click={() => addAdmin(userLogin)}
                 >Add {displayname} as Admin</button
               >
             </li>
