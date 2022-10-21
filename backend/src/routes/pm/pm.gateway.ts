@@ -106,7 +106,7 @@ export class PmGateway
 
     this.server.to(String(id)).emit("newInvite", {
       id: handshake.user.id,
-      displayname: handshake.user.id,
+      displayname: handshake.user.displayname,
       type,
     });
   }

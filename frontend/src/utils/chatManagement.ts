@@ -50,7 +50,7 @@ const addAdmin = curry((channel: string, name: string) =>
     .catch(console.error)
 );
 
-const removeAdmin = (channel: string, name: string) =>
+const removeAdmin = curry((channel: string, name: string) =>
   axios
     .post(
       `${import.meta.env.VITE_BACKEND_URI}/api/chat/removeAdmin/${name}`,
@@ -62,7 +62,8 @@ const removeAdmin = (channel: string, name: string) =>
       }
     )
     .then(({ data }) => data)
-    .catch(console.error);
+    .catch(console.error)
+);
 
 const isMuted = curry((channel: string, name: string) =>
   axios

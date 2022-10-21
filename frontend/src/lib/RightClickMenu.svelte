@@ -21,10 +21,10 @@
   export let banUser: (username: string, expires: Date) => void;
   export let muteUser: (username: string, expires: Date) => void;
   export let addAdmin: (userLogin: string) => void;
+  export let removeAdmin: (userLogin: string) => void;
 
   const dispatch = createEventDispatcher();
 
-  let menu: HTMLElement;
   let muteModal: HTMLElement;
   let banModal: HTMLElement;
   let muteCheckbox: HTMLElement;
@@ -34,7 +34,7 @@
   let infinite = true;
 
   const onPageClick = (e: MouseEvent) => {
-    if (!menu || e.target === menu || menu.contains(e.target as Node)) return;
+    if ((e.target as Element).classList.contains("click")) return;
     if (!muteCheckbox || e.target === muteCheckbox) return;
     if (!banCheckbox || e.target === banCheckbox) return;
     if (
@@ -59,9 +59,8 @@
 <svelte:body on:click={onPageClick} />
 {#if $id !== uid}
   <ul
-    bind:this={menu}
     style="top: {pos.y}px; left: {pos.x}px;"
-    class="menu p-2 shadow bg-base-100 rounded-box w-52 absolute grid z-40"
+    class="menu p-2 shadow bg-base-100 rounded-box w-52 absolute grid z-40 overflow-hidden"
   >
     {#if channel}
       <li>
@@ -85,27 +84,38 @@
       </li>
     {:else}
       <li class="text-error">
-        <button on:click={() => blockUser(uid)}>Block {displayname}</button>
+        <button class="text-left" on:click={() => blockUser(uid)}
+          >Block {displayname}</button
+        >
       </li>
     {/if}
     {#if channel}
-      {#await hasAdminRights(uid, channel) then admin}
+      {#await hasAdminRights(uid, channel) then [admin, isuidadmin]}
         {#if admin}
           <li class="text-error">
-            <label for="ban-modal" class="modal-button">Ban {displayname}</label
+            <label for="ban-modal" class="modal-button click"
+              >Ban {displayname}</label
             >
             <!--          <button on:click={() => banUser(userLogin)}>Ban {displayname}</button>-->
           </li>
           <li class="text-error">
-            <label for="mute-modal" class="modal-button"
+            <label for="mute-modal" class="modal-button click"
               >Mute {displayname}</label
             >
           </li>
-          <li>
-            <button on:click={() => addAdmin(userLogin)}
-              >Add {displayname} as Admin</button
-            >
-          </li>
+          {#if isuidadmin}
+            <li>
+              <button class="text-left" on:click={() => removeAdmin(userLogin)}
+                >Remove {displayname} as Admin</button
+              >
+            </li>
+          {:else}
+            <li>
+              <button class="text-left" on:click={() => addAdmin(userLogin)}
+                >Add {displayname} as Admin</button
+              >
+            </li>
+          {/if}
         {/if}
       {/await}
     {/if}

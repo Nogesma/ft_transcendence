@@ -15,6 +15,8 @@
   export let banUser: (username: string, expires: Date) => void = identity;
   export let muteUser: (username: string, expires: Date) => void = identity;
   export let addAdmin: (userLogin: string) => void = identity;
+  export let removeAdmin: (userLogin: string) => void = identity;
+
   export let sendInvite: (type: boolean) => void;
   export let acceptInvite: ({
     id,
@@ -42,7 +44,7 @@
 </script>
 
 <div
-  class="flex-1 px-4 bg-base-100 sm:px-6 border border-primary h-fit basis-5/6 justify-left overflow-auto m-2 p-1"
+  class="flex-1 px-4 bg-base-100 sm:px-6 border border-primary h-fit basis-5/6 justify-left overflow-auto m-2 p-1 h-96"
 >
   {#each messagesList as { displayname, message, login: userLogin, id: uid }, i}
     {#if !$blocks.has(uid)}
@@ -88,6 +90,7 @@
           {banUser}
           {muteUser}
           {addAdmin}
+          {removeAdmin}
         />
       {/if}
     {/if}

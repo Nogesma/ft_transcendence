@@ -8,6 +8,7 @@
     banUser,
     isAdmin,
     muteUser,
+    removeAdmin,
   } from "../utils/chatManagement.js";
   import { chatSocket } from "../stores/settings.js";
   import { getUserInfo } from "../utils/info.js";
@@ -119,6 +120,7 @@
   };
 
   $: addAdminC = addAdmin(channel);
+  $: removeAdminC = removeAdmin(channel);
   $: banUserC = banUser($chatSocket, channel);
   $: muteUserC = muteUser($chatSocket, channel);
 
@@ -162,6 +164,7 @@
     banUser={banUserC}
     muteUser={muteUserC}
     addAdmin={addAdminC}
+    removeAdmin={removeAdminC}
     acceptInvite={acceptInviteC}
     sendInvite={sendInviteC}
   />

@@ -148,6 +148,9 @@ export class SettingsController {
   @Post("block/:id")
   async blockUser(@Req() req: AuthenticatedRequest, @Param("id") id: number) {
     await this.settingsService.block(req.session.userId, id);
+    await this.settingsService
+      .denyFriendRequest(req.session.userId, id)
+      .catch();
   }
 
   @Post("unblock/:id")

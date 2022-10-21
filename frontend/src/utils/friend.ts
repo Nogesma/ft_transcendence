@@ -85,7 +85,7 @@ const denyFriendRequest = (friendId: number) =>
     })
     .catch(console.error);
 
-const getFriendList = () =>
+const getFriendList = (): Promise<number[]> =>
   axios
     .get(`${import.meta.env.VITE_BACKEND_URI}/api/user/friends`, {
       withCredentials: true,
@@ -93,7 +93,7 @@ const getFriendList = () =>
     .then(({ data }) => data)
     .catch(console.error);
 
-const getBlockList = () =>
+const getBlockList = (): Promise<number[]> =>
   axios
     .get(`${import.meta.env.VITE_BACKEND_URI}/api/user/blocks`, {
       withCredentials: true,
