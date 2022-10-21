@@ -409,7 +409,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
 
     await this.channelService.deleteChannel(channelName);
 
-    console.log("delete chan");
     this.server.to(channel.id).emit("channelDeleted");
   }
 }
