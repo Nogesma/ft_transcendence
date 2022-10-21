@@ -42,7 +42,7 @@
 </script>
 
 <div
-  class="flex-1 px-4 bg-base-100 sm:px-6 border border-primary h-fit basis-5/6 justify-left overflow-auto m-2 p-1"
+  class="flex-1 px-4 bg-base-100 sm:px-6 border border-primary h-fit basis-5/6 justify-left overflow-auto m-2 p-1 h-96"
 >
   {#each messagesList as { displayname, message, login: userLogin, id: uid }, i}
     {#if !$blocks.has(uid)}

@@ -181,7 +181,7 @@ export class ChatController {
   ) {
     if (!id || isNaN(id))
       throw new HttpException("id is not valid", HttpStatus.BAD_REQUEST);
-    return this.chatService.getPerms(req.session.userId, chan, id);
+    return this.chatService.getPerms(req.session.userId, chan, Number(id));
   }
 
   @Post("changeOwner/:chan/:newOwner")

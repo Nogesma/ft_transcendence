@@ -293,16 +293,18 @@ export class ChatService {
 
   getPerms = async (id: number, chan: string, uid: number) => {
     const channel = await this.channelService.getChannelByName(chan);
+    let a = false;
     if (channel) {
-      if (id === channel.ownerId) return true;
-
       const admins = await channel.$get("admin");
 
-      if (admins.find((u) => u.id === id) && !admins.find((u) => u.id === uid))
-        return true;
+      if (admins.find((u) => u.id === uid)) a = true;
+
+      if (id === channel.ownerId) return [true, a];
+
+      if (admins.find((u) => u.id === id) && !a) return [true, a];
     }
 
-    return false;
+    return [false, false];
   };
 
   changeOwner = async (id: number, chan: string, owner: number) => {

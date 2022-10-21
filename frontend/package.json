@@ -20,7 +20,7 @@
     "@tsconfig/svelte": "^3.0.0",
     "@types/bluebird": "^3.5.37",
     "@types/qrcode": "^1.5.0",
-    "@types/ramda": "^0.28.17",
+    "@types/ramda": "^0.28.18",
     "@typescript-eslint/eslint-plugin": "^5.40.1",
     "@typescript-eslint/parser": "^5.40.1",
     "autoprefixer": "^10.4.12",
