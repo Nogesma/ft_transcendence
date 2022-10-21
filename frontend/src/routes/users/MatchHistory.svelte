@@ -40,7 +40,6 @@
     if (table) {
       // We need to subtract thead height because the menu position is absolute.
       const bounds = table.getBoundingClientRect();
-      console.log(bounds);
       pos.y -= bounds.y;
       pos.x = dir ? pos.x - bounds.x : pos.x + bounds.x;
     }

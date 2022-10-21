@@ -11,13 +11,11 @@
     | { id: number; type: boolean; displayname: string }
     | undefined = undefined;
   export let channel: string | undefined = undefined;
-  export let sendMessage: (message: string) => void;
   export let banUser: (username: string, expires: Date) => void = identity;
   export let muteUser: (username: string, expires: Date) => void = identity;
   export let addAdmin: (userLogin: string) => void = identity;
   export let removeAdmin: (userLogin: string) => void = identity;
 
-  export let sendInvite: (type: boolean) => void;
   export let acceptInvite: ({
     id,
     type,
@@ -26,7 +24,6 @@
     type: boolean;
   }) => void;
 
-  let message: string;
   let cardIndex = -1;
   let menuIndex = -1;
   let pos = { x: 0, y: 0 };
@@ -43,17 +40,35 @@
   };
 </script>
 
+<!--      <div class="clearfix">-->
+<!--          <div-->
+<!--            class="bg-gray-300 w-3/4 mx-4 my-2 p-2 rounded-lg"-->
+<!--          >this is a basic mobile chat layout, build with tailwind css</div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; SINGLE MESSAGE 2 &ndash;&gt;-->
+<!--        <div class="clearfix">-->
+<!--          <div-->
+<!--            class="bg-gray-300 w-3/4 mx-4 my-2 p-2 rounded-lg clearfix"-->
+<!--          >It will be used for a full tutorial about building a chat app with vue, tailwind and firebase.</div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; SINGLE MESSAGE 3 &ndash;&gt;-->
+<!--        <div class="clearfix">-->
+<!--          <div-->
+<!--            class="bg-green-300 float-right w-3/4 mx-4 my-2 p-2 rounded-lg clearfix"-->
+<!--          >check my twitter to see when it will be released.</div>-->
+<!--        </div>-->
+<!--      </div>-->
+
 <div
-  class="flex-1 px-4 bg-base-100 sm:px-6 border border-primary h-fit basis-5/6 justify-left overflow-auto m-2 p-1 h-96"
+  id="scroller"
+  class="flex flex-col bg-base-200 rounded-box h-full basis-5/6 overflow-auto mt-2"
 >
   {#each messagesList as { displayname, message, login: userLogin, id: uid }, i}
-    {#if !$blocks.has(uid)}
-      <ul class="space-y-2">
-        <li
-          class="flex {$id === uid
-            ? 'justify-end'
-            : 'justify-start'} space-x-3 h-fit p-1 static"
-        >
+    <div class="flex flex-col m-2">
+      {#if !$blocks.has(uid)}
+        {#if displayname}
           <button
             class="{$id === uid ? 'text-right' : 'text-left'} hover:underline"
             on:contextmenu|preventDefault={(e) => openMenu(e, i)}
@@ -61,39 +76,41 @@
           >
             {displayname}
           </button>
+        {/if}
 
-          {#if i === cardIndex}
-            <LeftClickMenu
-              on:clickoutside={() => (cardIndex = -1)}
-              {uid}
-              {pos}
-              dir={!(p && $id === uid)}
-            />
-          {/if}
-          <div
-            class="max-w-xl px-4 py-1 text-gray-700 bg-gray-100 rounded shadow static"
-          >
-            <span class="block inline-block text-center justify-end">
-              {message}
-            </span>
-          </div>
-        </li>
-      </ul>
-      {#if i === menuIndex}
-        <RightClickMenu
-          on:clickoutside={() => (menuIndex = -1)}
-          {pos}
-          {uid}
-          {displayname}
-          {userLogin}
-          {channel}
-          {banUser}
-          {muteUser}
-          {addAdmin}
-          {removeAdmin}
-        />
+        <div
+          class="break-all {$id === uid
+            ? 'self-end'
+            : 'text-left self-start'} w-fit bg-base-100 p-2 mt-1 rounded-lg"
+        >
+          {message}
+        </div>
+
+        {#if i === cardIndex}
+          <LeftClickMenu
+            on:clickoutside={() => (cardIndex = -1)}
+            {uid}
+            {pos}
+            dir={!(p && $id === uid)}
+          />
+        {/if}
+
+        {#if i === menuIndex}
+          <RightClickMenu
+            on:clickoutside={() => (menuIndex = -1)}
+            {pos}
+            {uid}
+            {displayname}
+            {userLogin}
+            {channel}
+            {banUser}
+            {muteUser}
+            {addAdmin}
+            {removeAdmin}
+          />
+        {/if}
       {/if}
-    {/if}
+    </div>
   {/each}
   {#if invite && !$blocks.has(invite.id)}
     <div>
@@ -110,43 +127,16 @@
       </button>
     </div>
   {/if}
+  <div class="flex p-2" id="anchor" />
 </div>
 
-<div class="flex rounded p-2">
-  <form
-    class="form-control"
-    on:submit|preventDefault={() => {
-      sendMessage(message);
-      message = "";
-    }}
-  >
-    <label class="input-group">
-      <input
-        bind:value={message}
-        type="text"
-        class="input border border-primary bg-base-200 w-96 h-6"
-      />
-      <button type="submit">
-        <svg
-          class="w-5 h-5 text-gray-500 origin-center transform rotate-90"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"
-          />
-        </svg>
-      </button>
-    </label>
-  </form>
-</div>
+<style>
+  #scroller * {
+    overflow-anchor: none;
+  }
 
-<div class="flex">
-  <button class="btn w-24 m-1" on:click={() => sendInvite(false)}>
-    classic</button
-  >
-  <button class="btn w-24 m-1" on:click={() => sendInvite(true)}>
-    modified</button
-  >
-</div>
+  #anchor {
+    overflow-anchor: auto;
+    height: 1px;
+  }
+</style>

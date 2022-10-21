@@ -9,3 +9,7 @@
 .has-tooltip:hover .custom-tooltip {
   @apply visible z-50;
 }
+
+.full-height {
+  height: calc(100vh - 4rem);
+}

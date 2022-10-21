@@ -23,20 +23,22 @@
 
 {#if isEmpty(channel)}
   {#if channelList}
-    {#await channelList then data}
-      {#each data as { name }}
-        <button
-          class="btn btn-primary m-2"
-          on:click={() => (p ? push(`/chat/${name}`) : (channel = name))}
-          >{name}
-        </button>
-      {/each}
-      <JoinChannel on:newChannel={refreshChannels} />
-      <CreateChannel on:newChannel={refreshChannels} />
-      <LeaveChannel channels={data} on:newChannel={refreshChannels} />
-    {:catch err}
-      <p>{err}</p>
-    {/await}
+    <div class="flex flex-col p-2 gap-2 overflow-y-auto">
+      {#await channelList then data}
+        {#each data as { name }}
+          <button
+            class="btn btn-primary m-2"
+            on:click={() => (p ? push(`/chat/${name}`) : (channel = name))}
+            >{name}
+          </button>
+        {/each}
+        <JoinChannel on:newChannel={refreshChannels} />
+        <CreateChannel on:newChannel={refreshChannels} />
+        <LeaveChannel channels={data} on:newChannel={refreshChannels} />
+      {:catch err}
+        <p>{err}</p>
+      {/await}
+    </div>
   {/if}
 {:else}
   <Chat bind:channel bind:messagesList {p} />

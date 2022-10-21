@@ -91,7 +91,7 @@
     ctx.fillRect(p2.bar.x, p2.bar.y, p2.bar.w, p2.bar.h);
     ctx.fillRect(ball.x, ball.y, ball.w, ball.h);
     if (powerup) {
-      if (powerup.type === 1) ctx.fillStyle = "#f00";
+      if (powerup.type === 1) ctx.fillStyle = "#00f";
       else if (powerup.type === 2) ctx.fillStyle = "#0f0";
 
       ctx.fillRect(powerup.x, powerup.y, powerup.w, powerup.h);
@@ -127,6 +127,11 @@
         p2 = player2;
         id1 = p1.id;
         id2 = p2.id;
+        if (ball) {
+          ball.x = -50;
+          ball.y = -50;
+        }
+
         spectatorList = new Set(spectators);
 
         if ($id === p1.id) player = p1;
@@ -231,7 +236,7 @@
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
-<div class="flex flex-row h-full w-full pt-5">
+<div class="flex flex-row w-full full-height">
   <ChatDrawer />
   {#if isEmpty($gameId) || startsWith("custom", $gameId)}
     <div class="flex flex-col flex-auto">

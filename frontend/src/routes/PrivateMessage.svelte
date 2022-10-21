@@ -86,6 +86,8 @@
 
   $: acceptInviteC = acceptInvite($pmSocket, String(selectedPmId));
   $: sendInviteC = sendInvite($pmSocket, String(selectedPmId));
+
+  let message = "";
 </script>
 
 <div class="flex h-full">
@@ -113,11 +115,35 @@
         <Messages
           messagesList={currentPm}
           p={true}
-          sendMessage={sendPrivateMessage}
           invite={$invite.get(selectedPmId)}
           acceptInvite={acceptInviteC}
-          sendInvite={sendInviteC}
         />
+
+        <div class="flex content-center gap-4">
+          <form
+            class="form-control self-center"
+            on:submit|preventDefault={() => {
+              sendPrivateMessage(message);
+              message = "";
+            }}
+          >
+            <label class="input-group">
+              <input
+                type="text"
+                bind:value={message}
+                class="input input-bordered"
+              />
+              <button class="btn btn-primary" type="submit">Send</button>
+            </label>
+          </form>
+
+          <button class="btn w-24 m-1" on:click={() => sendInviteC(false)}>
+            classic</button
+          >
+          <button class="btn w-24 m-1" on:click={() => sendInviteC(true)}>
+            modified</button
+          >
+        </div>
       {:else}
         <div
           class="flex flex-auto items-center justify-center text-5xl font-bold"
