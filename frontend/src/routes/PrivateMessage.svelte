@@ -90,7 +90,7 @@
 
 <div class="flex h-full">
   <div class="flex flex-row flex-auto w-full">
-    <ul class="menu bg-base-200 w-1/6 rounded m-2">
+    <ul class="menu bg-base-200 w-1/6 rounded m-2 overflow-hidden">
       <li class="rounded">
         <label for="newpm-modal" class="modal-button">New private message</label
         >

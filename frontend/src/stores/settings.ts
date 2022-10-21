@@ -2,7 +2,6 @@ import { derived, readable, type Writable, writable } from "svelte/store";
 import axios from "axios";
 import { isEmpty, not } from "ramda";
 import { getChatSocket, getPmSocket } from "../utils/socket";
-import { getPendingFriendRequests } from "../utils/friend";
 import type { MessageList } from "../chat";
 
 const isLoggedIn = writable(false);

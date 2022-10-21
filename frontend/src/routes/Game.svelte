@@ -157,8 +157,10 @@
         s.on("updateScore", (s: [number, number]) => {
           p1.score = s[0];
           p2.score = s[1];
-          $status = 1;
-          if (p1.score >= 10 || p2.score >= 10) replace("/game");
+          if (p1.score >= 10 || p2.score >= 10) {
+            $status = 1;
+            replace("/game");
+          }
         });
 
         s.on("newSpectator", (id) => {
@@ -229,16 +231,16 @@
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
-<div class="flex flex-row h-full w-full">
+<div class="flex flex-row h-full w-full pt-5">
   <ChatDrawer />
   {#if isEmpty($gameId) || startsWith("custom", $gameId)}
     <div class="flex flex-col flex-auto">
       {#if p1 && p2 && (p1.score >= 10 || p2.score >= 10)}
         <div
-          class="flex flex-auto flex-row gap-8 basis-1/3 justify-center items-center"
+          class="flex flex-auto flex-row gap-8 basis-1/4 justify-evenly items-center"
         >
           {#if id1}
-            <div class="flex-col h-fit">
+            <div class="flex flex-auto h-full justify-center overflow-x-hidden">
               {#await getUserInfo(id1) then { login, displayname: name }}
                 <button
                   on:click|preventDefault={(e) => openMenu(e, id1)}
@@ -264,13 +266,15 @@
               {/await}
             </div>
           {/if}
-          <div class="flex flex-col text-5xl font-bold h-fit text-center gap-5">
+          <div
+            class="flex flex-col text-5xl font-bold h-full text-center gap-5"
+          >
             <div>{p1.score} - {p2.score}</div>
             <div>{player && player.score >= 10 ? "Victory" : "Defeat"}</div>
           </div>
 
           {#if id2}
-            <div class="flex-col h-fit">
+            <div class="flex flex-auto h-full justify-center overflow-x-hidden">
               {#await getUserInfo(id2) then { login, displayname: name }}
                 <button
                   on:click|preventDefault={(e) => openMenu(e, id2)}
@@ -304,7 +308,7 @@
     <div class="flex flex-auto flex-col" style="height: {HEIGHT}px">
       <div class="flex flex-row flex-auto justify-evenly flex-nowrap">
         {#if id1}
-          <div class="flex-col">
+          <div class="flex flex-auto overflow-x-hidden justify-center">
             {#await getUserInfo(id1) then { login, displayname: name }}
               <button
                 on:click|preventDefault={(e) => openMenu(e, id1)}
@@ -331,7 +335,7 @@
         <canvas id="game" />
 
         {#if id2}
-          <div class="flex-col">
+          <div class="flex flex-auto overflow-x-hidden justify-center">
             {#await getUserInfo(id2) then { login, displayname: name }}
               <button
                 on:click|preventDefault={(e) => openMenu(e, id2)}

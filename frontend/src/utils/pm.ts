@@ -1,6 +1,5 @@
 import type { Socket } from "socket.io-client";
 import {
-  blocks,
   friends,
   id,
   invite,

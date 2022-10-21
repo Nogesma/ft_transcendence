@@ -15,6 +15,8 @@
   export let banUser: (username: string, expires: Date) => void = identity;
   export let muteUser: (username: string, expires: Date) => void = identity;
   export let addAdmin: (userLogin: string) => void = identity;
+  export let removeAdmin: (userLogin: string) => void = identity;
+
   export let sendInvite: (type: boolean) => void;
   export let acceptInvite: ({
     id,
@@ -88,6 +90,7 @@
           {banUser}
           {muteUser}
           {addAdmin}
+          {removeAdmin}
         />
       {/if}
     {/if}
