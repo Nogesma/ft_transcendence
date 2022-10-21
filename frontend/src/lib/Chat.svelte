@@ -15,6 +15,9 @@
   import { onDestroy } from "svelte";
   import type { Message, MessageList } from "../chat";
   import Messages from "./Messages.svelte";
+  import ProfilePic from "./ProfilePic.svelte";
+  import { pick } from "ramda";
+  import LeftClickMenu from "./LeftClickMenu.svelte";
 
   export let channel: string;
   export let p = false;
@@ -40,7 +43,6 @@
     socket.on(
       "channelInfo",
       ({ memberList }: { memberList: Array<number> }) => {
-        console.log("channelInfo", { memberList });
         if (!memberList) return leaveChat(socket);
         connectedMembers = new Set(memberList);
       }
@@ -132,26 +134,40 @@
   $: $chatSocket.emit("joinRoom", { channel });
 
   onDestroy(() => emitLeave($chatSocket));
+
+  let showMenu = -1;
+  let pos = { x: 0, y: 0 };
+
+  const openMenu = (e: MouseEvent, i: number) => {
+    pos = pick(["x", "y"])(e);
+    showMenu = i;
+  };
+
+  let message = "";
 </script>
 
-<div class="flex flex-col h-full base-100 rounded-md overflow-auto">
-  <div class="px-4 sm:px-6">
-    <h2 class="text-lg font-medium text-gray-100" id="slide-over-title">
+<div class="flex flex-col h-full base-100 overflow-auto m-2">
+  <div class="flex flex-row gap-4 h-fit overflow-x-auto overflow-y-hidden">
+    <div class="text-5xl align-text-top font-bold text-primary">
       {channel}
-    </h2>
-  </div>
-  <span class="m-2">Active users:</span>
-  <div
-    class="flex flex-auto px-4 sm:px-6 mt-6 overflow-auto justify-left origin-center h-80 border border-primary m-2 p-2 bg-base-100"
-  >
-    {#each [...connectedMembers.values()] as spec}
-      <li>
-        <ul class="m-1">
-          {#await getUserInfo(spec) then { displayname: name }}
-            {name}
-          {/await}
-        </ul>
-      </li>
+    </div>
+    {#each [...connectedMembers.values()] as spec, i}
+      {#await getUserInfo(spec) then { login }}
+        <button
+          class="btn btn-ghost btn-circle avatar"
+          on:click|preventDefault={(e) => openMenu(e, i)}
+        >
+          <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
+        </button>
+        {#if showMenu === i}
+          <LeftClickMenu
+            on:click={() => (showMenu = -1)}
+            on:clickoutside={() => (showMenu = -1)}
+            uid={spec}
+            {pos}
+          />
+        {/if}
+      {/await}
     {/each}
   </div>
 
@@ -160,20 +176,46 @@
     {p}
     {invite}
     {channel}
-    {sendMessage}
     banUser={banUserC}
     muteUser={muteUserC}
     addAdmin={addAdminC}
     removeAdmin={removeAdminC}
     acceptInvite={acceptInviteC}
-    sendInvite={sendInviteC}
   />
 
-  <div class="flex">
+  <div
+    class="flex flex-row content-center h-fit gap-4 flex-wrap mt-4 justify-center"
+  >
+    <form
+      class="form-control self-center flex flex-auto"
+      on:submit|preventDefault={() => {
+        sendMessage(message);
+        message = "";
+      }}
+    >
+      <label class="input-group">
+        <input
+          type="text"
+          bind:value={message}
+          class="input input-bordered w-full"
+        />
+        <button class="btn btn-primary" type="submit">Send</button>
+      </label>
+    </form>
+
+    <button
+      class="btn w-24 m-1 self-center"
+      on:click={() => sendInviteC(false)}
+    >
+      classic</button
+    >
+    <button class="btn w-24 m-1 self-center" on:click={() => sendInviteC(true)}>
+      modified</button
+    >
     {#await isAdmin(channel) then bool}
       {#if bool}
         <button
-          class="btn rounded w-24 m-1"
+          class="btn rounded w-24 m-1 self-center"
           on:click={() => push(`/admin/chat/${channel}`)}
         >
           Manage channel</button
@@ -181,7 +223,10 @@
       {/if}
     {/await}
 
-    <button class="btn w-24 m-1" on:click={() => leaveChat($chatSocket)}>
+    <button
+      class="btn w-24 m-1 self-center"
+      on:click={() => leaveChat($chatSocket)}
+    >
       leave chat</button
     >
   </div>

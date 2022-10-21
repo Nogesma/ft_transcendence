@@ -147,7 +147,9 @@
         if (!x.includes(key)) map.delete(key);
       });
       Bluebird.each(x, async (v: number) => {
-        if (adminInfo.has(v)) return;
+        if (adminInfo.has(v)) {
+          return;
+        }
         adminInfo.set(
           v,
           (await getUserInfo(v)) as { login: string; displayname: string }
@@ -165,6 +167,10 @@
 </script>
 
 <div class="gap-5 flex flex-col p-5">
+  <button class="btn btn-primary" on:click={() => push(`/chat/${name}`)}
+    >Go back to chat</button
+  >
+
   {#if admin}
     <!-- Manage mutes -->
     <table class="table table-zebra w-full">
@@ -399,18 +405,32 @@
       <div class="flex flex-auto flex-row justify-evenly gap-5">
         {#await channelType then type}
           {#if type === 2}
-            <label for="add-modal" class="flex-grow btn modal-button"
-              >Add user to channel</label
+            <label
+              for="add-modal"
+              on:click={() => (verifiedName = "")}
+              on:keypress={() => (verifiedName = "")}
+              class="flex-grow btn modal-button">Add user to channel</label
             >
           {/if}
         {/await}
-        <label for="type-modal" class="flex-grow btn btn-error modal-button"
+        <label
+          for="type-modal"
+          on:click={() => (verifiedName = "")}
+          on:keypress={() => (verifiedName = "")}
+          class="flex-grow btn btn-error modal-button"
           >Change password/type of channel</label
         >
-        <label for="owner-modal" class="flex-grow btn btn-error modal-button"
-          >Change owner</label
+        <label
+          for="owner-modal"
+          on:click={() => (verifiedName = "")}
+          on:keypress={() => (verifiedName = "")}
+          class="flex-grow btn btn-error modal-button">Change owner</label
         >
-        <label for="delete-modal" class="flex-grow btn btn-error modal-button"
+        <label
+          for="delete-modal"
+          on:click={() => (verifiedName = "")}
+          on:keypress={() => (verifiedName = "")}
+          class="flex-grow btn btn-error modal-button"
           >Delete channel {name}</label
         >
       </div>

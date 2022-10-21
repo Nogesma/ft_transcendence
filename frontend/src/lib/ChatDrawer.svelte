@@ -22,11 +22,7 @@
   onDestroy(() => $chatSocket.emit("leaveRooms"));
 </script>
 
-<div
-  class="flex w-max flex-col flex-shrink-0 {showChat
-    ? 'w-96 bg-accent'
-    : ''} rounded"
->
+<div class="flex flex-col {showChat ? 'w-96 bg-accent' : ''} rounded max-h-90">
   <button
     class="btn btn-ghost btn-circle"
     on:click={() => (showChat = !showChat)}
@@ -41,8 +37,6 @@
   </button>
 
   {#if showChat}
-    <div class="flex flex-col p-2 gap-2 overflow-auto h-fit flex-1">
-      <ChannelManager bind:channel bind:messagesList p={false} />
-    </div>
+    <ChannelManager bind:channel bind:messagesList p={false} />
   {/if}
 </div>
