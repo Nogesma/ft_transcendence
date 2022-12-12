@@ -246,7 +246,7 @@
         >
           {#if id1}
             <div class="flex flex-auto h-full justify-center overflow-x-hidden">
-              {#await getUserInfo(id1) then { login, displayname: name }}
+              {#await getUserInfo(id1) then { login, displayname: name, profilepicture }}
                 <button
                   on:click|preventDefault={(e) => openMenu(e, id1)}
                   class="btn btn-ghost btn-circle avatar"
@@ -254,6 +254,7 @@
                   <ProfilePic
                     user={login}
                     attributes="h-10 w-10 rounded-full"
+                    def={profilepicture}
                   />
                   {name}
                   {#await getUserStats(id1) then { elo }}
@@ -280,7 +281,7 @@
 
           {#if id2}
             <div class="flex flex-auto h-full justify-center overflow-x-hidden">
-              {#await getUserInfo(id2) then { login, displayname: name }}
+              {#await getUserInfo(id2) then { login, displayname: name, profilepicture }}
                 <button
                   on:click|preventDefault={(e) => openMenu(e, id2)}
                   class="btn btn-ghost btn-circle avatar"
@@ -288,6 +289,7 @@
                   <ProfilePic
                     user={login}
                     attributes="h-10 w-10 rounded-full"
+                    def={profilepicture}
                   />
                   {name}
                   {#await getUserStats(id2) then { elo }}
@@ -314,12 +316,16 @@
       <div class="flex flex-row flex-auto justify-evenly flex-nowrap">
         {#if id1}
           <div class="flex flex-auto overflow-x-hidden justify-center">
-            {#await getUserInfo(id1) then { login, displayname: name }}
+            {#await getUserInfo(id1) then { login, displayname: name, profilepicture }}
               <button
                 on:click|preventDefault={(e) => openMenu(e, id1)}
                 class="btn btn-ghost btn-circle avatar"
               >
-                <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
+                <ProfilePic
+                  user={login}
+                  attributes="h-10 w-10 rounded-full"
+                  def={profilepicture}
+                />
                 {name}
                 {#await getUserStats(id1) then { elo }}
                   {elo}
@@ -341,12 +347,16 @@
 
         {#if id2}
           <div class="flex flex-auto overflow-x-hidden justify-center">
-            {#await getUserInfo(id2) then { login, displayname: name }}
+            {#await getUserInfo(id2) then { login, displayname: name, profilepicture }}
               <button
                 on:click|preventDefault={(e) => openMenu(e, id2)}
                 class="btn btn-ghost btn-circle avatar"
               >
-                <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
+                <ProfilePic
+                  user={login}
+                  attributes="h-10 w-10 rounded-full"
+                  def={profilepicture}
+                />
                 {name}
                 {#await getUserStats(id2) then { elo }}
                   {elo}
@@ -367,12 +377,16 @@
       <div class="flex justify-center">
         Spectators :
         {#each [...spectatorList] as spec}
-          {#await getUserInfo(spec) then { login, displayname: name }}
+          {#await getUserInfo(spec) then { login, displayname: name, profilepicture }}
             <button
               on:click|preventDefault={(e) => openMenu(e, spec)}
               class="btn btn-ghost btn-circle avatar"
             >
-              <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
+              <ProfilePic
+                user={login}
+                attributes="h-10 w-10 rounded-full"
+                def={profilepicture}
+              />
               {name}
             </button>
             {#if showMenu === spec}

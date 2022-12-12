@@ -40,6 +40,9 @@ export class UserService {
     return user;
   };
 
+  updatePfp = async (id: number, profilepicture: string) =>
+    this.userModel.update({ profilepicture }, { where: { id } });
+
   getUser = (id: number) => this.userModel.findByPk(id);
 
   getUserByLogin = (login: string) =>

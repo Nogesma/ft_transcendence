@@ -1,6 +1,12 @@
 import axios from "axios";
 import { push } from "svelte-spa-router";
-import { displayname, id, isLoggedIn, login } from "../stores/settings";
+import {
+  defaultpfp,
+  displayname,
+  id,
+  isLoggedIn,
+  login,
+} from "../stores/settings";
 
 const userDataUrl = `${import.meta.env.VITE_BACKEND_URI}/api/user/me`;
 
@@ -25,6 +31,9 @@ const getUserData = async () =>
       login.set(data.login);
       id.set(data.id);
       isLoggedIn.set(true);
+      console.log("pfp: ", data.profilepicture);
+      console.log("pfp: ", data);
+      defaultpfp.set(data.profilepicture);
     })
     .catch(() => {
       isLoggedIn.set(false);

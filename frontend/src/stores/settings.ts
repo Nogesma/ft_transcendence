@@ -14,17 +14,22 @@ const id = writable(0);
 
 const gameId = writable("");
 
+const defaultpfp = writable("");
+
 const updatepfp = writable(0);
 
 const pendingFriends = writable(new Set<number>());
 
-const pfp = derived([login, updatepfp], ([$login, $updatepfp], set) => {
-  if (not(isEmpty($login)))
-    axios
-      .head(`/imgs/${$login}.jpg`)
-      .then(() => set(`/imgs/${$login}.jpg?t=${$updatepfp}`))
-      .catch(() => set(`https://cdn.intra.42.fr/users/${$login}.jpg`));
-});
+const pfp = derived(
+  [login, updatepfp, defaultpfp],
+  ([$login, $updatepfp, $defaultpfp], set) => {
+    if (not(isEmpty($login)))
+      axios
+        .head(`/imgs/${$login}.jpg`)
+        .then(() => set(`/imgs/${$login}.jpg?t=${$updatepfp}`))
+        .catch(() => set($defaultpfp));
+  }
+);
 
 const status = writable(1);
 
@@ -61,4 +66,5 @@ export {
   friends,
   blocks,
   invite,
+  defaultpfp,
 };

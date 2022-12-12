@@ -32,7 +32,7 @@ export class SettingsService {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
 
-    return pick(["login", "displayname", "id"], user);
+    return pick(["login", "displayname", "id", "profilepicture"], user);
   };
 
   get2FAStatus = async (id: number) => {

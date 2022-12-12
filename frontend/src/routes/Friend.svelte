@@ -102,7 +102,7 @@
       </thead>
       <tbody>
         {#each [...$pendingFriends] as id}
-          {#await getUserInfo(id) then { login, displayname }}
+          {#await getUserInfo(id) then { login, displayname, profilepicture }}
             <tr>
               <td>
                 <div
@@ -115,6 +115,7 @@
                     <ProfilePic
                       attributes="h-10 w-10 rounded-full"
                       user={login}
+                      def={profilepicture}
                     />
                   </button>
                 </div>
@@ -163,7 +164,7 @@
     </thead>
     <tbody>
       {#each [...$friends] as id}
-        {#await getUserInfo(id) then { login, displayname }}
+        {#await getUserInfo(id) then { login, displayname, profilepicture }}
           <tr>
             <td>
               <div
@@ -176,6 +177,7 @@
                   <ProfilePic
                     attributes="h-10 w-10 rounded-full"
                     user={login}
+                    def={profilepicture}
                   />
                 </button>
               </div>

@@ -34,7 +34,7 @@
     </thead>
     <tbody>
       {#each [...$blocks] as uid}
-        {#await getUserInfo(uid) then { login, displayname }}
+        {#await getUserInfo(uid) then { login, displayname, profilepicture }}
           <tr>
             <td>
               <div
@@ -47,6 +47,7 @@
                   <ProfilePic
                     attributes="h-10 w-10 rounded-full"
                     user={login}
+                    def={profilepicture}
                   />
                 </button>
               </div>
