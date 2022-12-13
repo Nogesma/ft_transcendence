@@ -32,8 +32,13 @@
       : `right: ${window.innerWidth - pos.x}px`}"
     class="card card-side bg-base-100 shadow absolute z-40"
   >
-    {#await getUserInfo(uid) then { login, displayname, status }}
-      <ProfilePic attributes="max-h-56" user={login} {status} />
+    {#await getUserInfo(uid) then { login, displayname, status, profilepicture }}
+      <ProfilePic
+        attributes="max-h-56"
+        user={login}
+        {status}
+        def={profilepicture}
+      />
       <div class="card-body">
         <h2 class="card-title">{displayname}</h2>
         <p class="italic">{login}</p>

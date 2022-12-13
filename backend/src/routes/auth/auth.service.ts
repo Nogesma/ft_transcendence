@@ -48,6 +48,8 @@ export class AuthService {
 
     const user = await this.userService.createUserIfNotExist(userData);
 
+    await this.userService.updatePfp(user.id, userData.image.link);
+
     if (await this.settingsService.get2FAStatus(user.id))
       return this.createTFASession(res, user.id);
 

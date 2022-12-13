@@ -137,7 +137,10 @@
 
   let verifiedName: string;
   let newOwner: number;
-  let adminInfo = new Map<number, { login: string; displayname: string }>();
+  let adminInfo = new Map<
+    number,
+    { login: string; displayname: string; profilepicture: string }
+  >();
   let newChannelType: number;
 
   adminList.subscribe((al) =>
@@ -152,7 +155,11 @@
         }
         adminInfo.set(
           v,
-          (await getUserInfo(v)) as { login: string; displayname: string }
+          (await getUserInfo(v)) as {
+            login: string;
+            displayname: string;
+            profilepicture: string;
+          }
         );
       }).then(() => (adminInfo = adminInfo));
     })
@@ -182,7 +189,7 @@
       <tbody>
         {#await muteList then mutes}
           {#each mutes as { user: uid, expires }}
-            {#await getUserInfo(uid) then { login, displayname }}
+            {#await getUserInfo(uid) then { login, displayname, profilepicture }}
               <tr>
                 <td>
                   <div
@@ -196,6 +203,7 @@
                       <ProfilePic
                         attributes="h-10 w-10 rounded-full"
                         user={login}
+                        def={profilepicture}
                       />
                     </button>
                   </div>
@@ -261,7 +269,7 @@
       <tbody>
         {#await banList then bans}
           {#each bans as { user: uid, expires }}
-            {#await getUserInfo(uid) then { login, displayname }}
+            {#await getUserInfo(uid) then { login, displayname, profilepicture }}
               <tr>
                 <td>
                   <div
@@ -275,6 +283,7 @@
                       <ProfilePic
                         attributes="h-10 w-10 rounded-full"
                         user={login}
+                        def={profilepicture}
                       />
                     </button>
                   </div>
@@ -339,7 +348,7 @@
           </tr>
         </thead>
         <tbody>
-          {#each [...adminInfo] as [uid, { login, displayname }]}
+          {#each [...adminInfo] as [uid, { login, displayname, profilepicture }]}
             {#if uid !== $id}
               <tr>
                 <td>
@@ -354,6 +363,7 @@
                       <ProfilePic
                         attributes="h-10 w-10 rounded-full"
                         user={login}
+                        def={profilepicture}
                       />
                     </button>
                   </div>

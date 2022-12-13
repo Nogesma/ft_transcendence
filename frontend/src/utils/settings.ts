@@ -69,11 +69,11 @@ const getTFAStatus = () =>
     .then(({ data }) => data)
     .catch(F);
 
-const getProfilePicture = memoizeWith(String, async (u: string) =>
+const getProfilePicture = memoizeWith(String, async (u: string, def: string) =>
   axios
     .head(`/imgs/${u}.jpg`)
     .then(() => `/imgs/${u}.jpg`)
-    .catch(() => `https://cdn.intra.42.fr/users/${u}.jpg`)
+    .catch(() => def)
 );
 
 export {

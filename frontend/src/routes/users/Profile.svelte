@@ -18,12 +18,13 @@
 </script>
 
 {#if uid}
-  {#await getUserInfo(uid) then { login: lname, displayname: dname, status, currentGame: gameId }}
+  {#await getUserInfo(uid) then { login: lname, displayname: dname, status, currentGame: gameId, profilepicture }}
     <div class="hero h-full">
       <div class="hero-content flex-col lg:flex-row justify-evenly w-full">
         <ProfilePic
           attributes="max-w-sm rounded-lg shadow-2xl"
           user={lname}
+          def={profilepicture}
           {status}
         />
         <div class="flex flex-col ml-6 space-y-6 content-start">

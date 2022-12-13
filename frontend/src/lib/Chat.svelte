@@ -152,12 +152,16 @@
       {channel}
     </div>
     {#each [...connectedMembers.values()] as spec, i}
-      {#await getUserInfo(spec) then { login }}
+      {#await getUserInfo(spec) then { login, profilepicture }}
         <button
           class="btn btn-ghost btn-circle avatar"
           on:click|preventDefault={(e) => openMenu(e, i)}
         >
-          <ProfilePic user={login} attributes="h-10 w-10 rounded-full" />
+          <ProfilePic
+            user={login}
+            def={profilepicture}
+            attributes="h-10 w-10 rounded-full"
+          />
         </button>
         {#if showMenu === i}
           <LeftClickMenu

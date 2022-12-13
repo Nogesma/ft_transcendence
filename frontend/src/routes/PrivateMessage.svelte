@@ -61,7 +61,10 @@
     }
   }
 
-  let userInfo = new Map<number, { login: string; displayname: string }>();
+  let userInfo = new Map<
+    number,
+    { login: string; displayname: string; profilepicture: string }
+  >();
 
   privateMessages.subscribe((value) =>
     Promise.each(
@@ -74,7 +77,11 @@
         if (userInfo.has(key)) return;
         userInfo.set(
           key,
-          (await getUserInfo(key)) as { login: string; displayname: string }
+          (await getUserInfo(key)) as {
+            login: string;
+            displayname: string;
+            profilepicture: string;
+          }
         );
       }
     ).then(() => (userInfo = userInfo))
@@ -97,12 +104,16 @@
         <label for="newpm-modal" class="modal-button">New private message</label
         >
       </li>
-      {#each [...userInfo] as [id, { login, displayname }]}
+      {#each [...userInfo] as [id, { login, displayname, profilepicture }]}
         {#if !$blocks.has(id)}
           <li class="rounded {id === selectedPmId ? 'bordered' : ''}">
             <button on:click={() => push(`/pm/${id}`)}>
               <div class="avatar h-10 w-10">
-                <ProfilePic user={login} attributes="rounded-full" />
+                <ProfilePic
+                  user={login}
+                  attributes="rounded-full"
+                  def={profilepicture}
+                />
               </div>
               {displayname}
             </button>

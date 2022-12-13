@@ -49,6 +49,9 @@ export class User extends Model {
   @Column
   currentGame: string;
 
+  @Column
+  profilepicture: string;
+
   @HasMany(() => Session)
   session: Session[];
 

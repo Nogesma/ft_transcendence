@@ -79,7 +79,7 @@ export class InfoService {
       map((y) =>
         pipe(
           async (x) => (await x.$get("opponent")).toJSON(),
-          andThen(pick(["login", "displayname", "id"])),
+          andThen(pick(["login", "displayname", "id", "profilepicture"])),
           andThen(mergeLeft(y.toJSON()))
         )(y)
       )

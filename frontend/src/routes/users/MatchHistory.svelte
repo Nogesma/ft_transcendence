@@ -56,7 +56,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each matches as { login: opponentLogin, displayname: opponentDisplayname, opponentId, win, playerElo, opponentElo, playerScore, opponentScore, date }, i}
+        {#each matches as { login: opponentLogin, displayname: opponentDisplayname, opponentId, win, playerElo, opponentElo, playerScore, opponentScore, date, profilepicture }, i}
           <tr>
             <td class="text-xs text-center">
               <i>{playerElo}</i>
@@ -98,6 +98,7 @@
                   <ProfilePic
                     attributes="h-10 w-10 rounded-full"
                     user={opponentLogin}
+                    def={profilepicture}
                   />
                 </button>
 

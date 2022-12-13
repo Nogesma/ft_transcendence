@@ -8,11 +8,12 @@
   export let attributes: string;
   // todo: maybe protect from xss in username?
   export let user: string;
+  export let def = "";
   export let status = -1;
 
   let img: string | Promise<string>;
   // typescript hack because it can't find the type of pfp and img src needs to be a string
-  $: img = user === $login ? ($pfp as string) : getProfilePicture(user);
+  $: img = user === $login ? ($pfp as string) : getProfilePicture(user, def);
 
   const getStatus = cond<[number], [string, string]>([
     [equals(1), always(["badge-success", "Online"])],
